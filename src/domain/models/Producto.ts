@@ -1,7 +1,9 @@
+import { Unidad } from "../enum/Unidad";
+
 export interface Producto {
     id: number,
     nombre: string,
-    unidad: string,//TO DO : crear enums
+    unidad: Unidad,
     cantidad: number,
     marca: string;
 }
