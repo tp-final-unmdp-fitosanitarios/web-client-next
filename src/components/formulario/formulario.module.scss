@@ -1,6 +1,7 @@
 @import '../../app/styles/variables.scss';
 
 .form-container {
+    margin-top: $spacing-medium;
     background-color: $background-color;
     min-width: 90%;
     padding: $spacing-medium;
@@ -24,7 +25,7 @@
   }
   
   .input, .select {
-    width: 100%;
+    width: 90%;
     padding: $spacing-small;
     border: 1px solid #ccc;
     border-radius: $spacing-petite;

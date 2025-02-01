@@ -58,7 +58,7 @@ export default function AgregarProductos() { //TO-DO: spasar  Props.
             <div className={containerClass}  >
                 <h1 className={styles["title"]}> {title}</h1>
                 <Link href="/home">
-                    <button className=""> Volver </button>
+                    <button className="button button-primary"> Volver </button>
                 </Link>
 
                 <Formulario fields={fields} onSubmit={handleFormSubmit} onCancel={handleCancel} />
