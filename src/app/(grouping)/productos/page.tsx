@@ -1,0 +1,78 @@
+"use client";
+
+import Formulario from "@/components/formulario/formulario";
+import { Unidad } from "@/domain/enum/Unidad";
+import { Field } from "@/domain/models/Field";
+import { Producto } from "@/domain/models/Producto";
+import styles from "./productos-view.module.scss"
+import Link from "next/link";
+import GenericModal from "@/components/modal/modal";
+import { useState } from "react";
+
+export default function AgregarProductos() { //TO-DO: spasar  Props.
+
+    const title = 'Agregar Producto'
+
+    const [modalOpen, setModalOpen] = useState(false);
+
+    const handleOpenModal = () => setModalOpen(true);
+    const handleCloseModal = () => setModalOpen(false);
+    
+    const [producto, setProducto] = useState<Producto>({
+        id: 0,
+        nombre: "",
+        unidad: Unidad.Litros,
+        cantidad: 0,
+        marca: "",
+        descripcion: ""
+    });
+    
+    const handleFormSubmit = (inputData: Record<string, string | number>) => {
+        setProducto({
+            ...producto,
+            nombre: String(inputData.nombre),
+            cantidad: Number(inputData.cantidad),
+            unidad: String(inputData.unidad),
+            marca: String(inputData.marca),
+            descripcion: String(inputData.descripcion)
+        });
+        handleOpenModal();
+    };
+
+    const handleCancel = () => {
+        console.log('Cancel');
+    }
+
+    const fields: Field[] = [
+        { name: "nombre", label: "Nombre", type: "select", options: ["Producto A", "Producto B", "Producto C"] },
+        { name: "cantidad", label: "Cantidad", type: "number" },
+        { name: "unidad", label: "Unidad", type: "select", options: [Unidad.Litros, Unidad.Kilogramos] },
+        { name: "marca", label: "Marca", type: "text" },
+        { name: "descripcion", label: "Descripción", type: "text" },
+    ];
+
+    const containerClass = modalOpen ? `${styles.container} ${styles.container_blurred}` : styles.container;
+
+    return (
+        <div className="page-container">
+            <div className={containerClass}  >
+                <h1 className={styles["title"]}> {title}</h1>
+                <Link href="/home">
+                    <button className=""> Volver </button>
+                </Link>
+
+                <Formulario fields={fields} onSubmit={handleFormSubmit} onCancel={handleCancel} />
+            </div>
+            <GenericModal
+                isOpen={modalOpen}
+                onClose={handleCloseModal}
+                title="Producto añadido"
+                modalText={`Se añadadio el producto: ${producto.nombre}`}
+                buttonTitle="Cerrar"
+                showSecondButton={false} // o false según se necesite
+                secondButtonTitle="Acción Alternativa"
+            />
+
+        </div>)
+
+}

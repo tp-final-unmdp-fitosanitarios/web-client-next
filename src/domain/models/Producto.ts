@@ -3,7 +3,8 @@ import { Unidad } from "../enum/Unidad";
 export interface Producto {
     id: number,
     nombre: string,
-    unidad: Unidad,
+    unidad: Unidad | string,
     cantidad: number,
-    marca: string;
+    marca: string,
+    descripcion: string;
 }

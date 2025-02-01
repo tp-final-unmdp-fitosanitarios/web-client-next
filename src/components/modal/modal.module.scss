@@ -1,0 +1,31 @@
+@import '../../app/styles/variables.scss';
+
+.modal-content {
+    border: 1px solid $dark-color;
+    background-color: $light-color;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-around;
+    color: $dark-color;
+    border-radius: $border-radius;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+    min-height: 50%;
+    min-width: 80%;
+}
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
