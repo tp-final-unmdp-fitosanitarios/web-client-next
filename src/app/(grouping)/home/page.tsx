@@ -34,16 +34,18 @@ export default function Home() {
   //   }
   // };
 
-  let date: Date = new Date()
+  const date: Date = new Date()
   const dateWithoutTime: string = date.toLocaleDateString();
 
 
   return (
     <div className={styles.homeContainer}>
       <div className={styles.header}>
+       {/*desde aqui*/}
         <SideBar />
-        <Image className={styles.homeLogo} src={pampaGrowLogo} alt="Home Logo"/>
+        <Image className={styles.homeLogo} src={pampaGrowLogo} alt="Home Logo"/> {/*Esto deberia ir en un componente aparte como menu-bar */ }
         <h4 className={styles.homeDate}>{dateWithoutTime}</h4>
+        {/*hasta aqui*/}
       </div>
       
       <hr className={styles.homeDivision}></hr>
