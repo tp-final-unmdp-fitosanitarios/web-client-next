@@ -1,37 +1,37 @@
 "use client"; // Indicamos que el componente se ejecuta en el cliente
 
 import Link from "next/link";
-import { useState } from "react";
+// import { useState } from "react";
 import Image from "next/image";
 import pampaGrowLogo  from "../../../../public/PampaGrow.png";
 import styles from "./homepage.module.scss";
 
 export default function Home() {
-  const [data, setData] = useState(null);
-  const [error, setError] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const endpoint = "health";
-  const [user,setUser] = useState(null)
+  // const [data, setData] = useState(null);
+  // const [error, setError] = useState(null);
+  // const [loading, setLoading] = useState(false);
+  // const endpoint = "health";
+  // const [user,setUser] = useState(null)
 
-  const handleFetchOnClick = async () => {
-    setLoading(true);
-    setError(null);
+  // const handleFetchOnClick = async () => {
+  //   setLoading(true);
+  //   setError(null);
 
-    try {
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${endpoint}`,
-      );
-      if (!response.ok) {
-        throw new Error(`HTTP error! status: ${response.status}`);
-      }
-      const result = await response.json();
-      setData(result);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (error: any) {
-      setError(error.message);
-    } finally {
-      setLoading(false);
-    }
-  };
+  //   try {
+  //     const response = await fetch(`${process.env.NEXT_PUBLIC_API_BASE_URL}${endpoint}`,
+  //     );
+  //     if (!response.ok) {
+  //       throw new Error(`HTTP error! status: ${response.status}`);
+  //     }
+  //     const result = await response.json();
+  //     setData(result);
+  //     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  //   } catch (error: any) {
+  //     setError(error.message);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   let date: Date = new Date()
   const dateWithoutTime: string = date.toLocaleDateString();
