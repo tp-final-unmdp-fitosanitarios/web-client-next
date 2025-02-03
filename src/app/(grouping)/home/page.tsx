@@ -34,7 +34,7 @@ export default function Home() {
   };
 
   let date: Date = new Date()
-  let dateWithoutTime: string = date.toLocaleDateString();
+  const dateWithoutTime: string = date.toLocaleDateString();
 
   date = new Date()
 
