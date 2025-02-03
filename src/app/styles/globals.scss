@@ -4,6 +4,8 @@ body {
   color: $dark-color;
   background: $background-color-2;
   font-family: $font-family-primary;
+  overflow-x: hidden;
+  width: 100%;
 }
 
 .button-container {

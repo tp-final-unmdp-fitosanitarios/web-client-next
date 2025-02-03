@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import pampaGrowLogo  from "../../../../public/PampaGrow.png";
 import styles from "./homepage.module.scss";
+import SideBar from "../../../components/sideBar/SideBar"
 
 export default function Home() {
   // const [data, setData] = useState(null);
@@ -36,13 +37,15 @@ export default function Home() {
   let date: Date = new Date()
   const dateWithoutTime: string = date.toLocaleDateString();
 
-  date = new Date()
-
 
   return (
     <div className={styles.homeContainer}>
-      <Image className={styles.homeLogo} src={pampaGrowLogo} alt="Home Logo"/>
-      <h3 className={styles.homeDate}>{dateWithoutTime}</h3>
+      <div className={styles.header}>
+        <SideBar />
+        <Image className={styles.homeLogo} src={pampaGrowLogo} alt="Home Logo"/>
+        <h4 className={styles.homeDate}>{dateWithoutTime}</h4>
+      </div>
+      
       <hr className={styles.homeDivision}></hr>
       <h1>Bienvenido/a</h1>
       <h1>Rosario Hernandez</h1>
@@ -57,9 +60,7 @@ export default function Home() {
             <button className={`button button-primary ${styles.buttonHome}`}>Estadisticas</button>
         </Link>
       </div>
-      <Link href="/productos">
-          <button className={`button ${styles.buttonLogOut}`}> Cerrar Sesion</button>
-      </Link>
+      
       {/*<div className="button-container">
         <Link href="/productos">
           <button className="button button-primary"> Productos</button>

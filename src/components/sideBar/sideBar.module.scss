@@ -1,0 +1,13 @@
+@import '../../app/styles/variables.scss';
+
+.buttonLogOut {
+    background-color: $primary-color;
+    margin: 40px auto;
+  }
+
+.logOutContainer{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
