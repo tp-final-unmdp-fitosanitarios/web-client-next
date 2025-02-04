@@ -1,0 +1,44 @@
+@import "../../app/styles/variables.scss";
+
+.header{
+display: grid;
+grid-template-columns: 15% 70% 15%;
+align-items: center;
+width: 100%;
+}
+
+.homeLogo {
+margin: 0 auto;
+min-width: 30%;
+max-width: 40%;
+height: auto;
+}
+
+.homeDivision {
+width: 100%;
+background-color: $dark-color;
+border: 2px solid $secondary-color; 
+border-radius: $border-radius;
+}
+
+.pestañasContainer{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    width: 100%;
+}
+
+.pestañaActual{
+    border-bottom: 2px solid $dark-color;
+    border-radius: 0;
+}
+
+.pestañaNoSeleccionada{
+    opacity: 60%;
+    color: $light-color;
+}
+
+.pestaña{
+    width: 40%;
+    background-color: $background-color-2;
+}

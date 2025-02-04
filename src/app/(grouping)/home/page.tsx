@@ -1,18 +1,17 @@
 "use client"; // Indicamos que el componente se ejecuta en el cliente
 
-import Link from "next/link";
-// import { useState } from "react";
-import Image from "next/image";
-import pampaGrowLogo  from "../../../../public/PampaGrow.png";
-import styles from "./homepage.module.scss";
-import SideBar from "../../../components/sideBar/SideBar"
+import { useEffect, useState } from "react";
+import { User } from "@/domain/models/User";
+import { Roles } from "@/domain/enum/Roles";
+import HomepageJerarquico from "../../../components/homepageJerarquico/HomepageJerarquico";
+import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador";
 
 export default function Home() {
   // const [data, setData] = useState(null);
   // const [error, setError] = useState(null);
   // const [loading, setLoading] = useState(false);
   // const endpoint = "health";
-  // const [user,setUser] = useState(null)
+   const [user,setUser] = useState<User | null>(null)
 
   // const handleFetchOnClick = async () => {
   //   setLoading(true);
@@ -34,59 +33,23 @@ export default function Home() {
   //   }
   // };
 
-  const date: Date = new Date()
-  const dateWithoutTime: string = date.toLocaleDateString();
+  function fetchUser (): Promise<User> {
 
+    return new Promise<User>( (resolve,reject) => {
+      const response: User = {id:1,nombre:"Rosario Hernandez",rol:Roles.Aplicador}
+  
+      setTimeout( () => resolve(response), 1000)
+    })
 
-  return (
-    <div className={styles.homeContainer}>
-      <div className={styles.header}>
-       {/*desde aqui*/}
-        <SideBar />
-        <Image className={styles.homeLogo} src={pampaGrowLogo} alt="Home Logo"/> {/*Esto deberia ir en un componente aparte como menu-bar */ }
-        <h4 className={styles.homeDate}>{dateWithoutTime}</h4>
-        {/*hasta aqui*/}
-      </div>
-      
-      <hr className={styles.homeDivision}></hr>
-      <h1>Bienvenido/a</h1>
-      <h1>Rosario Hernandez</h1>
-      <div className={styles.buttonContainer}>
-        <Link href="/productos">
-            <button className={`button button-primary ${styles.buttonHome}`}>Productos</button>
-        </Link>
-        <Link href="/stock">
-            <button className={`button button-primary ${styles.buttonHome}`}>Stock</button>
-        </Link>
-        <Link href="/estadisticas">
-            <button className={`button button-primary ${styles.buttonHome}`}>Estadisticas</button>
-        </Link>
-      </div>
-      
-      {/*<div className="button-container">
-        <Link href="/productos">
-          <button className="button button-primary"> Productos</button>
-        </Link>
+  }
 
-        <button
-          onClick={handleFetchOnClick}
-          className="button button-secondary"
-        >
-          Obtener Datos
-        </button>
-      </div>
+  useEffect( () => {
+    fetchUser()
+      .then( (user) => {setUser(user)})
+  },[])
 
-      {loading && <p className="text-gray-500">Cargando datos...</p>}
+  if(!user)
+    return (<h3>Loading...</h3>)
 
-
-      {error && <p className="text-red-500">Error: {error}</p>}
-
-      {data && (
-        <div >
-          <h2>Datos:</h2>
-          <pre className="text-sm">{JSON.stringify(data, null, 2)}</pre>
-        </div>
-      )}*/}
-    </div>
-  );
+  return user.rol === Roles.Admin || user.rol === Roles.Encargado ? <HomepageJerarquico user={user}/> : <HomepageAplicador user={user}/> 
 }
