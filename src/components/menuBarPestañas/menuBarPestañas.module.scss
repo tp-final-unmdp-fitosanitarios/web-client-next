@@ -22,6 +22,7 @@ border-radius: $border-radius;
 }
 
 .pestañasContainer{
+    font-size: 18px;
     display: flex;
     justify-content: space-around;
     align-items: center;
@@ -29,7 +30,8 @@ border-radius: $border-radius;
 }
 
 .pestañaActual{
-    border-bottom: 2px solid $dark-color;
+    font-size: 18px;
+    border-bottom: 4px solid $dark-color;
     border-radius: 0;
 }
 

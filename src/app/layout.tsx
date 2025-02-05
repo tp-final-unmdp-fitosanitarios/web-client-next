@@ -3,8 +3,8 @@ import "./styles/globals.scss"
 
 
 export const metadata: Metadata = {
-  title: "Tp Final",
-  description: "Tp final",
+  title: "EPP gestion",
+  description: "EPP sistema de gestion fitosanitarios y stock ",
 };
 
 export default function RootLayout({

@@ -1,6 +1,6 @@
-import styles from "./modal.module.scss"
+import styles from "./GenericModal.module.scss"
 
-interface ModalProps {
+export interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     title: string;

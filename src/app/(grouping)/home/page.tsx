@@ -36,7 +36,7 @@ export default function Home() {
   function fetchUser (): Promise<User> {
 
     return new Promise<User>( (resolve,reject) => {
-      const response: User = {id:1,nombre:"Rosario Hernandez",rol:Roles.Aplicador}
+      const response: User = {id:1,nombre:"Rosario Hernandez",rol:Roles.Encargado}
   
       setTimeout( () => resolve(response), 1000)
     })

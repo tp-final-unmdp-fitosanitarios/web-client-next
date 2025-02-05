@@ -6,7 +6,7 @@ import { Field } from "@/domain/models/Field";
 import { Producto } from "@/domain/models/Producto";
 import styles from "./productos-view.module.scss"
 import Link from "next/link";
-import GenericModal from "@/components/modal/modal";
+import GenericModal from "@/components/modal/GenericModal";
 import { useState } from "react";
 
 export default function AgregarProductos() { //TO-DO: spasar  Props.

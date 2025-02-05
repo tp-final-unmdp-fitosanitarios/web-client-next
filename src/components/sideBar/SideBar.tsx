@@ -25,7 +25,7 @@ export default function sideBar () {
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
-        {['Productos', 'Stock', 'Estadisticas'].map((text, index) => (
+        {['Productos', 'Aplicaciones','Stock', 'Estadisticas'].map((text, index) => (
           <ListItem key={text} disablePadding>
             <ListItemButton>
               <ListItemIcon>
