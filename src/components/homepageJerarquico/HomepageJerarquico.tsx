@@ -1,10 +1,9 @@
-"use client";  //Indicamos que el componente se ejecuta en el cliente
+"use client";  
 
-import Link from "next/link";
+ import Link from "next/link";
 import styles from "./homepageJerarquico.module.scss";
 import MenuBar from "@/components/menuBar/MenuBar";
 import { User } from "@/domain/models/User";
-
 
 interface ButtonConfig {
   label: string;
@@ -17,12 +16,12 @@ interface homePageProps {
 }
 
 
-export default function HomepageJerarquico({ user, buttons }: homePageProps) {
+export default function HomepageJerarquico({ user,buttons }: homePageProps) {
 
   return (
     <>
       <div className={styles.homeContainer}>
-        <MenuBar />
+        <MenuBar  showMenu={true }/>
         <h1>Bienvenido/a</h1>
         <h1>{user.nombre}</h1>
         <div className={styles.buttonContainer}>

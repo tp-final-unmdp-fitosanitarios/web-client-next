@@ -29,8 +29,8 @@ export default function Home() {
     return new Promise<User>((resolve) => {
       const response: User = { id: 1, nombre: "Rosario Hernandez", rol: Roles.Admin }
       const response2: User = {id:2,nombre: "Jeremias Savarino",rol: Roles.Aplicador}
-      console.log(response);
-      setTimeout(() => resolve(response2), 1000)
+      console.log(response2);
+      setTimeout(() => resolve(response), 1000)
     })
 
   }

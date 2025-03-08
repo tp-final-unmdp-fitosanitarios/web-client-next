@@ -12,18 +12,25 @@ body {
   min-width: 90%;
   margin-top: $spacing-large;
   display: flex;
-  flex-direction: row;
+  flex-direction: row; 
   justify-content: center;
+  gap: $spacing-medium; 
 }
 
 .button {
-  min-width: 50%;
+  min-width: 150px; 
+  font-size: 14px;
+  width: 150px; 
   padding: $spacing-small $spacing-medium;
   border: none;
   border-radius: $border-radius;
   font-weight: $button-font-weight;
   cursor: pointer;
   color: $dark-color;
+  text-align: center; 
+  white-space: nowrap;
+  overflow: hidden; 
+  text-overflow: ellipsis; 
 }
 
 .button-primary {
@@ -31,6 +38,33 @@ body {
 }
 
 .button-secondary {
-  margin-left: $spacing-large;
   background-color: #cbcabd;
+}
+
+
+@media (min-width: 1000px) {
+  .button-container {
+    align-items: center; 
+    gap: $spacing-large; 
+    flex-wrap: wrap
+  }
+
+  .button {
+    width: 150px; 
+    font-size: 14px;
+  }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  overflow: hidden;
+}
+
+#root,
+#__next {
+  height: 100vh;
+  overflow: hidden;
 }
