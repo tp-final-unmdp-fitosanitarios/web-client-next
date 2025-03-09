@@ -16,7 +16,7 @@ export default function Home() {
     { label: "Stock", path: "/stock" },
   ];
 
-  if (user && user.rol === Roles.Admin) {
+  if (user && user.rol[0] === Roles.Admin) {
     buttons.push(
       { label: "Personal", path: "/personal" },
       { label: "Maquinas", path: "/maquinas" },
@@ -27,8 +27,14 @@ export default function Home() {
   function fetchUser(): Promise<User> {
 
     return new Promise<User>((resolve) => {
-      const response: User = { id: 1, nombre: "Rosario Hernandez", rol: Roles.Admin }
-      const response2: User = {id:2,nombre: "Jeremias Savarino",rol: Roles.Aplicador}
+      // id: string,
+      // nombre: string,
+      // apellido: string,
+      // rol: Roles[] | string[],
+      // companyId: string,
+      // email: string
+      const response: User = { id: "1", nombre: "Rosario",apellido:"Hernandez", rol: [Roles.Admin] ,companyId:"1",email:"email@mail.com"}
+      const response2: User = {id:"2",nombre: "Jeremias",apellido:"Savarino",rol: [Roles.Aplicador],companyId:"3",email:"email@mail.com"}
       console.log(response2);
       setTimeout(() => resolve(response), 1000)
     })
@@ -43,5 +49,5 @@ export default function Home() {
   if (!user)
     return (<h3>Loading...</h3>)
 
-  return user.rol === Roles.Admin || user.rol === Roles.Encargado ? <HomepageJerarquico user={user} buttons={buttons} /> : <HomepageAplicador user={user} />
+  return user.rol[0] === Roles.Admin || user.rol[0] === Roles.Encargado ? <HomepageJerarquico user={user} buttons={buttons} /> : <HomepageAplicador user={user} />
 }

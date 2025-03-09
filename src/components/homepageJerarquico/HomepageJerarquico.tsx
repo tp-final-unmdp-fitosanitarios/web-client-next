@@ -23,7 +23,7 @@ export default function HomepageJerarquico({ user,buttons }: homePageProps) {
       <div className={styles.homeContainer}>
         <MenuBar  showMenu={true }/>
         <h1>Bienvenido/a</h1>
-        <h1>{user.nombre}</h1>
+        <h1>{user.nombre+user.apellido}</h1>
         <div className={styles.buttonContainer}>
           {buttons.map((button, index) => (
             <Link key={index} href={button.path}>

@@ -3,12 +3,12 @@ import Image from "next/image"
 import SideBar from "../sideBar/SideBar"
 import pampaGrowLogo from "../../../public/PampaGrow.png"
 
-interface menuBarPestañasProps{
-    pestañaActual: string,
-    setPestañaPendientes: Function,
-    setPestañaEnCurso: Function
+interface MenuBarPestañasProps{
+    pestañaActual: string
+    setPestañaPendientes: () => void;
+    setPestañaEnCurso: () => void;
 }
-export default function MenuBarPestañas ({pestañaActual,setPestañaPendientes,setPestañaEnCurso}:menuBarPestañasProps) {
+export default function MenuBarPestañas ({pestañaActual,setPestañaPendientes,setPestañaEnCurso}:MenuBarPestañasProps) {
     
     
     function handleClickPendientes(){
