@@ -11,13 +11,13 @@ interface containerProps {
     pestañaActual: string;
 }
 
-export default function contenedorDeAplicaciones ({pestañaActual}: containerProps) {
+export default function ContenedorDeAplicaciones ({pestañaActual}: containerProps) {
     const [aplicaciones,setAplicaciones] = useState<Aplicacion[]>([])
     const [filteredAps, setFilteredAps] = useState<Aplicacion[]>([])
 
     function fetchAplicaciones (): Promise<Aplicacion[]> {
 
-    return new Promise<Aplicacion[]>( (resolve,reject) => {
+    return new Promise<Aplicacion[]>( (resolve) => {
         const productos: Producto[] = [
             { id: 1, nombre: "Fertilizante A", unidad: Unidad.Kilogramos, cantidad: 50, marca: "AgroFert", descripcion: "Fertilizante orgánico" },
             { id: 2, nombre: "Herbicida X", unidad: Unidad.Litros, cantidad: 20, marca: "HerbiTech", descripcion: "Herbicida selectivo" },
@@ -56,14 +56,14 @@ useEffect( () => {
             setAplicaciones(aplicaciones)
             setFilteredAps(aplicaciones.filter(e=>e.estado===EstadoAplicacion.Pendiente))
         })
-    },[])
+    },[aplicaciones])
 
 useEffect( () => {
     if(pestañaActual==="pendientes")
         setFilteredAps(aplicaciones.filter(e=>e.estado===EstadoAplicacion.Pendiente))
     else
         setFilteredAps(aplicaciones.filter(e=>e.estado===EstadoAplicacion.EnCurso))
-    },[pestañaActual])
+    },[pestañaActual,aplicaciones])
 
 return(
     <TablaAplicaciones aplicaciones={filteredAps} pestañaActual={pestañaActual}/>

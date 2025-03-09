@@ -14,7 +14,7 @@ import MenuIcon from '@mui/icons-material/Menu';
 import Link from 'next/link';
 import styles from "./sideBar.module.scss";
 
-export default function sideBar () {
+export default function SideBar () {
 
     const [open, setOpen] = React.useState(false);
 

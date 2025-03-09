@@ -23,7 +23,6 @@ export default function MenuBar({ showMenu, path }: MenuBarProps) {
         if (!showMenu && path) {
             router.push(path);
         }
-        return undefined;
     };
 
     return (
