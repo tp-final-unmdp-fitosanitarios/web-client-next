@@ -7,7 +7,7 @@ import HomepageJerarquico from "../../../components/homepageJerarquico/HomepageJ
 import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador";
 
 export default function Home() {
-      
+
   const [user, setUser] = useState<User | null>(null)
 
 
@@ -20,7 +20,8 @@ export default function Home() {
     buttons.push(
       { label: "Personal", path: "/personal" },
       { label: "Maquinas", path: "/maquinas" },
-      { label: "Estadísticas", path: "/estadisticas" }
+      { label: "Estadísticas", path: "/estadisticas" },
+      { label: "Login", path: "/login" }
     );
   }
 
@@ -33,8 +34,8 @@ export default function Home() {
       // rol: Roles[] | string[],
       // companyId: string,
       // email: string
-      const response: User = { id: "1", nombre: "Rosario",apellido:"Hernandez", rol: [Roles.Admin] ,companyId:"1",email:"email@mail.com"}
-      const response2: User = {id:"2",nombre: "Jeremias",apellido:"Savarino",rol: [Roles.Aplicador],companyId:"3",email:"email@mail.com"}
+      const response: User = { id: "1", nombre: "Rosario", apellido: "Hernandez", rol: [Roles.Admin], companyId: "1", email: "email@mail.com" }
+      const response2: User = { id: "2", nombre: "Jeremias", apellido: "Savarino", rol: [Roles.Aplicador], companyId: "3", email: "email@mail.com" }
       console.log(response2);
       setTimeout(() => resolve(response), 1000)
     })

@@ -34,9 +34,7 @@ export default function HomepageJerarquico({ user,buttons }: homePageProps) {
           ))}
         </div>
       </div>
-      <div>
-
-      </div>
+    
     </>
   );
 }

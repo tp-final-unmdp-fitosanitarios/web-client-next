@@ -9,9 +9,10 @@ interface FormularioProps {
   fields: Field[];
   onSubmit: (data: Record<string, string | number>) => void;
   onCancel?: () => void;
+  buttonName:string
 }
 
-export default function Formulario({ fields, onSubmit, onCancel }: FormularioProps) {
+export default function Formulario({ fields, onSubmit, onCancel,buttonName }: FormularioProps) {
   const initialState: Record<string, string | number> = fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {} as Record<string, string | number>);
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -79,7 +80,7 @@ export default function Formulario({ fields, onSubmit, onCancel }: FormularioPro
 
       <div className={styles["button-container"]}>
         <button type="submit" className={`${styles.button} ${styles["button-primary"]}`} onClick={handleSubmit}>
-          Continuar
+          {buttonName}
         </button>
         {onCancel && (
           <button type="button" onClick={handleCancel} className={`${styles.button} ${styles["button-secondary"]}`}>

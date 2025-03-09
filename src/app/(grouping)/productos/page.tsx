@@ -61,7 +61,7 @@ export default function AgregarProductos() { //TO-DO: spasar  Props.
                     <button className="button button-primary"> Volver </button>
                 </Link>
 
-                <Formulario fields={fields} onSubmit={handleFormSubmit} onCancel={handleCancel} />
+                <Formulario fields={fields} onSubmit={handleFormSubmit} onCancel={handleCancel} buttonName="Continuar" />
             </div>
             <GenericModal
                 isOpen={modalOpen}
