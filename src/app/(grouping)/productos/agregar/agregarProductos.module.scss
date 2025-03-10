@@ -1,0 +1,20 @@
+@import "../../../styles/variables.scss";
+
+.page-container ,.container{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+}
+
+.title{
+    display: flex;
+    justify-content: center;
+    color: $dark-color;
+   }
+ 
+
+.container_blurred {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+  }

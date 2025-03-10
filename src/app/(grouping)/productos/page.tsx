@@ -8,71 +8,71 @@ import styles from "./productos-view.module.scss"
 import Link from "next/link";
 import GenericModal from "@/components/modal/GenericModal";
 import { useState } from "react";
+import MenuBar from "@/components/menuBar/MenuBar";
+import ItemList from "@/components/itemList/ItemList";
 
 export default function AgregarProductos() { //TO-DO: spasar  Props.
 
-    const title = 'Agregar Producto'
-
-    const [modalOpen, setModalOpen] = useState(false);
-
-    const handleOpenModal = () => setModalOpen(true);
-    const handleCloseModal = () => setModalOpen(false);
+    const title = 'Productos'
     
-    const [producto, setProducto] = useState<Producto>({
-        id: 0,
-        nombre: "",
-        unidad: Unidad.Litros,
-        cantidad: 0,
-        marca: "",
-        descripcion: ""
-    });
-    
-    const handleFormSubmit = (inputData: Record<string, string | number>) => {
-        setProducto({
-            ...producto,
-            nombre: String(inputData.nombre),
-            cantidad: Number(inputData.cantidad),
-            unidad: String(inputData.unidad),
-            marca: String(inputData.marca),
-            descripcion: String(inputData.descripcion)
-        });
-        handleOpenModal();
-    };
+    const [productos, setProductos] = useState<any>([
+        { id: 1, name: "Glifosato 48%", marca: "AgroChem SA" },
+        { id: 2, name: "Clorpirifos 48%",marca: "Campo Verde Ltda" },
+        { id: 3, name: "Atrazina 90%",marca: "AgroSolutions" },
+        { id: 4, name: "Metomilo 40%",marca: "Fertichem" },
+        { id: 5, name: "2,4-D Amina 72%",marca: "AgroBioTech" },
+        { id: 6, name: "Carbendazim 50%",marca: "GreenField Agro" },
+        { id: 7, name: "Paraquat 20%",marca: "RuralQuim" },
+        { id: 8, name: "Cipermetrina 25%",marca: "PampaAgro" },
+        { id: 9, name: "Mancozeb 80%",marca: "EcoAgro" },
+        { id: 10, name: "Tebuconazol 25%",marca: "BioCrop Solutions" }
+      ]); //TO-DO: Cambiar any por Producto
 
-    const handleCancel = () => {
-        console.log('Cancel');
-    }
 
-    const fields: Field[] = [
-        { name: "nombre", label: "Nombre", type: "select", options: ["Producto A", "Producto B", "Producto C"] },
-        { name: "cantidad", label: "Cantidad", type: "number" },
-        { name: "unidad", label: "Unidad", type: "select", options: [Unidad.Litros, Unidad.Kilogramos] },
-        { name: "marca", label: "Marca", type: "text" },
-        { name: "descripcion", label: "Descripción", type: "text" },
+      const buttons = [
+        { label: "Quitar", path: "/productos/quitar" },
+        { label: "Agregar", path: "/productos/agregar" }
     ];
-
-    const containerClass = modalOpen ? `${styles.container} ${styles.container_blurred}` : styles.container;
+    
 
     return (
         <div className="page-container">
-            <div className={containerClass}  >
-                <h1 className={styles["title"]}> {title}</h1>
-                <Link href="/home">
-                    <button className="button button-primary"> Volver </button>
+            <MenuBar showMenu={true} path='' />
+            <h1 className={styles.title}>{title}</h1>
+
+            {<ItemList items={productos} />}
+
+            <div className={styles.buttonContainer}>
+            {buttons.map((button, index) => (
+                <Link key={index} href={button.path}>
+                    <button className={`button button-primary ${styles.buttonHome}`}>
+                        {button.label}
+                    </button>
                 </Link>
-
-                <Formulario fields={fields} onSubmit={handleFormSubmit} onCancel={handleCancel} buttonName="Continuar" />
+            ))}
             </div>
-            <GenericModal
-                isOpen={modalOpen}
-                onClose={handleCloseModal}
-                title="Producto añadido"
-                modalText={`Se añadadio el producto: ${producto.nombre}`}
-                buttonTitle="Cerrar"
-                showSecondButton={false} // o false según se necesite
-                secondButtonTitle="Acción Alternativa"
-            />
+        </div>
+    )
 
-        </div>)
 
 }
+
+/*
+return (<>
+        <MenuBar showMenu={false} path='home' />
+
+        <h1 className={styles.title}>Maquinas</h1>
+
+        {<ItemList
+            items={maquinas}
+        />}
+        <div className={styles.buttonContainer}>
+            {buttons.map((button, index) => (
+                <Link key={index} href={button.path}>
+                    <button className={`button button-primary ${styles.buttonHome}`}>
+                        {button.label}
+                    </button>
+                </Link>
+            ))}
+        </div>
+    </>)*/

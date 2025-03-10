@@ -39,6 +39,9 @@ const GenericList: React.FC<GenericListProps> = ({
   //   }
   // };
 
+  //Habria que encontrar la manera de que se muestren los campos genericos de los items
+  //para no depender de los nombres de cada campo de cada objeto
+  //Ahora solo se puede .name y .code
   return (
     <div className={styles.container}>
       <div className={styles.itemList}>

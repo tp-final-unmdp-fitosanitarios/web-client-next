@@ -11,3 +11,17 @@
     justify-content: center;
     align-items: center;
 }
+
+.paths {
+  border: 0px;
+  text-decoration: none;
+  color: $dark-color;
+  width: 100%;
+}
+
+.paths:hover {
+  border-bottom: 2px solid $dark-color;
+  cursor: pointer;
+  color: $dark-color;
+}
+

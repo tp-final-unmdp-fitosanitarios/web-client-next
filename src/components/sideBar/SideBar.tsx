@@ -25,14 +25,16 @@ export default function SideBar () {
   const DrawerList = (
     <Box sx={{ width: 250 }} role="presentation" onClick={toggleDrawer(false)}>
       <List>
-        {['Productos', 'Aplicaciones','Stock', 'Estadisticas'].map((text, index) => (
+        {['Home','Productos', 'Aplicaciones','Stock', 'Estadísticas'].map((text, index) => (
           <ListItem key={text} disablePadding>
-            <ListItemButton>
-              <ListItemIcon>
-                {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
-              </ListItemIcon>
-              <ListItemText primary={text} />
-            </ListItemButton>
+            <Link href={'/'+text.toLowerCase()} className={styles.paths}>
+              <ListItemButton className={styles.listItems}>
+                <ListItemIcon>
+                  {index % 2 === 0 ? <InboxIcon /> : <MailIcon />}
+                </ListItemIcon>
+                <ListItemText primary={text} />
+              </ListItemButton>
+            </Link>
           </ListItem>
         ))}
       </List>
