@@ -18,6 +18,7 @@ export default function HomepageAplicador({user}:homepageProps) {
     function setPestañaEnCurso() {
         setPestañaActual("enCurso")
     }
+    
     return (
         <>
         <div className={styles.homeContainer}>

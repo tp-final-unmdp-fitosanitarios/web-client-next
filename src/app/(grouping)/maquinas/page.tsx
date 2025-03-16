@@ -19,7 +19,6 @@ const maquinas = [
     { id: '313', name: 'Maquina 3', code: 'EPP-101' },
 
 
-    // Add more products as needed
 ];
 
 const buttons = [
