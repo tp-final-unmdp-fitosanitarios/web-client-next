@@ -3,7 +3,10 @@
 .form-container {
     margin-top: $spacing-medium;
     background-color: $background-color;
-    min-width: 80%;
+    min-width: 50%;
+    max-width: 90%;
+    margin-right: auto;
+    margin-left: auto;
     padding: $spacing-medium;
     border: 1px solid $light-color;
     border-radius: $spacing-small;
@@ -41,7 +44,7 @@
   }
   
   .button-container {
-    min-width: 80%;
+    min-width: 50%;
     margin-top: $spacing-large;
     display: flex;
     flex-direction: row;
@@ -49,7 +52,8 @@
   }
 
 .button {
-  min-width:50%;
+  min-width: 30%;
+  max-width: 80%;
   padding: $spacing-small $spacing-medium;
   border: none;
   border-radius: $border-radius;

@@ -2,12 +2,8 @@
 
 import React, { useState } from 'react';
 import styles from './ItemList.module.scss'; 
+import { Item } from '@/domain/models/Item';
 
-interface Item {
-  id: string;
-  name: string;
-  code: string;
-}
 
 interface GenericListProps {
   // mainText: string;

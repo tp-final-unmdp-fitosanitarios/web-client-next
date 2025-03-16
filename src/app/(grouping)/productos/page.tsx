@@ -1,55 +1,122 @@
 "use client";
-
-import Formulario from "@/components/formulario/formulario";
-import { Unidad } from "@/domain/enum/Unidad";
-import { Field } from "@/domain/models/Field";
-import { Producto } from "@/domain/models/Producto";
 import styles from "./productos-view.module.scss"
 import Link from "next/link";
-import GenericModal from "@/components/modal/GenericModal";
 import { useState } from "react";
 import MenuBar from "@/components/menuBar/MenuBar";
 import ItemList from "@/components/itemList/ItemList";
+import { Producto } from "@/domain/models/Producto";
+import { transformToItems } from "@/utilities/transform";
 
 export default function AgregarProductos() { //TO-DO: spasar  Props.
 
     const title = 'Productos'
-    
-    const [productos, setProductos] = useState<any>([
-        { id: 1, name: "Glifosato 48%", marca: "AgroChem SA" },
-        { id: 2, name: "Clorpirifos 48%",marca: "Campo Verde Ltda" },
-        { id: 3, name: "Atrazina 90%",marca: "AgroSolutions" },
-        { id: 4, name: "Metomilo 40%",marca: "Fertichem" },
-        { id: 5, name: "2,4-D Amina 72%",marca: "AgroBioTech" },
-        { id: 6, name: "Carbendazim 50%",marca: "GreenField Agro" },
-        { id: 7, name: "Paraquat 20%",marca: "RuralQuim" },
-        { id: 8, name: "Cipermetrina 25%",marca: "PampaAgro" },
-        { id: 9, name: "Mancozeb 80%",marca: "EcoAgro" },
-        { id: 10, name: "Tebuconazol 25%",marca: "BioCrop Solutions" }
-      ]); //TO-DO: Cambiar any por Producto
+
+    const [productos] = useState<Producto[]>([
+        {
+            id: 1,
+            nombre: "Glifosato 48%",
+            unidad: "LITROS",
+            cantidad: 20,
+            marca: "AgroChem SA",
+            descripcion: "Herbicida sistémico para el control de malezas."
+        },
+        {
+            id: 2,
+            nombre: "Clorpirifos 48%",
+            unidad: "LITROS",
+            cantidad: 15,
+            marca: "Campo Verde Ltda",
+            descripcion: "Insecticida organofosforado de amplio espectro."
+        },
+        {
+            id: 3,
+            nombre: "Atrazina 90%",
+            unidad: "KILOGRAMOS",
+            cantidad: 10,
+            marca: "AgroSolutions",
+            descripcion: "Herbicida selectivo para cultivos de maíz y sorgo."
+        },
+        {
+            id: 4,
+            nombre: "Metomilo 40%",
+            unidad: "LITROS",
+            cantidad: 5,
+            marca: "Fertichem",
+            descripcion: "Insecticida y acaricida de acción rápida."
+        },
+        {
+            id: 5,
+            nombre: "2,4-D Amina 72%",
+            unidad: "LITROS",
+            cantidad: 25,
+            marca: "AgroBioTech",
+            descripcion: "Herbicida hormonal para control de malezas de hoja ancha."
+        },
+        {
+            id: 6,
+            nombre: "Carbendazim 50%",
+            unidad: "KILOGRAMOS",
+            cantidad: 8,
+            marca: "GreenField Agro",
+            descripcion: "Fungicida sistémico para enfermedades de cultivos."
+        },
+        {
+            id: 7,
+            nombre: "Paraquat 20%",
+            unidad: "LITROS",
+            cantidad: 12,
+            marca: "RuralQuim",
+            descripcion: "Herbicida no selectivo de contacto."
+        },
+        {
+            id: 8,
+            nombre: "Cipermetrina 25%",
+            unidad: "LITROS",
+            cantidad: 18,
+            marca: "PampaAgro",
+            descripcion: "Insecticida piretroide para control de plagas."
+        },
+        {
+            id: 9,
+            nombre: "Mancozeb 80%",
+            unidad: "KILOGRAMOS",
+            cantidad: 15,
+            marca: "EcoAgro",
+            descripcion: "Fungicida protector de amplio espectro."
+        },
+        {
+            id: 10,
+            nombre: "Tebuconazol 25%",
+            unidad: "LITROS",
+            cantidad: 10,
+            marca: "BioCrop Solutions",
+            descripcion: "Fungicida sistémico para control de hongos."
+        }
+    ]); //TO-DO: Cambiar any por Producto
 
 
-      const buttons = [
+    const buttons = [
         { label: "Quitar", path: "/productos/quitar" },
         { label: "Agregar", path: "/productos/agregar" }
     ];
-    
+
+    const items = transformToItems(productos, "nombre", "marca");
 
     return (
         <div className="page-container">
             <MenuBar showMenu={true} path='' />
             <h1 className={styles.title}>{title}</h1>
 
-            {<ItemList items={productos} />}
+            {<ItemList items={items} />}
 
             <div className={styles.buttonContainer}>
-            {buttons.map((button, index) => (
-                <Link key={index} href={button.path}>
-                    <button className={`button button-primary ${styles.buttonHome}`}>
-                        {button.label}
-                    </button>
-                </Link>
-            ))}
+                {buttons.map((button, index) => (
+                    <Link key={index} href={button.path}>
+                        <button className={`button button-primary ${styles.buttonHome}`}>
+                            {button.label}
+                        </button>
+                    </Link>
+                ))}
             </div>
         </div>
     )

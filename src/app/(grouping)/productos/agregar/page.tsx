@@ -5,7 +5,6 @@ import { Unidad } from "@/domain/enum/Unidad";
 import { Field } from "@/domain/models/Field";
 import { Producto } from "@/domain/models/Producto";
 import styles from "./agregarProductos.module.scss"
-import Link from "next/link";
 import GenericModal from "@/components/modal/GenericModal";
 import { useState } from "react";
 import MenuBar from "@/components/menuBar/MenuBar";
@@ -51,8 +50,6 @@ export default function AgregarProductos() { //TO-DO: spasar  Props.
         { name: "marca", label: "Marca", type: "text" },
         { name: "descripcion", label: "Descripción", type: "text" },
     ];
-
-    const containerClass = modalOpen ? `${styles.container} ${styles.container_blurred}` : styles.container;
 
     return (
         <div className="page-container">
