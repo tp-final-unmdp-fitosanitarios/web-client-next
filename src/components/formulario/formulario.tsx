@@ -50,7 +50,7 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName }: Fo
   const handleCancel = () => {
     if (onCancel)
       onCancel();
-    setFormData(initialState); // 🔄 Limpieza de campos
+    setFormData(initialState); 
     setErrors({});
   };
 

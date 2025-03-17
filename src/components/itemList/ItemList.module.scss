@@ -86,4 +86,11 @@
   .item {
     font-size: 14px;
   }
+
+  .buttonContainer {
+    flex-direction: column;
+  }
+  .container {
+    max-height: 340px;
+  }
 }

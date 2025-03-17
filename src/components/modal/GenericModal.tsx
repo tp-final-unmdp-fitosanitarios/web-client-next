@@ -17,7 +17,7 @@ export default function GenericModal({ isOpen, onClose, title, modalText, button
         <div className={styles["modal-overlay"]}>
             <div className={styles["modal-content"]}>
                 <h2 className="title">{title}</h2>
-                <span>{modalText}</span>
+                <span className="text">{modalText}</span>
                 <div className="button-container">
                     <button className="button button-primary" onClick={onClose}>{buttonTitle}</button>
                     {showSecondButton && <button onClick={onClose} className="button button-secondary">{secondButtonTitle} </button>}

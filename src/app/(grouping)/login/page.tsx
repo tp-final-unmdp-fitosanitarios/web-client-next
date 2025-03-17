@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import Formulario from "@/components/formulario/formulario";
@@ -7,7 +8,6 @@ import styles from "./login-view.module.scss"
 import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
-import { error } from "console";
 
 //axios.defaults.headers.post['Content-Type'] ='application/x-www-form-urlencoded';
 //axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
@@ -29,10 +29,12 @@ const [errorReq,setErrorReq] = useState(false)
             }
         )
         setErrorReq(false)
+        console.log(res);
         }catch(e: any){
             if(e.status === 401)
                 setErrorReq(true)
         }
+ 
         
     }
 

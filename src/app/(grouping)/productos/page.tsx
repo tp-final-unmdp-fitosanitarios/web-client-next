@@ -7,7 +7,7 @@ import ItemList from "@/components/itemList/ItemList";
 import { Producto } from "@/domain/models/Producto";
 import { transformToItems } from "@/utilities/transform";
 
-export default function AgregarProductos() { //TO-DO: spasar  Props.
+export default function ProductosView() { //TO-DO: spasar  Props.
 
     const title = 'Productos'
 
