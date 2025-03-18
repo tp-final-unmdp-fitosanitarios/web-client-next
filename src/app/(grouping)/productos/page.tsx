@@ -100,14 +100,14 @@ export default function ProductosView() { //TO-DO: spasar  Props.
         { label: "Agregar", path: "/productos/agregar" }
     ];
 
-    const items = transformToItems(productos, "nombre", "marca");
-
+    const items = transformToItems(productos, "id",["nombre", "marca"]);
+    const campos = ["nombre","marca"]
     return (
         <div className="page-container">
             <MenuBar showMenu={true} path='' />
             <h1 className={styles.title}>{title}</h1>
 
-            {<ItemList items={items} />}
+            {<ItemList items={items} displayKeys={campos}/>}
 
             <div className={styles.buttonContainer}>
                 {buttons.map((button, index) => (

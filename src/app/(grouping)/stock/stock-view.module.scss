@@ -1,0 +1,46 @@
+@import '../../styles/variables.scss';
+
+
+
+.page-container ,.container{
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin:0;
+}
+
+.title {
+    align-self: center;
+    color: $dark-color;
+    display: flex;
+}
+
+.container_blurred {
+    filter: blur(5px);
+    transition: filter 0.3s ease-in-out;
+  }
+
+  .buttonContainer{
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    width: 80%;
+    margin: 40px auto;
+  }
+  .title{
+   display: flex;
+   justify-content: center;
+  }
+
+  @media (max-width: 1000px) {
+    .buttonContainer{
+      margin-top: 0px;
+      flex-direction: column;
+      align-items: center;
+    }
+  
+    .buttonHome{
+      margin: 15px auto;
+    }
+  }

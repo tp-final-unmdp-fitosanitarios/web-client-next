@@ -6,15 +6,12 @@ import { Item } from '@/domain/models/Item';
 
 
 interface GenericListProps {
-  // mainText: string;
-  // secondaryText?: string;
-  items: Item[]; 
-  // actionText: string;
-  // onAction: (selectedItems: Item[]) => void;
+  items: Record<string, string>[]; 
+  displayKeys: string[]; // Lista de claves a mostrar
 }
 
 const GenericList: React.FC<GenericListProps> = ({
-  items,
+  items, displayKeys
 }) => {
   const [selectedItems, setSelectedItems] = useState<string[]>([]);
 
@@ -28,20 +25,15 @@ const GenericList: React.FC<GenericListProps> = ({
     });
   };
 
-  // const handleActionClick = () => {
-  //   if (selectedItems.length > 0) {
-  //     const selected = items.filter((item) => selectedItems.includes(item.id));
-  //     onAction(selected); 
-  //   }
-  // };
-
-  //Habria que encontrar la manera de que se muestren los campos genericos de los items
-  //para no depender de los nombres de cada campo de cada objeto
-  //Ahora solo se puede .name y .code
   return (
     <div className={styles.container}>
       <div className={styles.itemList}>
-        {items.map((item) => (
+        {items.map((item) => {
+
+          let itemString = ""
+          displayKeys.forEach( (key) => {itemString = itemString+item[key]+" "})
+
+          return(
           <label key={item.id} className={styles.item}>
             <input
               type="checkbox"
@@ -49,10 +41,12 @@ const GenericList: React.FC<GenericListProps> = ({
               onChange={() => handleCheckboxChange(item.id)}
               className={styles.checkbox}
             />
-            <span className={styles.itemName}>{item.name}</span>
-            <span className={styles.itemCode}>- {item.code}</span>
+            <span  className={styles.itemField}>
+              {itemString}
+            </span>
           </label>
-        ))}
+          )
+        })}
       </div>
     </div>
   );

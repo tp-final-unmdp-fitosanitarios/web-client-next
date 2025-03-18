@@ -3,6 +3,7 @@ import ItemList from "@/components/itemList/ItemList"
 import Link from "next/link";
 import styles from "./maquinas-view.module.scss"
 import MenuBar from "@/components/menuBar/MenuBar";
+import { transformToItems } from "@/utilities/transform";
 
 const maquinas = [
     { id: '1', name: 'Maquina 1', code: 'EPP-123' },
@@ -26,15 +27,16 @@ const buttons = [
     { label: "Agregar", path: "/maquinas/agregar" }
 ];
 
+const items = transformToItems(maquinas, "id",["name", "code"]);
+const campos = ["name","code"]
+
 export default function MaquinasView() {
     return (<>
         <MenuBar showMenu={false} path='home' />
 
         <h1 className={styles.title}>Maquinas</h1>
 
-        {<ItemList
-            items={maquinas}
-        />}
+        {<ItemList items={items} displayKeys={campos}/>}
         <div className={styles.buttonContainer}>
             {buttons.map((button, index) => (
                 <Link key={index} href={button.path}>
