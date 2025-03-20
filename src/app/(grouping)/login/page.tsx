@@ -8,11 +8,14 @@ import Link from "next/link";
 import { useState } from "react";
 import axios from "axios";
 import { error } from "console";
+import useToken from "@/services/tokenService";
+import { apiService } from "@/services/api-service";
 //axios.defaults.headers.post['Content-Type'] ='application/x-www-form-urlencoded';
 //axios.defaults.headers.post['Access-Control-Allow-Origin'] = '*';
 
 export default function Login() {
 const [errorReq,setErrorReq] = useState(false)
+const { token, setToken } = useToken();
 
     const fields: Field[] = [
         { name: "email", label: "Nombre", type: "text" },
@@ -20,13 +23,22 @@ const [errorReq,setErrorReq] = useState(false)
 
     const login = async (formData: any) => {
         try{
-        const res = await axios.post(
+        /*const res = await axios.post(
             "http://localhost:8080/auth/login",
             {
                 email: formData["email"],
                 password: formData["password"]
             }
         )
+        //setToken(res.token)*/
+        const body = {
+            email: formData["email"],
+            password: formData["password"]
+        }
+        const res = await apiService.create("/auth/login",body)
+        //console.log(res)
+        const { token } = res.data as { token: string };
+        setToken(token)
         setErrorReq(false)
         }catch(e: any){
             if(e.status === 401)

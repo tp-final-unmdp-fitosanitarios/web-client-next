@@ -23,7 +23,7 @@ interface ApiResponse<T> {
 // Servicio genérico para manejar peticiones HTTP con Axios
 class ApiService {
   private axiosInstance: AxiosInstance;
-  private defaultBaseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3000/api";
+  private defaultBaseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/";
 
   constructor() {
     this.axiosInstance = axios.create({
