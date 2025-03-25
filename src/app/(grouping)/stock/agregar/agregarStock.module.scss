@@ -8,7 +8,6 @@
    .formAndItemListContainer{
     display: flex;
     justify-content: space-around;
-    align-items: center;
    }
 
    .formContainer{
@@ -47,7 +46,7 @@
   .buttonContainer{
     display: flex;
     justify-content: center;
-    margin-top: $spacing-large;
+    margin-top: $spacing-extra-large;
   }
 
   .buttonCancel{
@@ -58,4 +57,12 @@
     margin-left: $spacing-medium;
   }
 
-   
+  @media (max-width:500px) {
+    .formAndItemListContainer {
+      flex-direction: column-reverse;
+      align-items: center;
+    }
+    .itemListContainer {
+      min-width: 90%;
+    }
+  }

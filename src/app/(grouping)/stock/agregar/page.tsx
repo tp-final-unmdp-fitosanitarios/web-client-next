@@ -101,7 +101,7 @@ const AgregarStockPage: React.FC = () => {
             </div>
             <div className={styles.buttonContainer}>
                 <Link href="/stock">
-                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`}>
+                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} >
                         Cancelar
                     </button>
                 </Link>
