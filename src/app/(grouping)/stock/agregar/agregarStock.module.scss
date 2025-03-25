@@ -1,0 +1,61 @@
+@import "../../../styles/variables.scss";
+.title{
+    display: flex;
+    justify-content: center;
+    color: $dark-color;
+   }
+
+   .formAndItemListContainer{
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+   }
+
+   .formContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+   }
+
+   .itemListContainer{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    min-width: 40%;
+    max-width: 90%;
+   }
+
+   .button {
+    min-width: 30%;
+    max-width: 80%;
+    padding: $spacing-small $spacing-medium;
+    border: none;
+    border-radius: $border-radius;
+    font-weight: $button-font-weight;
+    cursor: pointer;
+    color: $dark-color;
+    margin-top: $spacing-large;
+  }
+  
+  .buttonPrimary {
+    margin-right: $spacing-large;
+    background-color: $primary-color;
+  }
+
+  .buttonContainer{
+    display: flex;
+    justify-content: center;
+    margin-top: $spacing-large;
+  }
+
+  .buttonCancel{
+    margin-right: $spacing-medium;
+  }
+
+  .buttonFinish{
+    margin-left: $spacing-medium;
+  }
+
+   

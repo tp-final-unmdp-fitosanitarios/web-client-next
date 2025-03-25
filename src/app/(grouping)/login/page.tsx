@@ -23,14 +23,6 @@ const { token, setToken } = useToken();
 
     const login = async (formData: any) => {
         try{
-        /*const res = await axios.post(
-            "http://localhost:8080/auth/login",
-            {
-                email: formData["email"],
-                password: formData["password"]
-            }
-        )
-        //setToken(res.token)*/
         const body = {
             email: formData["email"],
             password: formData["password"]
