@@ -4,16 +4,19 @@ import MenuBar from '@/components/menuBar/MenuBar';
 import { Unidad } from '@/domain/enum/Unidad';
 import { Field } from '@/domain/models/Field';
 import { Remito } from '@/domain/models/Remito';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styles from "./agregarStock.module.scss"
 import { Button, Link } from '@mui/material';
 import ItemList from '@/components/itemList/ItemList';
 import { transformToItems } from '@/utilities/transform';
 import { Producto } from '@/domain/models/Producto';
+import ModalAgregarProducto from "../../../../components/AgregarStock/modalStockAgregarProd/ModalAgregarProducto"
+import ResumenOperacion from "../../../../components/AgregarStock//resumenOperacionAgregar/ResumenOperacion"
 
 const AgregarStockPage: React.FC = () => {
     const [remito, setRemito] = useState<any>(null);
-    const [productos, setProducto] = useState<Producto[]>([
+    const [productosActuales, setProductosActuales] = useState([]);
+    const [productosAAgregar, setProductosAAgregar] = useState<Producto[]>([
         {
             id: 1,
             nombre: "Glifosato 48%",
@@ -30,25 +33,27 @@ const AgregarStockPage: React.FC = () => {
             marca: "Campo Verde Ltda",
             descripcion: "Insecticida organofosforado de amplio espectro."
         }]);
-    const [modalOpen, setModalOpen] = useState(false);
+    const [addProductModalOpen, setAddProductModalOpen] = useState(false);
+    const [finishModalOpen, setFinishModalOpen] = useState(false);
     const title = 'Agregar Stock'
-    
-    
 
-    const handleOpenModal = () => setModalOpen(true);
-    const handleCloseModal = () => setModalOpen(false);
-    
-    /*  id: number,
-        campo: Locacion,
-        productos: Productos [],
-        archivo: string,
-        fecha: Date
-    */
 
+    const handleAddProductOpenModal = () => setAddProductModalOpen(true);
+    const handleAddProductCloseModal = () => setAddProductModalOpen(false);
+    const handleFinishOpenModal = () => setFinishModalOpen(true);
+    const handleFinishCloseModal = () => setFinishModalOpen(false);
+    
     // Example usage of setProducto to avoid the unused variable warning
-    const addProducto = (producto: Producto) => {
-        setProducto([...productos, producto]);
+    const handleAddProducto = (producto: string,cantidad: number) => {
+        //busco el producto seleccionado
+        //lo agrego a la tabla
+        //setProducto([...productos, producto]);
     };
+
+    useEffect(() => {
+        ///Traigo los productos que tengo actualmente y los meto en el use state
+        ///Esto se hace para poder seleccionarlos al agregar producto
+    },[])
     
     const handleFormSubmit = (inputData: Record<string, string | number>) => {
         setRemito({
@@ -64,6 +69,10 @@ const AgregarStockPage: React.FC = () => {
         console.log('Cancel');
     }
 
+    const handleFinish = () => {
+
+    }
+
     const fields: Field[] = [
         { name: "nroRemito", label: "Numero de Remito", type: "text"},
         { name: "campo", label: "Campo", type: "select" , options:["campoA","campoB", "campoC"]},
@@ -71,7 +80,7 @@ const AgregarStockPage: React.FC = () => {
         { name: "archRemito", label: "Cargar Remito", type: "file" },
     ];
 
-    const items = transformToItems(productos, "id",["nombre", "marca"]);
+    const items = transformToItems(productosAAgregar, "id",["nombre", "marca"]);
     const campos = ["nombre","marca"]
 
     const buttons = [
@@ -86,29 +95,38 @@ const AgregarStockPage: React.FC = () => {
         <div className={styles.pageContainer}>
             <MenuBar showMenu={false} path='/productos' />
             <h1 className={styles.title}>{title}</h1>
-            <div className={styles.formAndItemListContainer}>
-                <div className={styles.formContainer}>
-                    <h3>Nuevo Remito</h3>
-                    <Formulario fields={fields} onSubmit={handleFormSubmit} buttonName="Guardar Remito" />
+            {!addProductModalOpen && !finishModalOpen ? 
+            (
+            <>
+                <div className={styles.formAndItemListContainer}>
+                    <div className={styles.formContainer}>
+                        <h3>Nuevo Remito</h3>
+                        <Formulario fields={fields} onSubmit={handleFormSubmit} buttonName="Guardar Remito" />
+                    </div>
+                    <div className={styles.itemListContainer}>
+                        <h3>Agregar Stock</h3>
+                        {<ItemList items={items} displayKeys={campos}/>}
+                        <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal}>
+                            Agregar Producto
+                        </button>
+                    </div>
                 </div>
-                <div className={styles.itemListContainer}>
-                    <h3>Agregar Stock</h3>
-                    {<ItemList items={items} displayKeys={campos}/>}
-                    <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`}>
-                        Agregar Producto
+                <div className={styles.buttonContainer}>
+                    <Link href="/stock">
+                        <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} >
+                            Cancelar
+                        </button>
+                    </Link>
+                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleFinishOpenModal}>
+                        Finalizar
                     </button>
                 </div>
-            </div>
-            <div className={styles.buttonContainer}>
-                <Link href="/stock">
-                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} >
-                        Cancelar
-                    </button>
-                </Link>
-                <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`}>
-                    Finalizar
-                </button>
-            </div>
+            </>
+            ) : addProductModalOpen ? (
+                <ModalAgregarProducto handleAddProducto={handleAddProducto} products={productosActuales} open={addProductModalOpen} setModalClose={handleAddProductCloseModal} />
+            ) : (
+                <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} />
+            )}
         </div>
     );
 };
