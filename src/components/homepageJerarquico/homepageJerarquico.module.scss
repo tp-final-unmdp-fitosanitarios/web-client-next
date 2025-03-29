@@ -29,13 +29,14 @@
   .buttonContainer {
     flex-direction: column;
     align-items: center;
-    gap: 15px;
+    gap: 30px;
+    margin-top: 100px;
   }
 
   .buttonHome {
-    margin: 0;
-    width: 100%;
-    max-width: 300px;
+     margin: 0;
+     min-width: 200px;
+     padding: 8px 16px;
   }
 }
 
@@ -43,11 +44,12 @@
 @media (max-width: 600px) {
   .buttonContainer {
     width: 90%;
-    gap: 10px;
+    gap: 30px;
+    margin-top: 100px;
   }
 
   .buttonHome {
-    min-width: 120px;
+    min-width: 200px;
     padding: 8px 16px;
   }
 

@@ -1,19 +1,18 @@
-import { Item } from "@/domain/models/Item";
+export interface Item {
+  id: number;
+  [key: string]: string | number;
+}
 
 export function transformToItems<T>(
-  array: T[],
+  data: T[],
   idKey: keyof T,
-  displayKeys: (keyof T)[]
-): Record<string, string>[] {
-  return array.map((item) => {
-    //A cada objeto le asigno una clave
-    const transformedItem: Record<string, string> = { id: String(item[idKey]) };
-
-    //Agrego la clave y su valor para cada campo recibido
+  displayKeys: string[]
+): Item[] {
+  return data.map((item) => {
+    const transformed: Item = { id: item[idKey] as number };
     displayKeys.forEach((key) => {
-      transformedItem[key as string] = String(item[key]);
+      transformed[key] = String(item[key as keyof T]); // Convertir a string
     });
-
-    return transformedItem;
+    return transformed;
   });
 }

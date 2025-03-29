@@ -1,55 +1,50 @@
-'use client';
+"use client";
+import styles from "./ItemList.module.scss";
 
-import React, { useState } from 'react';
-import styles from './ItemList.module.scss'; 
-import { Item } from '@/domain/models/Item';
-
-
-interface GenericListProps {
-  items: Record<string, string>[]; 
-  displayKeys: string[]; // Lista de claves a mostrar
+interface Item {
+  id: number;
+  [key: string]: string | number; // Permitir tanto string como number en las propiedades
 }
 
-const GenericList: React.FC<GenericListProps> = ({
-  items, displayKeys
+interface GenericListProps {
+  items: Item[];
+  displayKeys: string[]; // Lista de claves a mostrar
+  onSelect?: (id: number) => void; // Función para manejar selección (opcional)
+  selectedIds?: number[]; // IDs de los elementos seleccionados (opcional)
+}
+
+const ItemList: React.FC<GenericListProps> = ({
+  items,
+  displayKeys,
+  onSelect,
+  selectedIds = [],
 }) => {
-  const [selectedItems, setSelectedItems] = useState<string[]>([]);
-
-  const handleCheckboxChange = (id: string) => {
-    setSelectedItems((prevSelected) => {
-      if (prevSelected.includes(id)) {
-        return prevSelected.filter((itemId) => itemId !== id);
-      } else {
-        return [...prevSelected, id];
-      }
-    });
-  };
-
   return (
     <div className={styles.container}>
       <div className={styles.itemList}>
         {items.map((item) => {
+          // Construir una cadena con las propiedades especificadas en displayKeys
+          const itemString = displayKeys
+            .map((key) => String(item[key])) // Convertir cada valor a string
+            .join(" ");
 
-          let itemString = ""
-          displayKeys.forEach( (key) => {itemString = itemString+item[key]+" "})
-
-          return(
-          <label key={item.id} className={styles.item}>
-            <input
-              type="checkbox"
-              checked={selectedItems.includes(item.id)}
-              onChange={() => handleCheckboxChange(item.id)}
-              className={styles.checkbox}
-            />
-            <span  className={styles.itemField}>
-              {itemString}
-            </span>
-          </label>
-          )
+          return (
+            <label key={item.id} className={styles.item}>
+              {onSelect && (
+                <input
+                  type="checkbox"
+                  checked={selectedIds.includes(item.id)}
+                  onChange={() => onSelect(item.id)}
+                  className={styles.checkbox}
+                />
+              )}
+              <span className={styles.itemField}>{itemString}</span>
+            </label>
+          );
         })}
       </div>
     </div>
   );
 };
 
-export default GenericList;
+export default ItemList;

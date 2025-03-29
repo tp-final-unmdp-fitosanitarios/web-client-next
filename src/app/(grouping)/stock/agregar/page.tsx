@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import Formulario from '@/components/formulario/formulario';
 import MenuBar from '@/components/menuBar/MenuBar';
@@ -14,6 +15,7 @@ import ModalAgregarProducto from "../../../../components/AgregarStock/modalStock
 import ResumenOperacion from "../../../../components/AgregarStock//resumenOperacionAgregar/ResumenOperacion"
 
 const AgregarStockPage: React.FC = () => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [remito, setRemito] = useState<any>(null);
     const [productosActuales, setProductosActuales] = useState([]);
     const [productosAAgregar, setProductosAAgregar] = useState<Producto[]>([
