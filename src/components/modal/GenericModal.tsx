@@ -36,10 +36,10 @@ export default function GenericModal({
           </p>
           {productos.length > 0 ? (
             productos.map((producto, index) => (
-              <p key={index}>Se eliminó el producto {producto}.</p>
+              <p key={index}><strong> {producto}</strong>.</p>
             ))
           ) : (
-            <p>No se eliminaron productos.</p>
+            <p></p>
           )}
         </div>
         <div className="button-container">

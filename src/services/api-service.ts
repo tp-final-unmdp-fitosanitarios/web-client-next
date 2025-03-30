@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-import useToken from "./tokenService";
+// import useToken from "./tokenService";
 
 // Interfaz para las opciones de la petición
 interface ApiOptions {
@@ -22,7 +22,7 @@ interface ApiResponse<T> {
 }
 
 //Obtengo el token
-const { token } = useToken();
+// const { token } = useToken();
 
 // Servicio genérico para manejar peticiones HTTP con Axios
 class ApiService {
@@ -107,13 +107,13 @@ class ApiService {
   }
 
   // Métodos para autenticación
-  setAuthToken() {
-    this.axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  }
+  // setAuthToken() {
+  //   this.axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  // }
 
-  clearAuthToken() {
-    delete this.axiosInstance.defaults.headers.common["Authorization"];
-  }
+  // clearAuthToken() {
+  //   delete this.axiosInstance.defaults.headers.common["Authorization"];
+  // }
 }
 
 // Exportamos la instancia única
