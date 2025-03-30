@@ -11,6 +11,9 @@ import { useState } from "react";
 import { apiService } from "@/services/api-service";
 import useToken from "@/services/tokenService";
 
+// Forzar que esta página sea dinámica y no se prerenderice en el servidor
+export const dynamic = "force-dynamic";
+
 export default function Login() {
   const [errorReq, setErrorReq] = useState(false);
   const { token, setToken } = useToken();
