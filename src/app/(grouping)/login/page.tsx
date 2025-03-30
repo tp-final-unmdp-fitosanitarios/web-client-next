@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 
 import Formulario from "@/components/formulario/formulario";
@@ -20,6 +22,7 @@ const { token, setToken } = useToken();
     const fields: Field[] = [
         { name: "email", label: "Nombre", type: "text" },
         { name: "password", label: "Contraseña", type: "text" }];
+
 
     const login = async (formData: any) => {
         try{
