@@ -3,7 +3,7 @@ import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
 
 // Interfaz para las opciones de la petición
 interface ApiOptions {
-  baseUrl?: string; // Mantenemos esto para permitir URLs base personalizadas
+  baseUrl?: string;
   endpoint: string;
   id?: number | string;
   data?: any;
@@ -22,6 +22,7 @@ interface ApiResponse<T> {
 class ApiService {
   private axiosInstance: AxiosInstance;
   private defaultBaseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/";
+  private isClient: boolean = typeof window !== "undefined";
 
   constructor() {
     this.axiosInstance = axios.create({
@@ -29,10 +30,17 @@ class ApiService {
       headers: { "Content-Type": "application/json" },
     });
 
+    // Configurar el interceptor solo si estamos en el cliente
+    if (this.isClient) {
+      this.setupInterceptors();
+    }
+  }
+
+  private setupInterceptors() {
     // Interceptor para agregar el token dinámicamente en cada petición
     this.axiosInstance.interceptors.request.use(
       (config) => {
-        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        const token = localStorage.getItem("token");
         if (token) {
           config.headers["Authorization"] = `Bearer ${token}`;
         }
@@ -74,7 +82,7 @@ class ApiService {
       url,
       data,
       headers: { ...this.axiosInstance.defaults.headers.common, ...headers },
-      baseURL: baseUrl, // Usamos baseUrl aquí para permitir URLs dinámicas
+      baseURL: baseUrl,
     };
 
     try {
