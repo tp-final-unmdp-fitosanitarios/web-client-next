@@ -1,30 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosResponse } from "axios";
-// import useToken from "./tokenService";
 
 // Interfaz para las opciones de la petición
 interface ApiOptions {
-  baseUrl?: string; 
+  baseUrl?: string; // Mantenemos esto para permitir URLs base personalizadas
   endpoint: string;
   id?: number | string;
-  data?: any; 
-  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE"; 
-  headers?: Record<string, string>; 
+  data?: any;
+  method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
+  headers?: Record<string, string>;
 }
 
 // Interfaz para la respuesta de la API
 interface ApiResponse<T> {
-  data: T; 
-  status: number; 
-  success: boolean; 
-  error?: string; 
+  data: T;
+  status: number;
+  success: boolean;
+  error?: string;
 }
 
-//Obtengo el token
-// const { token } = useToken();
-
-// Servicio genérico para manejar peticiones HTTP con Axios
 class ApiService {
   private axiosInstance: AxiosInstance;
   private defaultBaseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/";
@@ -34,6 +28,18 @@ class ApiService {
       baseURL: this.defaultBaseUrl,
       headers: { "Content-Type": "application/json" },
     });
+
+    // Interceptor para agregar el token dinámicamente en cada petición
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+        if (token) {
+          config.headers["Authorization"] = `Bearer ${token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
 
     // Interceptor para manejar errores globalmente
     this.axiosInstance.interceptors.response.use(
@@ -68,12 +74,11 @@ class ApiService {
       url,
       data,
       headers: { ...this.axiosInstance.defaults.headers.common, ...headers },
+      baseURL: baseUrl, // Usamos baseUrl aquí para permitir URLs dinámicas
     };
 
-    const instance = axios.create({ baseURL: baseUrl, headers: config.headers });
-
     try {
-      const response = await instance(config);
+      const response = await this.axiosInstance(config);
       return { data: response.data, status: response.status, success: true };
     } catch (error: any) {
       return {
@@ -94,11 +99,21 @@ class ApiService {
     return this.request<T>({ endpoint, id, method: "GET", ...options });
   }
 
-  async update<T>(endpoint: string, id: number | string, data: any, options: Partial<ApiOptions> = {}): Promise<ApiResponse<T>> {
+  async update<T>(
+    endpoint: string,
+    id: number | string,
+    data: any,
+    options: Partial<ApiOptions> = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({ endpoint, id, method: "PUT", data, ...options });
   }
 
-  async patch<T>(endpoint: string, id: number | string, data: any, options: Partial<ApiOptions> = {}): Promise<ApiResponse<T>> {
+  async patch<T>(
+    endpoint: string,
+    id: number | string,
+    data: any,
+    options: Partial<ApiOptions> = {}
+  ): Promise<ApiResponse<T>> {
     return this.request<T>({ endpoint, id, method: "PATCH", data, ...options });
   }
 
@@ -106,14 +121,14 @@ class ApiService {
     return this.request<T>({ endpoint, id, method: "DELETE", ...options });
   }
 
-  // Métodos para autenticación
-  // setAuthToken() {
-  //   this.axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  // }
+  // Métodos para autenticación (opcional)
+  setAuthToken(token: string) {
+    this.axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+  }
 
-  // clearAuthToken() {
-  //   delete this.axiosInstance.defaults.headers.common["Authorization"];
-  // }
+  clearAuthToken() {
+    delete this.axiosInstance.defaults.headers.common["Authorization"];
+  }
 }
 
 // Exportamos la instancia única
