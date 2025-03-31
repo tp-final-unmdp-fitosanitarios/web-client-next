@@ -20,21 +20,21 @@ export default function AgregarProductos() { //TO-DO: spasar  Props.
     
     const [producto, setProducto] = useState<Producto>({
         id: 0,
-        nombre: "",
-        unidad: Unidad.Litros,
-        cantidad: 0,
-        marca: "",
-        descripcion: ""
+        name: "",
+        unit: Unidad.Litros,
+        quantity: 0,
+        brand: "",
+        description: ""
     });
     
     const handleFormSubmit = (inputData: Record<string, string | number>) => {
         setProducto({
             ...producto,
-            nombre: String(inputData.nombre),
-            cantidad: Number(inputData.cantidad),
-            unidad: String(inputData.unidad),
-            marca: String(inputData.marca),
-            descripcion: String(inputData.descripcion)
+            name: String(inputData.nombre),
+            quantity: Number(inputData.cantidad),
+            unit: String(inputData.unidad),
+            brand: String(inputData.marca),
+            description: String(inputData.descripcion)
         });
         handleOpenModal();
     };
@@ -62,7 +62,7 @@ export default function AgregarProductos() { //TO-DO: spasar  Props.
                 isOpen={modalOpen}
                 onClose={handleCloseModal}
                 title="Producto añadido"
-                modalText={`Se añadadio el producto: ${producto.nombre}`}
+                modalText={`Se añadadio el producto: ${producto.name}`}
                 buttonTitle="Cerrar"
                 showSecondButton={false} // o false según se necesite
                 secondButtonTitle="Acción Alternativa"

@@ -39,7 +39,7 @@ class ApiService {
   }
 
   private async request<T>(options: ApiOptions): Promise<ApiResponse<T>> {
-    const { baseUrl = this.defaultBaseUrl, endpoint, id, data, method = "GET", headers } = options;
+    const { baseUrl = this.defaultBaseUrl, endpoint, id, data, method, headers } = options;
     const url = id ? `${endpoint}/${id}` : endpoint;
 
     const config: AxiosRequestConfig = {
@@ -51,6 +51,7 @@ class ApiService {
     };
 
     const finalConfig = this.addAuthToken(config);
+    console.log(finalConfig);
 
     try {
       const response = await this.axiosInstance(finalConfig);

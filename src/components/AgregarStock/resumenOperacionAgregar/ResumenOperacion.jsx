@@ -3,15 +3,26 @@ import { Modal, Box } from '@mui/material';
 import ItemList from "../../itemList/ItemList"
 import { transformToItems } from '@/utilities/transform';
 import styles from "./resumenOperacion.module.scss"
+import { useItemsManager } from '@/hooks/useItemsManager';
 
-const ResumenOperacion = ({open,setModalClose,handleFinish, products}) => {
+const ResumenOperacion = ({open,setModalClose,handleFinish, products, locacion, remito}) => {
     
     const handleSubmit = (e) => {
+        
         handleFinish()
     }
 
-    const items = transformToItems(products, "id",["nombre", "marca"]);
-    const campos = ["nombre","marca"]
+    const items = transformToItems(products, "id",["name", "quantity"]);
+    const campos = ["name","quantity"]
+
+    const {
+        selectedIds,
+        deletedItems,
+        isModalOpen,
+        toggleSelectItem,
+        quitarItems,
+        closeModal,
+    } = useItemsManager(products);
 
     return (
         <div>
@@ -31,10 +42,19 @@ const ResumenOperacion = ({open,setModalClose,handleFinish, products}) => {
                 >
                     <h3>Resumen de Operacion</h3>
                     <p>Agregara los siguientes productos y cantidades</p>
-                    {<ItemList items={items} displayKeys={campos}/>}
+                    {products.length > 0 ? (
+                            <ItemList
+                                items={items}
+                                displayKeys={campos}
+                                onSelect={toggleSelectItem}
+                                selectedIds={selectedIds}
+                            />
+                            ) : (
+                                <p>Ocurrio un error al cargar el stock :(</p>
+                            )}
                     <div className={styles.outputContainer}>
-                        <p>Locacion</p>
-                        <p>Remito</p>
+                        <h6>Locacion: {locacion}</h6>
+                        <h6>Remito: {remito}</h6>
                     </div>
                     <div className={`${styles.buttonContainer}`}>
                             <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} onClick={setModalClose}> 

@@ -2,7 +2,9 @@ import { TipoLocacion } from "../enum/TipoLocacion";
 
 export interface Locacion {
     id: number,
-    direccion: string,
-    superficie: string,
-    tipo: TipoLocacion  
+    name: string
+    addres: string,
+    area: string,
+    type: TipoLocacion,
+    company_id: number  
 }

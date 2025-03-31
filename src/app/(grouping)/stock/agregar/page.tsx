@@ -13,53 +13,89 @@ import { transformToItems } from '@/utilities/transform';
 import { Producto } from '@/domain/models/Producto';
 import ModalAgregarProducto from "../../../../components/AgregarStock/modalStockAgregarProd/ModalAgregarProducto"
 import ResumenOperacion from "../../../../components/AgregarStock//resumenOperacionAgregar/ResumenOperacion"
+import { apiService } from '@/services/api-service';
+import { Locacion } from '@/domain/models/Locacion';
+import { useRouter } from 'next/router';
+import { useItemsManager } from '@/hooks/useItemsManager';
+
+type ProductoAAgregar = {
+    id: number
+    name: string;
+    quantity: number;
+};
 
 const AgregarStockPage: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [remito, setRemito] = useState<any>(null);
-    const [productosActuales, setProductosActuales] = useState([]);
-    const [productosAAgregar, setProductosAAgregar] = useState<Producto[]>([
-        {
-            id: 1,
-            nombre: "Glifosato 48%",
-            unidad: "LITROS",
-            cantidad: 20,
-            marca: "AgroChem SA",
-            descripcion: "Herbicida sistémico para el control de malezas."
-        },
-        {
-            id: 2,
-            nombre: "Clorpirifos 48%",
-            unidad: "LITROS",
-            cantidad: 15,
-            marca: "Campo Verde Ltda",
-            descripcion: "Insecticida organofosforado de amplio espectro."
-        }]);
+    const [productosExistentes, setProductosExistentes] = useState<Producto[]>([]);
+    const [locations, setLocations] = useState<Locacion[]>([]);
+    const [productosAAgregar, setProductosAAgregar] = useState<ProductoAAgregar[]>([]);
     const [addProductModalOpen, setAddProductModalOpen] = useState(false);
     const [finishModalOpen, setFinishModalOpen] = useState(false);
     const title = 'Agregar Stock'
 
-
     const handleAddProductOpenModal = () => setAddProductModalOpen(true);
     const handleAddProductCloseModal = () => setAddProductModalOpen(false);
-    const handleFinishOpenModal = () => setFinishModalOpen(true);
     const handleFinishCloseModal = () => setFinishModalOpen(false);
+    const handleFinishOpenModal = () => {
+        //Valido los campos del form
+        /*if(!remito)
+            return
+        if(productosAAgregar.length !== remito.cantProductos)
+            return*/
+
+        setFinishModalOpen(true);
+    }
     
-    // Example usage of setProducto to avoid the unused variable warning
-    const handleAddProducto = (producto: string,cantidad: number) => {
-        //busco el producto seleccionado
-        //lo agrego a la tabla
-        //setProducto([...productos, producto]);
+    const handleAddProducto = (producto: string, cantidad: number) => {
+        if (!cantidad) return;
+
+        const prod = productosExistentes.find((p) => p.name === producto);
+        if (!prod) return;
+
+        if (productosAAgregar.length >= remito.cantProductos) {
+            console.warn("No se pueden agregar más productos.");
+            return;
+        }
+        
+        const existingProductIndex = productosAAgregar.findIndex((p) => p.id === prod.id);
+        if (existingProductIndex !== -1) {
+            const updatedProductos = [...productosAAgregar];
+            updatedProductos[existingProductIndex].quantity += cantidad;
+            setProductosAAgregar(updatedProductos);
+        } else {
+            setProductosAAgregar([...productosAAgregar, { id: prod.id, name: producto, quantity: cantidad }]);
+        }
     };
 
+    const fetchProductos = async () => {
+        const response = await apiService.get<any>("/products");
+        return response.data.content;
+    } 
+
+    const fetchLocations = async () => {
+        const response = await apiService.get<any>("/locations?type=WAREHOUSE");
+        return response.data;
+    } 
+
     useEffect(() => {
-        ///Traigo los productos que tengo actualmente y los meto en el use state
-        ///Esto se hace para poder seleccionarlos al agregar producto
+        const fetchAndSetProductos = async () => {
+            const prods = await fetchProductos();
+            setProductosExistentes(prods);
+        };
+
+        const fetchAndSetLocations = async () => {
+            const locs = await fetchLocations();
+            console.log(locs)
+            setLocations(locs);
+        };
+
+        fetchAndSetProductos();
+        fetchAndSetLocations();
     },[])
     
     const handleFormSubmit = (inputData: Record<string, string | number>) => {
         setRemito({
-            id: 0,
             campo: String(inputData.campo),
             cantProductos: inputData.cantProductos,
             archivo: String(inputData.archRemito),
@@ -68,22 +104,26 @@ const AgregarStockPage: React.FC = () => {
     };
 
     const handleCancel = () => {
-        console.log('Cancel');
+        setAddProductModalOpen(false);
+        setFinishModalOpen(false);
+        setProductosAAgregar([]);
     }
 
     const handleFinish = () => {
-
+        //Armo la request
+        //Envio
+        //Si sale bien vuelvo a
     }
 
     const fields: Field[] = [
         { name: "nroRemito", label: "Numero de Remito", type: "text"},
-        { name: "campo", label: "Campo", type: "select" , options:["campoA","campoB", "campoC"]},
+        { name: "campo", label: "Campo", type: "select" , options:locations.map((l) => l.name)},
         { name: "cantProductos", label: "Cantidad de Productos", type: "number"},
         { name: "archRemito", label: "Cargar Remito", type: "file" },
     ];
 
-    const items = transformToItems(productosAAgregar, "id",["nombre", "marca"]);
-    const campos = ["nombre","marca"]
+    const items = transformToItems(productosAAgregar, "id",["name", "quantity"]);
+    const campos = ["name","quantity"]
 
     const buttons = [
         { label: "Cancelar", path: "/stock" },
@@ -93,6 +133,15 @@ const AgregarStockPage: React.FC = () => {
         { label: "Proveedores", path: "/stock/proveedores" },
         ];
 
+    const {
+        selectedIds,
+        deletedItems,
+        isModalOpen,
+        toggleSelectItem,
+        quitarItems,
+        closeModal,
+    } = useItemsManager(productosAAgregar);
+    //{<ItemList items={items} displayKeys={campos}/>}
     return (
         <div className={styles.pageContainer}>
             <MenuBar showMenu={false} path='/productos' />
@@ -107,10 +156,20 @@ const AgregarStockPage: React.FC = () => {
                     </div>
                     <div className={styles.itemListContainer}>
                         <h3>Agregar Stock</h3>
-                        {<ItemList items={items} displayKeys={campos}/>}
-                        <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal}>
+                        
+                        {productosAAgregar.length > 0 ? (
+                            <ItemList
+                                items={items}
+                                displayKeys={campos}
+                                onSelect={toggleSelectItem}
+                                selectedIds={selectedIds}
+                            />
+                        ) : (
+                            <p>Ingrese producttos para agregar stock</p>
+                        )}
+                        <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal} disabled={!remito}>
                             Agregar Producto
-                        </button>
+                        </button> {/*Agregarle el estilo al disabled}*/}
                     </div>
                 </div>
                 <div className={styles.buttonContainer}>
@@ -125,9 +184,9 @@ const AgregarStockPage: React.FC = () => {
                 </div>
             </>
             ) : addProductModalOpen ? (
-                <ModalAgregarProducto handleAddProducto={handleAddProducto} products={productosActuales} open={addProductModalOpen} setModalClose={handleAddProductCloseModal} />
+                <ModalAgregarProducto handleAddProducto={handleAddProducto} products={productosExistentes} open={addProductModalOpen} setModalClose={handleAddProductCloseModal} cantActual={productosAAgregar.length}limite={remito.cantProductos}/>
             ) : (
-                <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} />
+                <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} locacion={remito.campo} remito={remito.archivo}/>
             )}
         </div>
     );

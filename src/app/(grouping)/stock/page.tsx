@@ -14,20 +14,20 @@ import GenericModal from "@/components/modal/GenericModal";
 // Para backend: import { apiService } from "@/services/api-service";
 
 const productos: Producto[] = [
-    { id: 1, nombre: "Glifosato 48%", unidad: "LITROS", cantidad: 20, marca: "AgroChem SA", descripcion: "Herbicida sistémico para el control de malezas." },
-    { id: 2, nombre: "Clorpirifos 48%", unidad: "LITROS", cantidad: 15, marca: "Campo Verde Ltda", descripcion: "Insecticida organofosforado de amplio espectro." },
-    { id: 3, nombre: "Atrazina 90%", unidad: "KILOGRAMOS", cantidad: 10, marca: "AgroSolutions", descripcion: "Herbicida selectivo para cultivos de maíz y sorgo." },
-    { id: 4, nombre: "Metomilo 20%", unidad: "LITROS", cantidad: 25, marca: "FertiAgro", descripcion: "Insecticida de contacto y acción translaminar." },
-    { id: 5, nombre: "2,4-D Amina", unidad: "LITROS", cantidad: 30, marca: "GreenField", descripcion: "Herbicida selectivo para cultivos de cereales y pasturas." },
-    { id: 6, nombre: "Carbendazim 50%", unidad: "KILOGRAMOS", cantidad: 12, marca: "AgroBio", descripcion: "Fungicida sistémico para control de enfermedades foliares." }
+    { id: 1, name: "Glifosato 48%", unit: "LITROS", quantity: 20, brand: "AgroChem SA", description: "Herbicida sistémico para el control de malezas." },
+    { id: 2, name: "Clorpirifos 48%", unit: "LITROS", quantity: 15, brand: "Campo Verde Ltda", description: "Insecticida organofosforado de amplio espectro." },
+    { id: 3, name: "Atrazina 90%", unit: "KILOGRAMOS", quantity: 10, brand: "AgroSolutions", description: "Herbicida selectivo para cultivos de maíz y sorgo." },
+    { id: 4, name: "Metomilo 20%", unit: "LITROS", quantity: 25, brand: "FertiAgro", description: "Insecticida de contacto y acción translaminar." },
+    { id: 5, name: "2,4-D Amina", unit: "LITROS", quantity: 30, brand: "GreenField", description: "Herbicida selectivo para cultivos de cereales y pasturas." },
+    { id: 6, name: "Carbendazim 50%", unit: "KILOGRAMOS", quantity: 12, brand: "AgroBio", description: "Fungicida sistémico para control de enfermedades foliares." }
 ];
 
 const locaciones: Locacion[] = [
-    { id: 1, direccion: "Yanquetruz 123", superficie: "50 Ha", tipo: TipoLocacion.Campo },
-    { id: 2, direccion: "Tres Marias 456", superficie: "75 Ha", tipo: TipoLocacion.Campo },
-    { id: 3, direccion: "Estancia La Pampa", superficie: "100 Ha", tipo: TipoLocacion.Campo },
-    { id: 4, direccion: "Depósito Central", superficie: "500 m²", tipo: TipoLocacion.Campo },
-    { id: 5, direccion: "Sucursal Norte", superficie: "300 m²", tipo: TipoLocacion.Campo }
+    { id: 1, name: "Deposito 1", addres: "Yanquetruz 123", area: "50 Ha", type: TipoLocacion.Campo, company_id:1 },
+    { id: 2, name: "Deposito 2",addres: "Tres Marias 456", area: "75 Ha", type: TipoLocacion.Campo, company_id:1 },
+    { id: 3, name: "Deposito 3",addres: "Estancia La Pampa", area: "100 Ha", type: TipoLocacion.Campo, company_id:1 },
+    { id: 4, name: "Deposito 4",addres: "Depósito Central", area: "500 m²", type: TipoLocacion.Campo, company_id:1 },
+    { id: 5, name: "Deposito 5",addres: "Sucursal Norte", area: "300 m²", type: TipoLocacion.Campo, company_id:1 }
 ];
 
 const initialStock: Stock[] = [
@@ -97,7 +97,7 @@ export default function StockView() {
     // };
 
     const modalText = deletedItems.length > 0
-        ? `Se han eliminado los siguientes productos del stock:\n${deletedItems.map((s) => s.producto.nombre).join("\n")}`
+        ? `Se han eliminado los siguientes productos del stock:\n${deletedItems.map((s) => s.producto.name).join("\n")}`
         : "";
 
     // Para backend: agregar manejo de loading y error

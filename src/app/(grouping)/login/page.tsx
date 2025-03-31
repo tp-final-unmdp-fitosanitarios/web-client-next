@@ -29,7 +29,9 @@ export default function Login() {
         email: formData["email"],
         password: formData["password"],
       };
+      console.log(body);
       const res = await apiService.create("/auth/login", body);
+      console.log(res);
       const { token } = res.data as { token: string };
       setToken(token);
       setErrorReq(false);

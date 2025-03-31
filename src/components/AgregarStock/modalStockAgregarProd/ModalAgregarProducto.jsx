@@ -2,15 +2,16 @@ import React, { useState } from 'react';
 import { Modal, Box, TextField, Autocomplete } from '@mui/material';
 import styles from "./modalAgregarProducto.module.scss"
 
-const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto}) => {
+const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto, limite, cantActual}) => {
+    const [cantidad, setCantidad] = useState("");
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setModalClose();
-        handleAddProducto(e.target[0].value,Math.round(e.target[1].value));
+        handleAddProducto(e.target[0].value,Math.round(cantidad));
     };
 
-    const options = products.map((p) => ({ label: p.nombre+" "+p.marca }));
+    const options = products.map((p) => ({ label: p.name }));
 
     return (
         <div>
@@ -28,7 +29,8 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto}
                         borderRadius: 2,
                     }}
                 >
-                    <h3 className={styles.title}>Agregar Producto</h3>
+                    <h3 className={styles.title}>Agregar Producto {cantActual}/{limite}</h3>
+                    {cantActual<limite ? (
                     <form onSubmit={handleSubmit}>
                         <Autocomplete
                             disablePortal
@@ -41,6 +43,7 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto}
                             label="Cantidad"
                             name="cantidad"
                             type='number'
+                            onChange={(e) => setCantidad(e.target.value)}
                             required
                         />
                         <div className={`${styles.buttonContainer}`}>
@@ -52,6 +55,9 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto}
                             </button>
                         </div>
                     </form>
+                    ):(
+                        <p>Ya lleno todos los productos ingresados</p>
+                    ) }
                 </Box>
             </Modal>
         </div>
