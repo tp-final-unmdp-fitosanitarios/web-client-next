@@ -4,7 +4,7 @@ export interface Producto {
     id: number,
     name: string,
     unit: Unidad | string,
-    quantity: number,
+    amount: number,
     brand: string,
     description: string;
 }

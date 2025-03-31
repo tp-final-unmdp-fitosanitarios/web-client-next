@@ -8,12 +8,11 @@ import { useItemsManager } from '@/hooks/useItemsManager';
 const ResumenOperacion = ({open,setModalClose,handleFinish, products, locacion, remito}) => {
     
     const handleSubmit = (e) => {
-        
         handleFinish()
     }
 
-    const items = transformToItems(products, "id",["name", "quantity"]);
-    const campos = ["name","quantity"]
+    const items = transformToItems(products, "id",["name","size","unit", "quantity"]);
+    const campos = ["name","size","unit","quantity"]
 
     const {
         selectedIds,
@@ -40,21 +39,29 @@ const ResumenOperacion = ({open,setModalClose,handleFinish, products, locacion, 
                         borderRadius: 2,
                     }}
                 >
-                    <h3>Resumen de Operacion</h3>
-                    <p>Agregara los siguientes productos y cantidades</p>
+                    <h3 className={styles.title}>Resumen de Operación</h3>
+                    <p className={styles.message}>Agregará los siguientes productos y cantidades</p>
                     {products.length > 0 ? (
                             <ItemList
                                 items={items}
                                 displayKeys={campos}
                                 onSelect={toggleSelectItem}
                                 selectedIds={selectedIds}
+                                selectItems={false}
+                                deleteItems={false}
                             />
                             ) : (
                                 <p>Ocurrio un error al cargar el stock :(</p>
                             )}
                     <div className={styles.outputContainer}>
-                        <h6>Locacion: {locacion}</h6>
-                        <h6>Remito: {remito}</h6>
+                        <div className={styles.dataPresentation}>
+                            <h5>Locacion: </h5>
+                            <h5>{locacion}</h5>
+                        </div>
+                        <div className={styles.dataPresentation}>
+                            <h5>Remito: </h5>
+                            <h5>{remito}</h5>
+                        </div>
                     </div>
                     <div className={`${styles.buttonContainer}`}>
                             <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} onClick={setModalClose}> 

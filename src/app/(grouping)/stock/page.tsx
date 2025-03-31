@@ -14,12 +14,12 @@ import GenericModal from "@/components/modal/GenericModal";
 // Para backend: import { apiService } from "@/services/api-service";
 
 const productos: Producto[] = [
-    { id: 1, name: "Glifosato 48%", unit: "LITROS", quantity: 20, brand: "AgroChem SA", description: "Herbicida sistémico para el control de malezas." },
-    { id: 2, name: "Clorpirifos 48%", unit: "LITROS", quantity: 15, brand: "Campo Verde Ltda", description: "Insecticida organofosforado de amplio espectro." },
-    { id: 3, name: "Atrazina 90%", unit: "KILOGRAMOS", quantity: 10, brand: "AgroSolutions", description: "Herbicida selectivo para cultivos de maíz y sorgo." },
-    { id: 4, name: "Metomilo 20%", unit: "LITROS", quantity: 25, brand: "FertiAgro", description: "Insecticida de contacto y acción translaminar." },
-    { id: 5, name: "2,4-D Amina", unit: "LITROS", quantity: 30, brand: "GreenField", description: "Herbicida selectivo para cultivos de cereales y pasturas." },
-    { id: 6, name: "Carbendazim 50%", unit: "KILOGRAMOS", quantity: 12, brand: "AgroBio", description: "Fungicida sistémico para control de enfermedades foliares." }
+    { id: 1, name: "Glifosato 48%", unit: "LITROS", amount: 20, brand: "AgroChem SA", description: "Herbicida sistémico para el control de malezas." },
+    { id: 2, name: "Clorpirifos 48%", unit: "LITROS", amount: 15, brand: "Campo Verde Ltda", description: "Insecticida organofosforado de amplio espectro." },
+    { id: 3, name: "Atrazina 90%", unit: "KILOGRAMOS", amount: 10, brand: "AgroSolutions", description: "Herbicida selectivo para cultivos de maíz y sorgo." },
+    { id: 4, name: "Metomilo 20%", unit: "LITROS", amount: 25, brand: "FertiAgro", description: "Insecticida de contacto y acción translaminar." },
+    { id: 5, name: "2,4-D Amina", unit: "LITROS", amount: 30, brand: "GreenField", description: "Herbicida selectivo para cultivos de cereales y pasturas." },
+    { id: 6, name: "Carbendazim 50%", unit: "KILOGRAMOS", amount: 12, brand: "AgroBio", description: "Fungicida sistémico para control de enfermedades foliares." }
 ];
 
 const locaciones: Locacion[] = [
@@ -130,6 +130,8 @@ export default function StockView() {
                     displayKeys={campos}
                     onSelect={toggleSelectItem}
                     selectedIds={selectedIds}
+                    selectItems={true}
+                    deleteItems={false}
                 />
             ) : (
                 <p>No hay elementos en el stock</p>

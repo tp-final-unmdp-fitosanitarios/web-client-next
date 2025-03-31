@@ -56,7 +56,7 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto,
                         </div>
                     </form>
                     ):(
-                        <p>Ya lleno todos los productos ingresados</p>
+                        <p className={styles.message}>Ya completó todos los productos ingresados</p>
                     ) }
                 </Box>
             </Modal>

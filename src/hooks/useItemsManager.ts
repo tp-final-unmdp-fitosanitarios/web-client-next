@@ -28,6 +28,11 @@ export const useItemsManager = <T extends ItemWithId<ID>, ID = number>(initialIt
     setIsModalOpen(true);
   };
 
+  const quitarItem = (id: ID) => {
+    console.log("Borrando: "+id);
+    setItems((prev) => prev.filter((item) => item.id !== id));
+  };
+
   const closeModal = () => {
     setIsModalOpen(false);
     setDeletedItems([]);
@@ -41,5 +46,6 @@ export const useItemsManager = <T extends ItemWithId<ID>, ID = number>(initialIt
     toggleSelectItem,
     quitarItems,
     closeModal,
+    quitarItem
   };
 };

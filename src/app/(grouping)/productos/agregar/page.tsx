@@ -22,7 +22,7 @@ export default function AgregarProductos() { //TO-DO: spasar  Props.
         id: 0,
         name: "",
         unit: Unidad.Litros,
-        quantity: 0,
+        amount: 0,
         brand: "",
         description: ""
     });
@@ -31,7 +31,7 @@ export default function AgregarProductos() { //TO-DO: spasar  Props.
         setProducto({
             ...producto,
             name: String(inputData.nombre),
-            quantity: Number(inputData.cantidad),
+            amount: Number(inputData.cantidad),
             unit: String(inputData.unidad),
             brand: String(inputData.marca),
             description: String(inputData.descripcion)

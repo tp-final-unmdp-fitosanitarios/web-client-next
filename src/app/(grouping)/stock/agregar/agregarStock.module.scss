@@ -66,3 +66,7 @@
       min-width: 90%;
     }
   }
+
+  .button:disabled{
+    background-color: $light-color;
+  }

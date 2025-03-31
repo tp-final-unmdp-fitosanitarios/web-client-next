@@ -15,17 +15,20 @@ import ModalAgregarProducto from "../../../../components/AgregarStock/modalStock
 import ResumenOperacion from "../../../../components/AgregarStock//resumenOperacionAgregar/ResumenOperacion"
 import { apiService } from '@/services/api-service';
 import { Locacion } from '@/domain/models/Locacion';
-import { useRouter } from 'next/router';
 import { useItemsManager } from '@/hooks/useItemsManager';
+import { useRouter } from 'next/navigation';
 
 type ProductoAAgregar = {
     id: number
     name: string;
     quantity: number;
+    size: number;
+    unit: string;
 };
 
 const AgregarStockPage: React.FC = () => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const router = useRouter();
     const [remito, setRemito] = useState<any>(null);
     const [productosExistentes, setProductosExistentes] = useState<Producto[]>([]);
     const [locations, setLocations] = useState<Locacion[]>([]);
@@ -64,35 +67,42 @@ const AgregarStockPage: React.FC = () => {
             updatedProductos[existingProductIndex].quantity += cantidad;
             setProductosAAgregar(updatedProductos);
         } else {
-            setProductosAAgregar([...productosAAgregar, { id: prod.id, name: producto, quantity: cantidad }]);
+            setProductosAAgregar([...productosAAgregar, { id: prod.id, name: producto, size:prod.amount, unit:prod.unit+" x ", quantity: cantidad }]);
         }
     };
 
     const fetchProductos = async () => {
-        const response = await apiService.get<any>("/products");
-        return response.data.content;
+        try{
+            const response = await apiService.get<any>("/products");
+            return response.data.content;
+        }
+        catch(e: any){
+            console.log(e.message);
+            return [];
+        }
+        
     } 
 
     const fetchLocations = async () => {
-        const response = await apiService.get<any>("/locations?type=WAREHOUSE");
-        return response.data;
+        try{
+            const response = await apiService.get<any>("/locations?type=WAREHOUSE");
+            return response.data;
+        }
+        catch(e: any){
+            console.log(e.message);
+            return []; //Aca puede caer por falta de conexion o forbbiden. Chequear como lo manejamos
+        }
+        
     } 
 
     useEffect(() => {
-        const fetchAndSetProductos = async () => {
-            const prods = await fetchProductos();
+        const fetchData = async () => {
+            const [prods, locs] = await Promise.all([fetchProductos(), fetchLocations()]);
             setProductosExistentes(prods);
-        };
-
-        const fetchAndSetLocations = async () => {
-            const locs = await fetchLocations();
-            console.log(locs)
             setLocations(locs);
         };
-
-        fetchAndSetProductos();
-        fetchAndSetLocations();
-    },[])
+        fetchData();
+    }, [])
     
     const handleFormSubmit = (inputData: Record<string, string | number>) => {
         setRemito({
@@ -107,6 +117,7 @@ const AgregarStockPage: React.FC = () => {
         setAddProductModalOpen(false);
         setFinishModalOpen(false);
         setProductosAAgregar([]);
+        router.push("/stock");
     }
 
     const handleFinish = () => {
@@ -117,13 +128,13 @@ const AgregarStockPage: React.FC = () => {
 
     const fields: Field[] = [
         { name: "nroRemito", label: "Numero de Remito", type: "text"},
-        { name: "campo", label: "Campo", type: "select" , options:locations.map((l) => l.name)},
+        { name: "campo", label: "Campo", type: "select" , options:locations ? locations.map((l) => l.name) : []},
         { name: "cantProductos", label: "Cantidad de Productos", type: "number"},
         { name: "archRemito", label: "Cargar Remito", type: "file" },
     ];
 
-    const items = transformToItems(productosAAgregar, "id",["name", "quantity"]);
-    const campos = ["name","quantity"]
+    const items = transformToItems(productosAAgregar, "id",["name","size","unit", "quantity"]);
+    const campos = ["name","size","unit","quantity"]
 
     const buttons = [
         { label: "Cancelar", path: "/stock" },
@@ -141,10 +152,14 @@ const AgregarStockPage: React.FC = () => {
         quitarItems,
         closeModal,
     } = useItemsManager(productosAAgregar);
-    //{<ItemList items={items} displayKeys={campos}/>}
+
+    const quitarItem = (id: number) => {
+        setProductosAAgregar((prev) => prev.filter((item) => item.id !== id));
+      };
+    
     return (
         <div className={styles.pageContainer}>
-            <MenuBar showMenu={false} path='/productos' />
+            <MenuBar showMenu={false} path='/stock' />
             <h1 className={styles.title}>{title}</h1>
             {!addProductModalOpen && !finishModalOpen ? 
             (
@@ -163,6 +178,9 @@ const AgregarStockPage: React.FC = () => {
                                 displayKeys={campos}
                                 onSelect={toggleSelectItem}
                                 selectedIds={selectedIds}
+                                selectItems={false}
+                                deleteItems={true}
+                                onDelete={quitarItem}
                             />
                         ) : (
                             <p>Ingrese producttos para agregar stock</p>

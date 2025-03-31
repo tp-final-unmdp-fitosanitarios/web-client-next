@@ -33,6 +33,16 @@ margin-top: $spacing-large;
     margin-right: $spacing-medium;
   }
 
-  .buttonFinish{
-    margin-left: $spacing-medium;
-  }
+.buttonFinish{
+  margin-left: $spacing-medium;
+}
+
+.message{
+  text-align: center;
+}
+
+.dataPresentation{
+  display: flex;
+  flex-direction: row;
+  justify-content: space-evenly;
+}
