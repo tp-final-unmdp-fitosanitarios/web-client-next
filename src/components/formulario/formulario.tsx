@@ -7,13 +7,13 @@ import { Field } from "@/domain/models/Field";
 
 interface FormularioProps {
   fields: Field[];
-  onSubmit: (data: Record<string, string | number>) => void;
+  onSubmit: (data: Record<string, string>) => void;
   onCancel?: () => void;
   buttonName:string
 }
 
 export default function Formulario({ fields, onSubmit, onCancel,buttonName }: FormularioProps) {
-  const initialState: Record<string, string | number> = fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {} as Record<string, string | number>);
+  const initialState: Record<string, string > = fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {} as Record<string, string>);
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
 

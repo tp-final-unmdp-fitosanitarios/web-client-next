@@ -1,20 +1,26 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
-// Tipo genérico para ítems con un id de tipo configurable
-interface ItemWithId<ID = number> {
-  id: ID;
+// Tipo genérico para ítems con un id de tipo string
+interface ItemWithId {
+  id: string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   [key: string]: any;
 }
 
-export const useItemsManager = <T extends ItemWithId<ID>, ID = number>(initialItems: T[]) => {
+export const useItemsManager = <T extends ItemWithId>(initialItems: T[]) => {
   const [items, setItems] = useState<T[]>(initialItems);
-  const [selectedIds, setSelectedIds] = useState<ID[]>([]);
+
+  // Escucha cambios en initialItems para actualizar el estado
+  useEffect(() => {
+    setItems(initialItems);
+  }, [initialItems]);
+
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [deletedItems, setDeletedItems] = useState<T[]>([]);
   const [isModalOpen, setIsModalOpen] = useState(false);
 
-  const toggleSelectItem = (id: ID) => {
+  const toggleSelectItem = (id: string) => {
     setSelectedIds((prev) =>
       prev.includes(id) ? prev.filter((selectedId) => selectedId !== id) : [...prev, id]
     );
@@ -26,11 +32,6 @@ export const useItemsManager = <T extends ItemWithId<ID>, ID = number>(initialIt
     setItems((prev) => prev.filter((item) => !selectedIds.includes(item.id)));
     setSelectedIds([]);
     setIsModalOpen(true);
-  };
-
-  const quitarItem = (id: ID) => {
-    console.log("Borrando: "+id);
-    setItems((prev) => prev.filter((item) => item.id !== id));
   };
 
   const closeModal = () => {
@@ -46,6 +47,5 @@ export const useItemsManager = <T extends ItemWithId<ID>, ID = number>(initialIt
     toggleSelectItem,
     quitarItems,
     closeModal,
-    quitarItem
   };
 };

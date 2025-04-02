@@ -17,9 +17,10 @@ import { apiService } from '@/services/api-service';
 import { Locacion } from '@/domain/models/Locacion';
 import { useItemsManager } from '@/hooks/useItemsManager';
 import { useRouter } from 'next/navigation';
+import { ResponseItems } from '@/domain/models/ResponseItems';
 
 type ProductoAAgregar = {
-    id: number
+    id: string;
     name: string;
     quantity: number;
     size: number;
@@ -27,8 +28,8 @@ type ProductoAAgregar = {
 };
 
 const AgregarStockPage: React.FC = () => {
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const router = useRouter();
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [remito, setRemito] = useState<any>(null);
     const [productosExistentes, setProductosExistentes] = useState<Producto[]>([]);
     const [locations, setLocations] = useState<Locacion[]>([]);
@@ -73,9 +74,11 @@ const AgregarStockPage: React.FC = () => {
 
     const fetchProductos = async () => {
         try{
-            const response = await apiService.get<any>("/products");
-            return response.data.content;
+            const response = await apiService.get<ResponseItems<Producto>>("/products");
+            const productos  = response.data.content;
+            return productos;
         }
+         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         catch(e: any){
             console.log(e.message);
             return [];
@@ -83,16 +86,19 @@ const AgregarStockPage: React.FC = () => {
         
     } 
 
-    const fetchLocations = async () => {
+    const fetchLocations = async (): Promise<Locacion[]> => {
         try{
-            const response = await apiService.get<any>("/locations?type=WAREHOUSE");
-            return response.data;
+            const response = await apiService.get<Locacion[]>("/locations?type=ZONE");
+            const locaciones = response.data;
+            console.log("locaciones", locaciones);
+            
+            return locaciones;
         }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         catch(e: any){
             console.log(e.message);
             return []; //Aca puede caer por falta de conexion o forbbiden. Chequear como lo manejamos
         }
-        
     } 
 
     useEffect(() => {
@@ -104,7 +110,7 @@ const AgregarStockPage: React.FC = () => {
         fetchData();
     }, [])
     
-    const handleFormSubmit = (inputData: Record<string, string | number>) => {
+    const handleFormSubmit = (inputData: Record<string, string>) => {
         setRemito({
             campo: String(inputData.campo),
             cantProductos: inputData.cantProductos,
@@ -153,7 +159,7 @@ const AgregarStockPage: React.FC = () => {
         closeModal,
     } = useItemsManager(productosAAgregar);
 
-    const quitarItem = (id: number) => {
+    const quitarItem = (id: string) => {
         setProductosAAgregar((prev) => prev.filter((item) => item.id !== id));
       };
     
@@ -183,7 +189,7 @@ const AgregarStockPage: React.FC = () => {
                                 onDelete={quitarItem}
                             />
                         ) : (
-                            <p>Ingrese producttos para agregar stock</p>
+                            <p>Ingrese productos para agregar stock</p>
                         )}
                         <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal} disabled={!remito}>
                             Agregar Producto

@@ -1,11 +1,15 @@
+import { Unidad } from "../enum/Unidad";
 import { Locacion } from "./Locacion";
 import { Producto } from "./Producto";
+import { Proveedor } from "./Proveedor";
 
 export interface Stock {
-    id: number,
-    ultima_modificacion: Date,
-    campo: Locacion,
+    id: string,
+    provider: Proveedor,
+    location: Locacion, 
     producto: Producto,
-    cantidad: number 
-    
+    amount: number,
+    unit: Unidad,
+    lotNumber: string,
+    expirationDate: Date 
 }
