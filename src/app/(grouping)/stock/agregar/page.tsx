@@ -7,7 +7,7 @@ import { Field } from '@/domain/models/Field';
 import { Remito } from '@/domain/models/Remito';
 import React, { useEffect, useState } from 'react';
 import styles from "./agregarStock.module.scss"
-import { Button, Link } from '@mui/material';
+import { Link} from '@mui/material';
 import ItemList from '@/components/itemList/ItemList';
 import { transformToItems } from '@/utilities/transform';
 import { Producto } from '@/domain/models/Producto';
@@ -25,6 +25,8 @@ type ProductoAAgregar = {
     quantity: number;
     size: number;
     unit: string;
+    expirationDate: string;
+    lotNumber: string;
 };
 
 const AgregarStockPage: React.FC = () => {
@@ -43,15 +45,15 @@ const AgregarStockPage: React.FC = () => {
     const handleFinishCloseModal = () => setFinishModalOpen(false);
     const handleFinishOpenModal = () => {
         //Valido los campos del form
-        /*if(!remito)
+        if(!remito)
             return
-        if(productosAAgregar.length !== remito.cantProductos)
-            return*/
+        if(productosAAgregar.length != remito.cantProductos) //CantProductos es de tipo any, si comparo tambien tipos, explota
+            return
 
         setFinishModalOpen(true);
     }
     
-    const handleAddProducto = (producto: string, cantidad: number) => {
+    const handleAddProducto = (producto: string, cantidad: number, lotNumber: string, expirationDate: any) => {
         if (!cantidad) return;
 
         const prod = productosExistentes.find((p) => p.name === producto);
@@ -61,14 +63,16 @@ const AgregarStockPage: React.FC = () => {
             console.warn("No se pueden agregar más productos.");
             return;
         }
-        
+
+        const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
+
         const existingProductIndex = productosAAgregar.findIndex((p) => p.id === prod.id);
         if (existingProductIndex !== -1) {
             const updatedProductos = [...productosAAgregar];
             updatedProductos[existingProductIndex].quantity += cantidad;
             setProductosAAgregar(updatedProductos);
         } else {
-            setProductosAAgregar([...productosAAgregar, { id: prod.id, name: producto, size:prod.amount, unit:prod.unit+" x ", quantity: cantidad }]);
+            setProductosAAgregar([...productosAAgregar, { id: prod.id, name: producto, size: prod.amount, unit: prod.unit + " x ", quantity: cantidad, expirationDate: formattedExpirationDate, lotNumber }]);
         }
     };
 
@@ -130,6 +134,37 @@ const AgregarStockPage: React.FC = () => {
         //Armo la request
         //Envio
         //Si sale bien vuelvo a
+        const loc = locations?.find((l) => l.name === remito.campo)?.id;
+        if (!loc) throw new Error("No se encontro la locacion");
+
+        const addStockRequest = {
+            companyId: Number(1),
+            products: productosAAgregar.map((p) => {
+                const prod = productosExistentes.find((prod) => prod.id === p.id);
+                const prodReq = {
+                    ...prod,
+                    amountofUnits: p.quantity,
+                    totalAmount: (prod?.amount ?? 0) * p.quantity,
+                    unit: prod?.unit as Unidad,
+                    lotNumber: p.lotNumber,
+                    expirationDate: p.expirationDate
+                };
+
+                return {product: prodReq};
+            }),
+            attachment: remito.archivo,
+            location_id: loc
+        }
+        console.log(loc);
+        console.log(addStockRequest);
+        apiService.create("/delivery", addStockRequest).then((response: any) => {
+            if (response.success) {
+                console.log("Stock agregado correctamente");
+                handleCancel();
+            } else {
+                console.error("Error al agregar stock:", response.error);
+            }
+        })   
     }
 
     const fields: Field[] = [
@@ -162,6 +197,7 @@ const AgregarStockPage: React.FC = () => {
     const quitarItem = (id: string) => {
         setProductosAAgregar((prev) => prev.filter((item) => item.id !== id));
       };
+
     
     return (
         <div className={styles.pageContainer}>
@@ -193,7 +229,7 @@ const AgregarStockPage: React.FC = () => {
                         )}
                         <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal} disabled={!remito}>
                             Agregar Producto
-                        </button> {/*Agregarle el estilo al disabled}*/}
+                        </button> 
                     </div>
                 </div>
                 <div className={styles.buttonContainer}>

@@ -51,7 +51,6 @@ class ApiService {
     };
 
     const finalConfig = this.addAuthToken(config);
-    console.log(finalConfig);
 
     try {
       const response = await this.axiosInstance(finalConfig);

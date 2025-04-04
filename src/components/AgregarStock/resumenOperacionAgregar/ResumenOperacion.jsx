@@ -68,7 +68,7 @@ const ResumenOperacion = ({open,setModalClose,handleFinish, products, locacion, 
                                 Cancelar
                             </button>
                             <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleSubmit}>
-                                Guardar
+                                Finalizar
                             </button>
                         </div>
                 </Box>

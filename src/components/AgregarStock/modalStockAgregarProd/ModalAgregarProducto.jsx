@@ -1,14 +1,21 @@
 import React, { useState } from 'react';
-import { Modal, Box, TextField, Autocomplete } from '@mui/material';
+import { Modal, Box, TextField, Autocomplete} from '@mui/material';
 import styles from "./modalAgregarProducto.module.scss"
+import { Dayjs } from 'dayjs';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
 const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto, limite, cantActual}) => {
-    const [cantidad, setCantidad] = useState("");
+    const [cantidad, setCantidad] = useState(0);
+    const [lotNumber, setLotNumber] = useState("");
+    const [expirationDate, setExpirationDate] = useState(null);
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setModalClose();
-        handleAddProducto(e.target[0].value,Math.round(cantidad));
+        handleAddProducto(e.target[0].value,Math.round(cantidad),lotNumber, expirationDate);
     };
 
     const options = products.map((p) => ({ label: p.name }));
@@ -46,6 +53,20 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto,
                             onChange={(e) => setCantidad(e.target.value)}
                             required
                         />
+                        <TextField
+                            fullWidth
+                            margin="normal"
+                            label="Nro de Lote"
+                            name="lotNumber"
+                            type='text'
+                            onChange={(e) => setLotNumber(e.target.value)}
+                            required
+                        />
+                        <LocalizationProvider dateAdapter={AdapterDayjs}>
+                            <DemoContainer components={['DatePicker']}>
+                                <DatePicker value={expirationDate} onChange={(newDate) => setExpirationDate(newDate)} />
+                            </DemoContainer>
+                        </LocalizationProvider>
                         <div className={`${styles.buttonContainer}`}>
                             <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} onClick={setModalClose}> 
                                 Cancelar

@@ -10,6 +10,8 @@ import GenericModal from "@/components/modal/GenericModal";
 import { apiService } from "@/services/api-service";
 import { useEffect, useState } from "react";
 import { ResponseItems } from "@/domain/models/ResponseItems";
+import { Locacion } from "@/domain/models/Locacion";
+import { Autocomplete, TextField } from "@mui/material";
 
 
 const buttons = [
@@ -24,25 +26,51 @@ export default function StockView() {
     const [stockFromServer, setStockFromServer] = useState<Stock[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
+    const [locations, setLocations] = useState<Locacion[]>([]);
+    const [actualLocation, setActualLocation] = useState<string>("");
+
+    const fetchLocations = async (): Promise<void> => {
+        try {
+            const response = await apiService.get<Locacion[]>("/locations?type=ZONE");
+            const locaciones = response.data;
+
+            setLocations(locaciones);
+            if (locaciones.length > 0) {
+                setActualLocation(locaciones[0].id); // Set the first location as the default
+            }
+        } catch (e: any) {
+            console.log(e.message);
+            setLocations([]); // Handle connection or forbidden errors
+        }
+    };
+
+    const fetchStock = async (locationId: string) => {
+        try {
+            const response = await apiService.get<ResponseItems<Stock>>(
+                `stock?size=2&page=1&location=${locationId}`
+            );
+            if (response.success) {
+                const stock = response.data.content;
+                setStockFromServer(stock);
+            } else {
+                setError(response.error || "Error al obtener el stock");
+            }
+        } catch (err) {
+            setError("Error al conectar con el servidor: " + err);
+        } finally {
+            setLoading(false);
+        }
+    };
 
     useEffect(() => {
-        const fetchStock = async () => {//To do: ver porque falla la peticion
-            try {
-                const response = await apiService.get<ResponseItems<Stock>>('stock');
-                if (response.success) {
-                    const stock = response.data.content;
-                    setStockFromServer(stock);
-                } else {
-                    setError(response.error || "Error al obtener el stock");
-                }
-            } catch (err) {
-                setError("Error al conectar con el servidor" + err);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchStock();
+        fetchLocations();
     }, []);
+
+    useEffect(() => {
+        if (actualLocation) {
+            fetchStock(actualLocation);
+        }
+    }, [actualLocation]);
 
     const {
         items: stock,  // Usamos los datos mockeados como base
@@ -94,10 +122,20 @@ export default function StockView() {
         );
     }
 
+    const options = locations.map((l) => ({ label: l.name }));
+    
     return (
         <div className="page-container">
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Stock</h1>
+
+            <Autocomplete
+                disablePortal
+                options={options}
+                renderInput={(params) => <TextField {...params} label="Locacion" required/>}
+                onChange={(e) => setActualLocation((e.target as HTMLInputElement).value)}
+                sx={{ width: 300 }}
+            />
 
             {items.length > 0 ? (
                 <ItemList
@@ -109,7 +147,7 @@ export default function StockView() {
                     deleteItems={false}
                 />
             ) : (
-                <p>No hay elementos en el stock</p>
+                <h3 className={styles.title}>No hay elementos en el stock</h3>
             )}
 
             <div className={styles.buttonContainer}>
