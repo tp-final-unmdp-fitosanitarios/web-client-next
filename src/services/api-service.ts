@@ -39,8 +39,8 @@ class ApiService {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
-        if (error.response?.status === 401 || error.response?.status === 500) {
-          console.log("Fallo de autenticacion")
+        if (error.response?.status === 401) {
+          console.log("Fallo de autorrizacion")
           this.logout();
         }
         return Promise.reject(error);
