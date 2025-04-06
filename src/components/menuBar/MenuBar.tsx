@@ -9,12 +9,13 @@ import { IoArrowBack } from 'react-icons/io5';
 
 
 interface MenuBarProps {
-    showMenu: boolean,
+    showMenu: boolean;
+    showArrow?:boolean;
     path?: string;
 }
 
 
-export default function MenuBar({ showMenu, path }: MenuBarProps) {
+export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
     const router = useRouter();
     const date: Date = new Date()
     const dateWithoutTime: string = date.toLocaleDateString();
@@ -25,22 +26,24 @@ export default function MenuBar({ showMenu, path }: MenuBarProps) {
         }
     };
 
-    return (
-        <>
+        return (
+            <>
             <div className={styles.header}>
                 <div>
-                    {showMenu ? (
-                        <SideBar />
-                    ) : (
-                        <button className={styles.backButton} onClick={handleBackClick}>
-                            <IoArrowBack className={styles.backIcon} />
-                        </button>
-                    )}
+                {showMenu ? (
+                    <SideBar />
+                ) : (
+                    showArrow && (
+                    <button className={styles.backButton} onClick={handleBackClick}>
+                        <IoArrowBack className={styles.backIcon} />
+                    </button>
+                    )
+                )}
                 </div>
                 <Image className={styles.homeLogo} src={pampaGrowLogo} alt="Home Logo" />
                 <h4 className={styles.homeDate}>{dateWithoutTime}</h4>
             </div>
             <hr className={styles.homeDivision}></hr>
-        </>
-    )
+            </>
+        )
 }

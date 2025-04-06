@@ -1,45 +1,68 @@
-/*"use client";
-import React, { createContext, useContext, useState, ReactNode } from 'react';
+"use client";
+import ApiService from "@/services/api-service";
+import { useRouter } from "next/navigation";
+import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 
 interface AuthContextType {
-    isAuthenticated: boolean;
-    login: () => void;
-    logout: () => void;
-    getToken: () => string;
-    setToken: (newToken: string) => void
-    getRoles: () => string[];
-    setRoles: (newRoles: string[]) => void;
+  isAuthenticated: boolean;
+  token: string | null;
+  login: (updatedToken: string) => void;
+  logout: () => void;
+  getApiService: () => ApiService;
+  isReady: boolean; // Agregado para indicar si el contexto está listo
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 interface AuthProviderProps {
-    children: ReactNode;
+  children: ReactNode;
 }
 
-export const AuthProvider: React.FC<AuthProviderProps> = ({ children}) => {
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
-    const [token,setNewToken] = useState("");
-    const [roles, setNewRoles] = useState<string[]>([])
+export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
+  const [token, setToken] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const router = useRouter(); // Hook para redirigir después del login
+  let apiService: ApiService;
+  const [isReady, setIsReady] = useState(false);
 
-    const login = () => setIsAuthenticated(true);
-    const logout = () => setIsAuthenticated(false);
-    const getToken = () => token;
-    const setToken = (newToken: string) => setNewToken(newToken);
-    const getRoles = () => roles;
-    const setRoles = (newRoles: string[]) => setNewRoles(newRoles);
+  const logout = () => {
+    console.log("Eliminando el token: ", token);
+    localStorage.removeItem("token");
+    setToken(null);
+    setIsAuthenticated(false);
+    apiService = new ApiService(null, logout);
+    router.push("/login");
+  };
 
-    return (
-        <AuthContext.Provider value={{ isAuthenticated, login, logout, getToken, setToken, getRoles,setRoles}}>
-            {children}
-        </AuthContext.Provider>
-    );
+  useEffect(() => {
+    const storedToken = localStorage.getItem("token");
+    if (storedToken) {
+      setToken(storedToken);
+      setIsAuthenticated(true);
+    }
+    setIsReady(true);
+  }, []);
+
+  const getApiService = () => new ApiService(token, logout);
+
+  const login = (updatedToken: string) => {
+    localStorage.setItem("token", updatedToken);
+    setToken(updatedToken);
+    setIsAuthenticated(true);
+  };
+
+
+  return (
+    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, getApiService, isReady }}>
+      {children}
+    </AuthContext.Provider>
+  );
 };
 
 export const useAuth = (): AuthContextType => {
-    const context = useContext(AuthContext);
-    if (!context) {
-        throw new Error('useAuth must be used within an AuthProvider');
-    }
-    return context;
-};*/
+  const context = useContext(AuthContext);
+  if (!context) {
+    throw new Error("useAuth must be used within an AuthProvider");
+  }
+  return context;
+};

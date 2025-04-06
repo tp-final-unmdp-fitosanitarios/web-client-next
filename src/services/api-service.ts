@@ -1,5 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import axios, { AxiosInstance, AxiosRequestConfig } from "axios";
+import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders } from "axios";
+//import useToken from "./tokenService";
+
 
 interface ApiOptions {
   baseUrl?: string;
@@ -20,23 +22,46 @@ interface ApiResponse<T> {
 class ApiService {
   private axiosInstance: AxiosInstance;
   private defaultBaseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/";
+  private token: string | null = null;
+  private logout: () => void;
 
-  constructor() {
+  
+  constructor(token: string | null, logout: () => void) {
+    this.logout = logout;
     this.axiosInstance = axios.create({
       baseURL: this.defaultBaseUrl,
-      headers: { "Content-Type": "application/json" },
-    });
+      headers: {
+        "Content-Type": "application/json",
+        ...(token ? { Authorization: `Bearer ${token}` } : {}),
+      },
+    })
+
+    this.axiosInstance.interceptors.response.use(
+      (response) => response,
+      (error) => {
+        if (error.response?.status === 401 || error.response?.status === 500) {
+          console.log("Fallo de autenticacion")
+          this.logout();
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    this.axiosInstance.interceptors.request.use(
+      (config) => {
+        if (!config.headers) {
+          config.headers = {} as AxiosRequestHeaders;
+        }
+        if (this.token) {
+          // Aseguramos compatibilidad con tipos AxiosHeaderValue
+          (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${this.token}`;
+        }
+        return config;
+      },
+      (error) => Promise.reject(error)
+    );
   }
 
-  private addAuthToken(config: AxiosRequestConfig) {
-    if (typeof window !== "undefined") {
-      const token = localStorage.getItem("token");
-      if (token) {
-        config.headers = { ...config.headers, Authorization: `Bearer ${token}` };
-      }
-    }
-    return config;
-  }
 
   private async request<T>(options: ApiOptions): Promise<ApiResponse<T>> {
     const { baseUrl = this.defaultBaseUrl, endpoint, id, data, method, headers } = options;
@@ -50,10 +75,10 @@ class ApiService {
       baseURL: baseUrl,
     };
 
-    const finalConfig = this.addAuthToken(config);
-
     try {
-      const response = await this.axiosInstance(finalConfig);
+      console.log(config.url);
+      console.log(config.headers);
+      const response = await this.axiosInstance(config);
       return { data: response.data, status: response.status, success: true };
     } catch (error: any) {
       return {
@@ -95,13 +120,6 @@ class ApiService {
     return this.request<T>({ endpoint, id, method: "DELETE", ...options });
   }
 
-  setAuthToken(token: string) {
-    this.axiosInstance.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-  }
-
-  clearAuthToken() {
-    delete this.axiosInstance.defaults.headers.common["Authorization"];
-  }
 }
 
-export const apiService = new ApiService();
+export default ApiService;

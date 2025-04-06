@@ -13,17 +13,18 @@ import { transformToItems } from '@/utilities/transform';
 import { Producto } from '@/domain/models/Producto';
 import ModalAgregarProducto from "../../../../components/AgregarStock/modalStockAgregarProd/ModalAgregarProducto"
 import ResumenOperacion from "../../../../components/AgregarStock//resumenOperacionAgregar/ResumenOperacion"
-import { apiService } from '@/services/api-service';
 import { Locacion } from '@/domain/models/Locacion';
 import { useItemsManager } from '@/hooks/useItemsManager';
 import { useRouter } from 'next/navigation';
 import { ResponseItems } from '@/domain/models/ResponseItems';
+import { useAuth } from '@/components/Auth/AuthProvider';
 
 type ProductoAAgregar = {
     id: string;
     name: string;
-    quantity: number;
     size: number;
+    amount_of_units: number | null;
+    total_amount: number | null;
     unit: string;
     expirationDate: string;
     lotNumber: string;
@@ -38,6 +39,8 @@ const AgregarStockPage: React.FC = () => {
     const [productosAAgregar, setProductosAAgregar] = useState<ProductoAAgregar[]>([]);
     const [addProductModalOpen, setAddProductModalOpen] = useState(false);
     const [finishModalOpen, setFinishModalOpen] = useState(false);
+    const { getApiService, isReady } = useAuth();
+    const apiService = getApiService();
     const title = 'Agregar Stock'
 
     const handleAddProductOpenModal = () => setAddProductModalOpen(true);
@@ -53,8 +56,8 @@ const AgregarStockPage: React.FC = () => {
         setFinishModalOpen(true);
     }
     
-    const handleAddProducto = (producto: string, cantidad: number, lotNumber: string, expirationDate: any) => {
-        if (!cantidad) return;
+    const handleAddProducto = (producto: string, lotNumber: string, expirationDate: any, amount_of_units: number | null, total_amount: number | null) => {
+        if (!amount_of_units && !total_amount) return;
 
         const prod = productosExistentes.find((p) => p.name === producto);
         if (!prod) return;
@@ -68,11 +71,19 @@ const AgregarStockPage: React.FC = () => {
 
         const existingProductIndex = productosAAgregar.findIndex((p) => p.id === prod.id);
         if (existingProductIndex !== -1) {
-            const updatedProductos = [...productosAAgregar];
-            updatedProductos[existingProductIndex].quantity += cantidad;
-            setProductosAAgregar(updatedProductos);
+            console.warn("Ya se agrego el producto", prod.name);
+            return;
         } else {
-            setProductosAAgregar([...productosAAgregar, { id: prod.id, name: producto, size: prod.amount, unit: prod.unit + " x ", quantity: cantidad, expirationDate: formattedExpirationDate, lotNumber }]);
+            setProductosAAgregar(
+                [...productosAAgregar,
+                    { id: prod.id,
+                     name: producto,
+                     size: prod.amount,
+                     unit: prod.unit,
+                     total_amount: total_amount,
+                     amount_of_units: amount_of_units,
+                     expirationDate: formattedExpirationDate,
+                     lotNumber }]);
         }
     };
 
@@ -106,13 +117,14 @@ const AgregarStockPage: React.FC = () => {
     } 
 
     useEffect(() => {
+        if(!isReady) return;
         const fetchData = async () => {
             const [prods, locs] = await Promise.all([fetchProductos(), fetchLocations()]);
             setProductosExistentes(prods);
             setLocations(locs);
         };
         fetchData();
-    }, [])
+    }, [isReady])
     
     const handleFormSubmit = (inputData: Record<string, string>) => {
         setRemito({
@@ -138,19 +150,20 @@ const AgregarStockPage: React.FC = () => {
         if (!loc) throw new Error("No se encontro la locacion");
 
         const addStockRequest = {
-            companyId: Number(1),
+            company_id: 1,
             products: productosAAgregar.map((p) => {
                 const prod = productosExistentes.find((prod) => prod.id === p.id);
-                const prodReq = {
-                    ...prod,
-                    amountofUnits: p.quantity,
-                    totalAmount: (prod?.amount ?? 0) * p.quantity,
-                    unit: prod?.unit as Unidad,
-                    lotNumber: p.lotNumber,
-                    expirationDate: p.expirationDate
-                };
+                const prodReq ={   product_id: p.id,
+                    unit: p.unit,
+                    lot_number: p.lotNumber,
+                    expiration_date: p.expirationDate}
 
-                return {product: prodReq};
+                if (p.amount_of_units)
+                    return {...prodReq, amount_of_units: p.amount_of_units, total_amount: null};
+
+                if(p.total_amount)
+                    return {...prodReq, total_amount: p.total_amount, amount_of_units: null};
+
             }),
             attachment: remito.archivo,
             location_id: loc
@@ -174,8 +187,22 @@ const AgregarStockPage: React.FC = () => {
         { name: "archRemito", label: "Cargar Remito", type: "file" },
     ];
 
-    const items = transformToItems(productosAAgregar, "id",["name","size","unit", "quantity"]);
-    const campos = ["name","size","unit","quantity"]
+    const items = transformToItems(productosAAgregar, "id", ["name", "size", "unit", "amount_of_units", "total_amount"]).map((item) => {
+        if (item.amount_of_units !== "null") {
+            return {
+                ...item,
+                display: `${item.name} ${item.size} ${item.unit} x ${item.amount_of_units}U`,
+            };
+        } else if (item.total_amount !== "null") {
+            return {
+                ...item,
+                display: `${item.name} ${item.total_amount} ${item.unit}`,
+            };
+        }
+        return item;
+    });
+
+    const campos = ["display"];
 
     const buttons = [
         { label: "Cancelar", path: "/stock" },
@@ -201,7 +228,7 @@ const AgregarStockPage: React.FC = () => {
     
     return (
         <div className={styles.pageContainer}>
-            <MenuBar showMenu={false} path='/stock' />
+            <MenuBar showMenu={false} showArrow={true} path='/stock' />
             <h1 className={styles.title}>{title}</h1>
             {!addProductModalOpen && !finishModalOpen ? 
             (
@@ -210,6 +237,7 @@ const AgregarStockPage: React.FC = () => {
                     <div className={styles.formContainer}>
                         <h3>Nuevo Remito</h3>
                         <Formulario fields={fields} onSubmit={handleFormSubmit} buttonName="Guardar Remito" />
+                        
                     </div>
                     <div className={styles.itemListContainer}>
                         <h3>Agregar Stock</h3>

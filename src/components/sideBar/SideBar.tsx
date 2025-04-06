@@ -13,10 +13,12 @@ import MailIcon from '@mui/icons-material/Mail';
 import MenuIcon from '@mui/icons-material/Menu';
 import Link from 'next/link';
 import styles from "./sideBar.module.scss";
+import { useAuth } from '../Auth/AuthProvider';
 
 export default function SideBar () {
 
     const [open, setOpen] = React.useState(false);
+    const {logout} = useAuth(); 
 
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
@@ -40,9 +42,7 @@ export default function SideBar () {
       </List>
       <Divider />
       <div className={styles.logOutContainer}>
-        <Link href="/productos">
-            <button className={`button ${styles.buttonLogOut}`}> Cerrar Sesion</button>
-        </Link>
+            <button className={`button ${styles.buttonLogOut}`} onClick={logout}> Cerrar Sesion</button>
       </div>
     </Box>
   );

@@ -8,22 +8,23 @@ import { Field } from "@/domain/models/Field";
 import styles from "./login-view.module.scss";
 import Link from "next/link";
 import { useState } from "react";
-import { apiService } from "@/services/api-service";
-import useToken from "@/services/tokenService";
+import { useAuth } from "@/components/Auth/AuthProvider";
+import { useRouter } from 'next/navigation';
 
 // Forzar que esta página sea dinámica y no se prerenderice en el servidor
 export const dynamic = "force-dynamic";
 
 export default function Login() {
   const [errorReq, setErrorReq] = useState(false);
-  const { token, setToken } = useToken();
-
+  const { getApiService , login} = useAuth(); // Hook para manejar el token de autenticación
   const fields: Field[] = [
     { name: "email", label: "Nombre", type: "text" },
     { name: "password", label: "Contraseña", type: "password" }, 
   ];
+  const router = useRouter(); // Hook para redirigir después del login
 
-  const login = async (formData: any) => {
+  const log_in = async (formData: any) => {
+    const apiService = getApiService();
     try {
       const body = {
         email: formData["email"],
@@ -33,8 +34,9 @@ export default function Login() {
       const res = await apiService.create("/auth/login", body);
       console.log(res);
       const { token } = res.data as { token: string };
-      setToken(token);
+      login(token); /// Login del provider
       setErrorReq(false);
+      router.push("/home"); // Redirigir a la página de inicio después del login exitoso
     } catch (e: any) {
       if (e.response?.status === 401) { 
         setErrorReq(true);
@@ -46,11 +48,11 @@ export default function Login() {
 
   return (
     <>
-      <MenuBar showMenu={false} path="home" />
+      <MenuBar showMenu={false}showArrow={false} path="home" />
       <h1 className={styles.title}>Login</h1>
       <div className={styles.mainContainer}>
         <div className={styles.formContainer}>
-          <Formulario fields={fields} onSubmit={login} buttonName="Ingresar" />
+          <Formulario fields={fields} onSubmit={log_in} buttonName="Ingresar" />
           {errorReq && (
             <p className={styles.error}>Usuario y/o contraseña incorrectos.</p>
           )}

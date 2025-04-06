@@ -40,3 +40,10 @@ margin-top: $spacing-large;
 .message{
   text-align: center;
 }
+
+.radioContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: $spacing-large;
+}

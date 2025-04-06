@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import "./styles/globals.scss"
-
+import { AuthProvider } from "@/components/Auth/AuthProvider";
 
 export const metadata: Metadata = {
   title: "EPP gestion",
@@ -12,10 +12,11 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en">
       <body>
-        {children}
+      <AuthProvider>{children}</AuthProvider>
       </body>
     </html>
   );

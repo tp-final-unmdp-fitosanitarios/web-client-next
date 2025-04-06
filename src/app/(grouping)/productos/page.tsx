@@ -8,8 +8,8 @@ import { transformToItems } from "@/utilities/transform";
 import { useItemsManager } from "@/hooks/useItemsManager";
 import GenericModal from "@/components/modal/GenericModal";
 import { useEffect, useState } from "react";
-import { apiService } from "@/services/api-service";
 import { ResponseItems } from "@/domain/models/ResponseItems";
+import { useAuth } from "@/components/Auth/AuthProvider";
 
 const buttons = [{ label: "Agregar", path: "/productos/agregar" }];
 
@@ -17,6 +17,8 @@ export default function ProductosView() {
      const [productosFromServer, setProductosFromServer] = useState<Producto[]>([]);
      const [loading, setLoading] = useState<boolean>(true);
      const [error, setError] = useState<string>("");
+     const { getApiService } = useAuth();
+     const apiService = getApiService();
 
     useEffect(() => {
         const fetchProductos = async () => {//bearer token

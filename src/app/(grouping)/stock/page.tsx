@@ -7,11 +7,11 @@ import MenuBar from "@/components/menuBar/MenuBar";
 import { transformToItems } from "@/utilities/transform";
 import { Stock } from "@/domain/models/Stock";
 import GenericModal from "@/components/modal/GenericModal";
-import { apiService } from "@/services/api-service";
 import { useEffect, useState } from "react";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import { Locacion } from "@/domain/models/Locacion";
 import { Autocomplete, TextField } from "@mui/material";
+import { useAuth } from "@/components/Auth/AuthProvider";
 
 
 const buttons = [
@@ -28,6 +28,8 @@ export default function StockView() {
     const [error, setError] = useState<string>("");
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [actualLocation, setActualLocation] = useState<string>("");
+    const { getApiService, isReady } = useAuth();
+    const apiService = getApiService();
 
     const fetchLocations = async (): Promise<void> => {
         try {
@@ -63,14 +65,16 @@ export default function StockView() {
     };
 
     useEffect(() => {
+        if(!isReady) return; // Esperar a que el contexto esté listo
         fetchLocations();
-    }, []);
+    }, [isReady]);
 
     useEffect(() => {
+        if(!isReady) return;
         if (actualLocation) {
             fetchStock(actualLocation);
         }
-    }, [actualLocation]);
+    }, [actualLocation,isReady]);
 
     const {
         items: stock,  // Usamos los datos mockeados como base
@@ -135,6 +139,7 @@ export default function StockView() {
                 renderInput={(params) => <TextField {...params} label="Locacion" required/>}
                 onChange={(e) => setActualLocation((e.target as HTMLInputElement).value)}
                 sx={{ width: 300 }}
+                className=""
             />
 
             {items.length > 0 ? (

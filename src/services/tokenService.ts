@@ -1,4 +1,4 @@
-"use client"; // Asegúrate de que esto esté presente
+/*"use client"; // Asegúrate de que esto esté presente
 import { useState, useEffect } from "react";
 
 export default function useToken() {
@@ -18,8 +18,16 @@ export default function useToken() {
     setToken(userToken);
   };
 
+  const removeToken = () => {
+    if (typeof window !== "undefined") { // Proteger eliminación en localStorage
+      localStorage.removeItem("token");
+    }
+    setToken(null);
+  };
+
   return {
     setToken: saveToken,
+    removeToken,
     token,
   };
-}
+}*/

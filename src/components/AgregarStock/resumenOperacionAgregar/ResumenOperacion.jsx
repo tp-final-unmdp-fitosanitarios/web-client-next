@@ -11,8 +11,22 @@ const ResumenOperacion = ({open,setModalClose,handleFinish, products, locacion, 
         handleFinish()
     }
 
-    const items = transformToItems(products, "id",["name","size","unit", "quantity"]);
-    const campos = ["name","size","unit","quantity"]
+    const items = transformToItems(products, "id", ["name", "size", "unit", "amount_of_units", "total_amount"]).map((item) => {
+        if (item.amount_of_units !== "null") {
+            return {
+                ...item,
+                display: `${item.name} ${item.size} ${item.unit} x ${item.amount_of_units}U`,
+            };
+        } else if (item.total_amount !== "null") {
+            return {
+                ...item,
+                display: `${item.name} ${item.total_amount} ${item.unit}`,
+            };
+        }
+        return item;
+    });
+
+    const campos = ["display"];
 
     const {
         selectedIds,
