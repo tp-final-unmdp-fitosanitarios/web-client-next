@@ -6,8 +6,17 @@ import styles from "./moverStock.module.scss";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import { Stock } from "@/domain/models/Stock";
 import { ResponseItems } from "@/domain/models/ResponseItems";
+import MenuBar from "@/components/menuBar/MenuBar";
+import { useSearchParams } from "next/navigation";
+
 
 const MoverStock = () => {
+  const searchParams = useSearchParams();
+  const origen = searchParams.get("origen");
+  const destino = searchParams.get("destino");
+
+  const actualLocation = origen
+
   const [stockFromServer, setStockFromServer] = useState<Stock[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [error, setError] = useState<string>("");
@@ -15,9 +24,7 @@ const MoverStock = () => {
   const { getApiService, isReady } = useAuth();
   const apiService = getApiService();
 
-  const actualLocation = "locacion-origen"; // Hardcodeado por ahora
-
-  const fetchStock = async () => { // TO DO: aplicar css y terminar de deasrrollar el componente
+  const fetchStock = async () => { //Terminar de deasrrollar el componente :  Hacer peticion para traer el stock por locacion. Agregar logica para mover productos.
     try {
       const response = await apiService.get<ResponseItems<Stock>>(
         `stock?size=100&page=1&location=${actualLocation}`
@@ -58,26 +65,31 @@ const MoverStock = () => {
   if (error) return <div>Error: {error}</div>;
 
   return (
+
+
     <div className={styles.pageContainer}>
-      <div className={styles.column}>
-        <h2>Stock disponible en {actualLocation}</h2>
-        <ItemList
-          items={items}
-          displayKeys={["producto", "amount", "location"]}
-          onSelect={toggleSelectItem}
-          selectedIds={selectedIds}
-          selectItems={true}
-          deleteItems={false}
-        />
-      </div>
-      <div className={styles.column}>
-        <h2>Productos a mover</h2>
-        <ItemList
-          items={selectedItems}
-          displayKeys={["producto", "amount", "location"]}
-          selectItems={false}
-          deleteItems={false}
-        />
+      <MenuBar showMenu={true} path="" />
+      <div className={styles.mainContainer}>
+        <div className={styles.column}>
+          <h2 className={styles.subtitle}>Stock disponible en {actualLocation}</h2>
+          <ItemList
+            items={items}
+            displayKeys={["producto", "amount", "location"]}
+            onSelect={toggleSelectItem}
+            selectedIds={selectedIds}
+            selectItems={true}
+            deleteItems={false}
+          />
+        </div>
+        <div className={styles.column}>
+          <h2 className={styles.subtitle}>Productos a mover hacia {destino}</h2>
+          <ItemList
+            items={selectedItems}
+            displayKeys={["producto", "amount", "location"]}
+            selectItems={false}
+            deleteItems={false}
+          />
+        </div>
       </div>
     </div>
   );

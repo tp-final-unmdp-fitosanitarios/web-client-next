@@ -30,8 +30,12 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
   };
   const router = useRouter();
 
-  const handleFormSubmit = () => {
-      router.push("/stock/mover");// To do: pasar los datos de la locacion origen y destino
+  const handleFormSubmit = (formValues: Record<string, string>) => {
+    const origen = formValues["origen"];
+    const destino = formValues["destino"];
+  
+    // Redirigimos con los valores como query params se hace esto porque el router no permite pasar valores por el state
+    router.push(`/stock/mover?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}`);
     onClose();
   };
 
