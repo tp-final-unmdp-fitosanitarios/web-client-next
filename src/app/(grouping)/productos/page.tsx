@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import styles from "./productos-view.module.scss";
 import Link from "next/link";
@@ -55,21 +56,29 @@ export default function ProductosView() {
 
     const items = transformToItems(productos, "id", ["name"]);
     const campos = ["name"];
-
-    // Para backend: agregar esta función para sincronizar eliminaciones con el servidor
-    // const handleQuitarItems = async () => {
-    //     try {
-    //         const response = await apiService.delete('productos', { ids: selectedIds });
-    //         if (response.success) {
-    //             quitarItems(); // Solo llamamos a quitarItems si la eliminación en el backend es exitosa
-    //         } else {
-    //             alert("Error al eliminar productos");
-    //         }
-    //     } catch (err) {
-    //         alert("Error al conectar con el servidor");
-    //     }
-    // };
-
+    
+    const handleQuitarItems = async () => {
+        try {
+            const deleteResults = await Promise.all(
+                selectedIds.map(async (id) => {
+                    const response = await apiService.delete("products", id);
+                    return response.success;
+                })
+            );
+    
+            const allDeleted = deleteResults.every((success) => success);
+    
+            if (allDeleted) {
+                quitarItems(); // Esto actualiza los productos visibles y muestra la modal
+            } else {
+                alert("Algunos productos no pudieron ser eliminados.");
+            }
+        } catch (err) {
+            alert("Error al conectar con el servidor");
+        }
+    };
+    ;
+    
     const modalText =
         deletedItems.length > 0
             ? `Se han eliminado los siguientes productos:\n${deletedItems.map((p) => p.name).join("\n")}`
@@ -113,7 +122,7 @@ export default function ProductosView() {
                 {selectedIds.length > 0 && (
                     <button
                         className={`button button-secondary ${styles.buttonHome}`}
-                        onClick={quitarItems} // Para backend: usar handleQuitarItems en lugar de quitarItems
+                        onClick={handleQuitarItems}
                     >
                         Quitar
                     </button>

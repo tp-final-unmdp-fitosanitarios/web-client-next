@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client"
 import Formulario from '@/components/formulario/formulario';
@@ -93,7 +94,6 @@ const AgregarStockPage: React.FC = () => {
             const productos  = response.data.content;
             return productos;
         }
-         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         catch(e: any){
             console.log(e.message);
             return [];
@@ -109,7 +109,6 @@ const AgregarStockPage: React.FC = () => {
             
             return locaciones;
         }
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         catch(e: any){
             console.log(e.message);
             return []; //Aca puede caer por falta de conexion o forbbiden. Chequear como lo manejamos

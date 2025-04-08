@@ -3,5 +3,6 @@ export interface Field {
     label: string;
     type: "text" | "select" | "number" | "file" | "password";
     options?: string[]; // Para dropdowns
+    onFocus?: () => void; 
   }
   

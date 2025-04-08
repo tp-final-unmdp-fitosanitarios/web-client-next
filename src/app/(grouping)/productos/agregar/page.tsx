@@ -69,7 +69,7 @@ export default function AgregarProductos() {
 
     return (
         <div className="page-container">
-            <MenuBar showMenu={false} path="/productos" />
+            <MenuBar showMenu={true} path="/productos" />
             <h1 className={styles.title}>{title}</h1>
 
             <Formulario fields={fields} onSubmit={handleFormSubmit} onCancel={handleCancel} buttonName="Continuar" />

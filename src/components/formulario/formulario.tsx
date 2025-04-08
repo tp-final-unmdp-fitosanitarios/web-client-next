@@ -61,7 +61,7 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName }: Fo
           <div key={field.name} className={`${styles["input-group"]}`} >
             <label className={styles.label}>{field.label}</label>
             {field.type === "select" ? (
-              <select name={field.name} value={formData[field.name]} onChange={handleChange} className={styles.select}>
+              <select name={field.name} value={formData[field.name]} onChange={handleChange}  onFocus={field.onFocus} className={styles.select}>
                 <option value="">Seleccione una opción</option>
                 {field.options?.map((option) => (
                   <option key={option} value={option}>

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useItemsManager } from "@/hooks/useItemsManager";
 import ItemList from "@/components/itemList/ItemList";
@@ -12,11 +13,10 @@ import { ResponseItems } from "@/domain/models/ResponseItems";
 import { Locacion } from "@/domain/models/Locacion";
 import { Autocomplete, TextField } from "@mui/material";
 import { useAuth } from "@/components/Auth/AuthProvider";
-
+import MoverStockModal from "@/components/MoverStockModal/MoverStockModal";
 
 const buttons = [
     { label: "Agregar", path: "/stock/agregar" },
-    { label: "Mover", path: "/stock/mover" },
     { label: "Retirar", path: "/stock/retirar" },
     { label: "Ver Movimientos", path: "/stock/movimientos" },
     { label: "Proveedores", path: "/stock/proveedores" },
@@ -28,6 +28,7 @@ export default function StockView() {
     const [error, setError] = useState<string>("");
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [actualLocation, setActualLocation] = useState<string>("");
+    const [showMoverModal, setShowMoverModal] = useState(false);
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
 
@@ -65,16 +66,16 @@ export default function StockView() {
     };
 
     useEffect(() => {
-        if(!isReady) return; // Esperar a que el contexto esté listo
+        if (!isReady) return; // Esperar a que el contexto esté listo
         fetchLocations();
     }, [isReady]);
 
     useEffect(() => {
-        if(!isReady) return;
+        if (!isReady) return;
         if (actualLocation) {
             fetchStock(actualLocation);
         }
-    }, [actualLocation,isReady]);
+    }, [actualLocation, isReady]);
 
     const {
         items: stock,  // Usamos los datos mockeados como base
@@ -127,7 +128,7 @@ export default function StockView() {
     }
 
     const options = locations.map((l) => ({ label: l.name }));
-    
+
     return (
         <div className="page-container">
             <MenuBar showMenu={true} path="" />
@@ -136,7 +137,7 @@ export default function StockView() {
             <Autocomplete
                 disablePortal
                 options={options}
-                renderInput={(params) => <TextField {...params} label="Locacion" required/>}
+                renderInput={(params) => <TextField {...params} label="Locacion" required />}
                 onChange={(e) => setActualLocation((e.target as HTMLInputElement).value)}
                 sx={{ width: 300 }}
                 className=""
@@ -164,6 +165,12 @@ export default function StockView() {
                         Quitar
                     </button>
                 )}
+                <button
+                    className={`button button-primary ${styles.buttonHome}`}
+                    onClick={() => setShowMoverModal(true)}
+                >
+                    Mover
+                </button>
 
                 {buttons.map((button, index) => (
                     <Link key={index} href={button.path}>
@@ -172,6 +179,7 @@ export default function StockView() {
                         </button>
                     </Link>
                 ))}
+
             </div>
 
             <GenericModal
@@ -182,6 +190,10 @@ export default function StockView() {
                 buttonTitle="Cerrar"
                 showSecondButton={false}
             />
+
+            {showMoverModal && (
+                <MoverStockModal onClose={() => setShowMoverModal(false)} />
+            )}
         </div>
     );
 }
