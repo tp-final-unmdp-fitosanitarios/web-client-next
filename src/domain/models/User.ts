@@ -2,9 +2,9 @@ import { Roles } from "../enum/Roles"
 
 export interface User {
     id: string,
-    nombre: string,
-    apellido: string,
-    rol: Roles[] | string[],
+    first_name: string,
+    last_name: string,
+    roles: Roles[] | string[],
     companyId: string,
     email: string
 }

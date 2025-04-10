@@ -10,6 +10,8 @@ interface AuthContextType {
   logout: () => void;
   getApiService: () => ApiService;
   isReady: boolean; // Agregado para indicar si el contexto está listo
+  getUserId: () => string | null;
+  setUserId: (id: string) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -21,6 +23,7 @@ interface AuthProviderProps {
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userId, set_UserId] = useState<string | null>(null);
   const router = useRouter(); // Hook para redirigir después del login
   let apiService: ApiService;
   const [isReady, setIsReady] = useState(false);
@@ -51,9 +54,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsAuthenticated(true);
   };
 
+  const getUserId = () => userId;
+  const setUserId = (id: string) => set_UserId(id);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, getApiService, isReady }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, getApiService, isReady, getUserId, setUserId }}>
       {children}
     </AuthContext.Provider>
   );

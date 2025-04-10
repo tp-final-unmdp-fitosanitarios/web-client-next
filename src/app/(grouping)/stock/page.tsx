@@ -50,10 +50,11 @@ export default function StockView() {
     const fetchStock = async (locationId: string) => {
         try {
             const response = await apiService.get<ResponseItems<Stock>>(
-                `stock?size=2&page=1&location=${locationId}`
+                `stock?location=${locationId}`
             );
             if (response.success) {
                 const stock = response.data.content;
+                console.log(stock);
                 setStockFromServer(stock);
             } else {
                 setError(response.error || "Error al obtener el stock");
@@ -64,6 +65,8 @@ export default function StockView() {
             setLoading(false);
         }
     };
+
+
 
     useEffect(() => {
         if (!isReady) return; // Esperar a que el contexto esté listo
@@ -87,8 +90,27 @@ export default function StockView() {
         closeModal,
     } = useItemsManager(stockFromServer);
 
-    const items = transformToItems(stock, "id", ["producto", "amount", "location"]);
-    const campos = ["producto", "amount", "location"];
+
+    let displayStock: any[] = [];
+    if (stock.length > 0) {
+        displayStock = stock.map((item) => {
+            return {
+                id: item.id,
+                producto: item.product?.name || '',
+                amount: item.amount,
+                unit: item.unit || ''
+            };
+        });
+    }
+
+    const items = transformToItems(displayStock, "id", ["producto", "amount", "unit"]).map((item) => {
+            return {
+                ...item,
+                display: `${item.producto} : ${item.amount}${item.unit}`,
+            };
+            });
+
+    const campos = ["display"];
 
     // Para backend: agregar esta función para sincronizar eliminaciones con el servidor
     // const handleQuitarItems = async () => {
@@ -105,7 +127,7 @@ export default function StockView() {
     // };
 
     const modalText = deletedItems.length > 0
-        ? `Se han eliminado los siguientes productos del stock:\n${deletedItems.map((s) => s.producto.name).join("\n")}`
+        ? `Se han eliminado los siguientes productos del stock:\n${deletedItems.map((s) => s.product.name).join("\n")}`
         : "";
 
 
@@ -137,9 +159,14 @@ export default function StockView() {
             <Autocomplete
                 disablePortal
                 options={options}
+                defaultValue={locations[0]?.name ? {label: locations[0].name} : null}
                 renderInput={(params) => <TextField {...params} label="Locacion" required />}
-                onChange={(e) => setActualLocation((e.target as HTMLInputElement).value)}
-                sx={{ width: 300 }}
+                onChange={(e, newValue) => {
+                  if (newValue) {
+                    setActualLocation(locations.find(l => l.name === newValue.label)?.id || '');
+                  }
+                }}
+                sx={{ width: 300, margin: '0 auto', marginBottom: '10px' }}
                 className=""
             />
 

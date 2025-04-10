@@ -5,18 +5,38 @@ import { User } from "@/domain/models/User";
 import { Roles } from "@/domain/enum/Roles";
 import HomepageJerarquico from "../../../components/homepageJerarquico/HomepageJerarquico";
 import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador";
+import { useAuth } from "@/components/Auth/AuthProvider";
 
 export default function Home() {
 
   const [user, setUser] = useState<User | null>(null)
-
+  const [loading, setLoading] = useState(true);
+  const { getApiService, isReady, getUserId } = useAuth();
+  const apiService = getApiService();
+  const userId = getUserId();
 
   const buttons = [
     { label: "Productos", path: "/productos" },
     { label: "Stock", path: "/stock" },
   ];
 
-  if (user && user.rol[0] === Roles.Admin) {
+  useEffect(() => {
+    if (isReady && userId) {
+      fetchUser().then(user => {
+        setUser(user);
+        setLoading(false);
+      }).catch(error => {
+        console.error('Error fetching user:', error);
+        setLoading(false);
+      });
+    }
+  }, [isReady, userId]);
+
+  if (loading) {
+    return <div>Cargando...</div>;
+  }
+
+  if (user && Array.isArray(user.roles) && user.roles.length > 0 && user.roles[0] === Roles.Admin) {
     buttons.push(
       { label: "Personal", path: "/personal" },
       { label: "Maquinas", path: "/maquinas" },
@@ -25,30 +45,14 @@ export default function Home() {
     );
   }
 
-  function fetchUser(): Promise<User> {
-
-    return new Promise<User>((resolve) => {
-      // id: string,
-      // nombre: string,
-      // apellido: string,
-      // rol: Roles[] | string[],
-      // companyId: string,
-      // email: string
-      const response: User = { id: "1", nombre: "Rosario", apellido: "Hernandez", rol: [Roles.Admin], companyId: "1", email: "email@mail.com" }
-      const response2: User = { id: "2", nombre: "Jeremias", apellido: "Savarino", rol: [Roles.Aplicador], companyId: "3", email: "email@mail.com" }
-      console.log(response2);
-      setTimeout(() => resolve(response), 1000)
-    })
-
+  async function fetchUser(): Promise<User> {
+   const res = await apiService.get<User>(`/users/${userId}`)
+   console.log(res.data)
+   return res.data
   }
-
-  useEffect(() => {
-    fetchUser()
-      .then((user) => { setUser(user) })
-  }, [])
 
   if (!user)
     return (<h3>Loading...</h3>)
 
-  return user.rol[0] === Roles.Admin || user.rol[0] === Roles.Encargado ? <HomepageJerarquico user={user} buttons={buttons} /> : <HomepageAplicador user={user} />
+  return user.roles[0] === Roles.Admin || user.roles[0] === Roles.Encargado ? <HomepageJerarquico user={user} buttons={buttons} /> : <HomepageAplicador user={user} />
 }

@@ -7,7 +7,7 @@ export interface Stock {
     id: string,
     provider: Proveedor,
     location: Locacion, 
-    producto: Producto,
+    product: Producto,
     amount: number,
     unit: Unidad,
     lotNumber: string,
