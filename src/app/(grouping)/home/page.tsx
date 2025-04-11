@@ -41,7 +41,6 @@ export default function Home() {
       { label: "Personal", path: "/personal" },
       { label: "Maquinas", path: "/maquinas" },
       { label: "Estadísticas", path: "/estadisticas" },
-      { label: "Login", path: "/login" }
     );
   }
 

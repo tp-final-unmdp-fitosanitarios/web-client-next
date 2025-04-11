@@ -34,7 +34,7 @@ export default function StockView() {
 
     const fetchLocations = async (): Promise<void> => {
         try {
-            const response = await apiService.get<Locacion[]>("/locations?type=ZONE");
+            const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE&type=FIELD");
             const locaciones = response.data;
 
             setLocations(locaciones);
