@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useEffect, useState } from "react";
 import ItemList from "@/components/itemList/ItemList";
@@ -54,7 +53,7 @@ const MoverStock = () => {
 
   const items = stockFromServer.map((item) => ({
     id: item.id,
-    producto: item.producto.name,
+    producto: item.product.name,
     amount: item.amount.toString(),
     location: item.location.name,
   }));
