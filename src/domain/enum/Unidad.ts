@@ -1,4 +1,4 @@
 export enum Unidad {
-  Litros = "Litros",
-  Kilogramos = "Kilogramos",
+  Litros = "LT",
+  Kilogramos = "KG",
   }

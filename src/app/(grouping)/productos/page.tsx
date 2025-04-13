@@ -113,7 +113,7 @@ export default function ProductosView() {
                     items={items}
                     displayKeys={campos}
                     onSelect={toggleSelectItem}
-                    selectedIds={selectedIds} selectItems={true} deleteItems={false}                />
+                    selectedIds={selectedIds} selectItems={true} deleteItems={false}  selectSingleItem={false}  />
             ) : (
                 <p>No hay productos disponibles</p>
             )}

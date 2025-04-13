@@ -15,6 +15,7 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import styles from "./agregarProductos.module.scss";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 
+
 export default function AgregarProductos() {
   const title = "Agregar Producto";
   const router = useRouter();
@@ -33,7 +34,7 @@ export default function AgregarProductos() {
     providers: [],
     agrochemical: {
       id: "",
-      activePrinciple: "",
+      active_principle: "",
       description: "",
       companyId: "",
       category: "HERBICIDE",
@@ -51,7 +52,7 @@ export default function AgregarProductos() {
     const fetchData = async () => {
       try {
         const agroResponse = await apiService.get<ResponseItems<Agroquimico>>("/agrochemicals");
-        const provResponse = await apiService.get<ResponseItems<Proveedor>>("/providers"); //Falla esta peticion ( hay que cargar los datos en el backend)
+        const provResponse = await apiService.get<ResponseItems<Proveedor>>("/providers");
         if (agroResponse.success && provResponse.success) {
           console.log("Agroquímico recibido ", agroResponse.data.content);
           setAgroquimicos(agroResponse.data.content);
@@ -75,7 +76,7 @@ export default function AgregarProductos() {
 
   const handleFormSubmit = (inputData: Record<string, string | number>) => {
     const agroquimicoSeleccionado = agroquimicos.find(
-      (a) => a.activePrinciple === inputData.agroquimico
+      (a) => a.active_principle === inputData.agroquimico
     );
 
     const proveedorSeleccionado = proveedores.find(
@@ -91,114 +92,107 @@ export default function AgregarProductos() {
       console.error("Proveedor no encontrado");
       return;
     }
+   
 
-    const nuevoProducto: Producto = {
-      id: "", 
+    const nuevoProducto: Producto = {// actualizar cuando facu cambie la DTO desde el back
+      id: null,
       name: String(inputData.nombre),
       unit: inputData.unidad as Unidad,
       amount: Number(inputData.cantidad),
       brand: String(inputData.marca),
-      createdAt: new Date().toISOString(), 
+      createdAt: new Date().toISOString(),
       agrochemicalId: agroquimicoSeleccionado.id,
       agrochemical: {
-        id: agroquimicoSeleccionado.id,
-        activePrinciple: agroquimicoSeleccionado.activePrinciple,
-        description: agroquimicoSeleccionado.description,
-        companyId: agroquimicoSeleccionado.companyId,
-        category: inputData.categoria as "HERBICIDE" | "INSECTICIDE" | "FUNGICIDE",
-        createdAt: agroquimicoSeleccionado.createdAt,
-        updatedAt: agroquimicoSeleccionado.updatedAt,
+        ...agroquimicoSeleccionado,
+        activePrinciple: agroquimicoSeleccionado.active_principle,
       },
       providers: [
         {
-          id: proveedorSeleccionado.id,
-          name: proveedorSeleccionado.name,
-          description: proveedorSeleccionado.description,
-          companyId: proveedorSeleccionado.companyId,
+          ...proveedorSeleccionado,
+          companyId: proveedorSeleccionado.companyId, 
           products: [],
-        },
-      ],
+        }
+      ]
     };
+    
 
     setnewProducto(nuevoProducto);
-    createProduct(nuevoProducto);
-  };
+    createProduct();
+  }
+    const createProduct = async () => {
+      try {
+        const response = await apiService.create<Producto>("/products", newProducto);
 
-  const createProduct = async (data: Producto) => {
-    try {
-      const response = await apiService.create<Producto>("/products", data);
-
-      if (response.success) {
-        console.log("Producto creado:", response.data);
-        setnewProducto(response.data);
-        handleOpenModal();
-      } else {
-        console.error("Error al crear el producto:", response.error);
+        if (response.success) {
+          console.log("Producto creado:", response.data);
+          setnewProducto(response.data);
+          handleOpenModal();
+        } else {
+          console.error("Error al crear el producto:", response.error);
+        }
+      } catch (error: any) {
+        console.error("Error en la solicitud:", error.message);
       }
-    } catch (error: any) {
-      console.error("Error en la solicitud:", error.message);
-    }
-  };
+    };
 
-  const handleCancel = () => {
-    console.log("Cancel");
-  };
+    const handleCancel = () => {
+      router.push("/productos");
+    };
+    const fields: Field[] = [
+      {
+        name: "nombre",
+        label: "Nombre",
+        type: "text",
+      },
+      { name: "cantidad", label: "Cantidad", type: "number" },
+      {
+        name: "unidad",
+        label: "Unidad",
+        type: "select",
+        options: Object.values(Unidad),
+      },
+      { name: "marca", label: "Marca", type: "text" },
+      {
+        name: "agroquimico",
+        label: "Agroquímico",
+        type: "select",
+        options: agroquimicos.map((a) => a.active_principle),
+      },
+      {
+        name: "categoria",
+        label: "Categoría",
+        type: "select",
+        options: ["HERBICIDE", "INSECTICIDE", "FUNGICIDE"],
+      },
+      {
+        name: "proveedor",
+        label: "Proveedor",
+        type: "select",
+        options: proveedores.map((p) => p.name),
+      },
+    ];
 
-  const fields: Field[] = [
-    {
-      name: "nombre",
-      label: "Nombre",
-      type: "select",
-      options: ["Producto A", "Producto B", "Producto C"],
-    },
-    { name: "cantidad", label: "Cantidad", type: "number" },
-    {
-      name: "unidad",
-      label: "Unidad",
-      type: "select",
-      options: Object.values(Unidad),
-    },
-    { name: "marca", label: "Marca", type: "text" },
-    {
-      name: "agroquimico",
-      label: "Agroquímico",
-      type: "select",
-      options: agroquimicos.map((a) => a.activePrinciple),
-    },
-    {
-      name: "categoria",
-      label: "Categoría",
-      type: "select",
-      options: ["HERBICIDE", "INSECTICIDE", "FUNGICIDE"],
-    },
-    {
-      name: "proveedor",
-      label: "Proveedor",
-      type: "select",
-      options: proveedores.map((p) => p.name),
-    },
-  ];
+    return (
+      <div className="page-container">
+        <MenuBar showMenu={true} path="/productos" />
+        <h1 className={styles.title}>{title}</h1>
 
-  return (
-    <div className="page-container">
-      <MenuBar showMenu={true} path="/productos" />
-      <h1 className={styles.title}>{title}</h1>
+        <Formulario
+          fields={fields}
+          onSubmit={handleFormSubmit}
+          onCancel={handleCancel}
+          buttonName="Continuar"
+        />
 
-      <Formulario
-        fields={fields}
-        onSubmit={handleFormSubmit}
-        onCancel={handleCancel}
-        buttonName="Continuar"
-      />
+        <GenericModal
+          isOpen={modalOpen}
+          onClose={handleCloseModal}
+          title="Producto añadido"
+          modalText={`Se añadió el producto: ${newProducto.name}`}
+          buttonTitle="Cerrar"
+          showSecondButton={false}
+        />
+      </div>
+    );
+  }
 
-      <GenericModal
-        isOpen={modalOpen}
-        onClose={handleCloseModal}
-        title="Producto añadido"
-        modalText={`Se añadió el producto: ${newProducto.name}`}
-        buttonTitle="Cerrar"
-        showSecondButton={false}
-      />
-    </div>
-  );
-}
