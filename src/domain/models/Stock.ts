@@ -10,6 +10,6 @@ export interface Stock {
     product: Producto,
     amount: number,
     unit: Unidad,
-    lotNumber: string,
-    expirationDate: Date 
+    lot_number: string,
+    expiration_date: Date 
 }

@@ -7,7 +7,7 @@ interface Props {
     setModalClose: () => void;
     stock: Stock;
     open: boolean;
-    addProductToMove: (stock: Stock,cantidadBultos: string | null, total: string | null) => void;
+    addProductToMove: (stock: Stock,cantidadBultos: number | null, total: number | null) => void;
   }
 
 
@@ -18,29 +18,13 @@ const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProd
 
     const handleSubmit = (e: any) => {
         e.preventDefault();
-        let cant;
-
-        if(selectedSize === 'unitAmount'){
-            cant = Number(cantidad) * stock.product.amount;
-            if(cant > stock.amount){
-                console.log("La cantidad de bultos excede el stock actual");
-                return;
-            }
-        }
-        if(selectedSize === 'totalAmount'){
-            cant = Number(cantidad);
-            if(cant > stock.amount){
-                console.log("La cantidad total excede el stock actual");
-                return;
-            }
-        }
-
+        
         setModalClose();
         if(selectedSize === 'unitAmount')
-            addProductToMove(stock,cantidad,null);
+            addProductToMove(stock,Number(cantidad),null);
         
         if(selectedSize === 'totalAmount')
-            addProductToMove(stock,null,cantidad);
+            addProductToMove(stock,null,Number(cantidad));
         
     };
 

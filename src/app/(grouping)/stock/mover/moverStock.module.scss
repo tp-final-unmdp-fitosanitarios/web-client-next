@@ -1,3 +1,5 @@
+@import "../../../styles/variables.scss";
+
 .mainContainer {
     display: flex;
     flex-direction: row;
@@ -27,3 +29,20 @@
         justify-content: center;
     }
 }
+
+.button {
+    min-width: 30%;
+    max-width: 80%;
+    padding: $spacing-small $spacing-medium;
+    border: none;
+    border-radius: $border-radius;
+    font-weight: $button-font-weight;
+    cursor: pointer;
+    color: $dark-color;
+    margin-top: $spacing-large;
+  }
+  
+  .buttonPrimary {
+    margin-right: $spacing-large;
+    background-color: $primary-color;
+  }

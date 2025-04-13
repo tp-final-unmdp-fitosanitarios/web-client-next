@@ -9,7 +9,8 @@ import MenuBar from "@/components/menuBar/MenuBar";
 import { useSearchParams } from "next/navigation";
 import { transformToItems } from "@/utilities/transform";
 import MoverProductModal from "@/components/MoverProductModal/MoverProductModal";
-
+import { Button } from "@mui/material";
+import ResultModal from "@/components/MoverSockResumenOperacion/ModalResumenOperacion";
 
 const MoverStock = () => {
   const searchParams = useSearchParams();
@@ -17,14 +18,14 @@ const MoverStock = () => {
   const destino = searchParams.get("destino");
 
   const actualLocation = origen
-
   const [stockFromServer, setStockFromServer] = useState<Stock[]>([]);
-  const [productsToMove, setProductsToMove] = useState<Stock[]>([]);
+  const [productsToMove, setProductsToMove] = useState<(Stock & {flag: string, cantidad: number})[]>([]);
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [selectedItem, setSelectedItem] = useState<Stock | null>(null);
   const [error, setError] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(true);
   const [showMoverProductModal, setShowMoverProductModal] = useState<boolean>(false);
+  const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const { getApiService, isReady } = useAuth();
   const apiService = getApiService();
 
@@ -86,24 +87,24 @@ const MoverStock = () => {
     setSelectedItem(null);
   };
 
-  const addProductToMove = (stock: Stock,cantidadBultos: string | null, total: string | null) => {
+  const addProductToMove = (stock: Stock,cantidadBultos: number | null, total: number | null) => {
     if(cantidadBultos)
       setProductsToMove([...productsToMove,
         {...stock,
-          amount: Math.floor(Number(cantidadBultos) * stock.product.amount),
+          flag: "unitAmount",
+          cantidad: cantidadBultos
         }
       ]);
 
     if(total)
       setProductsToMove([...productsToMove,
         {...stock,
-          amount: Math.floor(Number(total)),
+          flag: "totalAmount",
+          cantidad: total
         }
       ]);
   };
 
-  if (loading) return <div>Cargando...</div>;
-  if (error) return <div>Error: {error}</div>;
 
   const handleDeleteProduct = (id: string) => {
     setProductsToMove(productsToMove.filter((item) => item.id !== id));
@@ -125,9 +126,56 @@ const MoverStock = () => {
 
 const campos = ["display"];
 
+  function handleMoveProducts(e: any): void {
+    if(productsToMove.length > 0)
+      setShowResultModal(true);
+  }
+
+  const handleResultModalClose = () => {
+    setShowResultModal(false);
+  }
+
+  async function handleFinish(): Promise<void> {
+    const stockToMove = productsToMove.map((item) => {
+      console.log(item);
+      if(item.flag === "unitAmount")
+        return{
+        product_id: item.product.id,
+        amount_of_units: item.cantidad,
+        total_amount: null,
+        unit: item.product.unit,
+        lot_number: item.lot_number,
+        expiration_date: item.expiration_date}
+
+      if(item.flag === "totalAmount")
+        return{
+          product_id: item.product.id,
+          amount_of_units: null,
+          total_amount: item.cantidad,
+          unit: item.product.unit,
+          lot_number: item.lot_number,
+          expiration_date: item.expiration_date}
+    });
+
+
+
+    const moveStockRequest = {
+      origin_id: origen,
+      destination_id: destino,
+      stock_to_move: stockToMove
+    }
+
+    console.log(moveStockRequest);
+
+    const response = await apiService.create<ResponseItems<Stock>>("stock/movement", moveStockRequest);
+    console.log(response);
+  }
+
+
+  if (loading) return <div>Cargando...</div>;
+  if (error) return <div>Error: {error}</div>;
+
   return (
-
-
     <div className={styles.pageContainer}>
       <MenuBar showMenu={true} path="" />
       <div className={styles.mainContainer}>
@@ -156,8 +204,12 @@ const campos = ["display"];
           />
         </div>
       </div>
+      <Button className={styles.buttonPrimary} onClick={handleMoveProducts}>Mover productos</Button>
       {showMoverProductModal && selectedItem && (
         <MoverProductModal open={showMoverProductModal} setModalClose={handleModalClose} stock={selectedItem} addProductToMove={addProductToMove}/>
+      )}
+      {showResultModal && (
+        <ResultModal open={showResultModal} setModalClose={handleResultModalClose} stock={productsToMove} origen={origen} destino={destino} handleFinish={handleFinish}/>
       )}
     </div>
   );
