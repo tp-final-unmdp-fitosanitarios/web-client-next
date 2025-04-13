@@ -178,6 +178,7 @@ export default function StockView() {
                     selectedIds={selectedIds}
                     selectItems={true}
                     deleteItems={false}
+                    selectSingleItem={false}
                 />
             ) : (
                 <h3 className={styles.title}>No hay elementos en el stock</h3>

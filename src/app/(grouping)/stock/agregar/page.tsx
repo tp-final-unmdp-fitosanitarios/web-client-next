@@ -61,7 +61,7 @@ const AgregarStockPage: React.FC = () => {
         if (!amount_of_units && !total_amount) return;
 
         const prod = productosExistentes.find((p) => p.name === producto);
-        if (!prod) return;
+        if (!prod || !prod.id) return;
 
         if (productosAAgregar.length >= remito.cantProductos) {
             console.warn("No se pueden agregar más productos.");
@@ -250,6 +250,7 @@ const AgregarStockPage: React.FC = () => {
                                 selectItems={false}
                                 deleteItems={true}
                                 onDelete={quitarItem}
+                                selectSingleItem={false}
                             />
                         ) : (
                             <p>Ingrese productos para agregar stock</p>

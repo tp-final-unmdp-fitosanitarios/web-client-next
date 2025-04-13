@@ -13,6 +13,8 @@ interface GenericListProps {
   selectItems: boolean;
   deleteItems: boolean;
   onDelete?: (id: string) => void; // Función para manejar selección (opcional)
+  selectSingleItem: boolean;
+  onSelectSingleItem?: (id: string) => void; // Función para manejar selección de un solo item (opcional)
 }
 
 const ItemList: React.FC<GenericListProps> = ({
@@ -22,7 +24,9 @@ const ItemList: React.FC<GenericListProps> = ({
   selectItems,
   deleteItems,
   onDelete,
-  displayKeys
+  displayKeys,
+  selectSingleItem,
+  onSelectSingleItem
 }) => {
   return (
     <div className={styles.container}>
@@ -49,7 +53,13 @@ const ItemList: React.FC<GenericListProps> = ({
                 </IconButton>
               ) : null}
               {displayKeys.map((key) => (
-                <span key={key} className={styles.itemField}>{item[key]}</span>
+                <span 
+                  key={key} 
+                  className={styles.itemField} 
+                  onClick={selectSingleItem && onSelectSingleItem ? () => onSelectSingleItem(item.id) : undefined}
+                >
+                  {item[key]}
+                </span>
               ))}
 
             </label>

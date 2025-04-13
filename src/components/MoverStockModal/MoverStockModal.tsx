@@ -21,7 +21,7 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
   const fetchLocations = async () => {
     if (loaded || !isReady) return;
     try {
-      const response = await apiService.get<Locacion[]>("/locations?type=ZONE");
+      const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE&type=FIELD");
       setLocations(response.data);
       setLoaded(true);
     } catch (error: any) {
@@ -33,9 +33,16 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
   const handleFormSubmit = (formValues: Record<string, string>) => {
     const origen = formValues["origen"];
     const destino = formValues["destino"];
+    const origenId = locations.find(loc => loc.name === origen)?.id;
+    const destinoId = locations.find(loc => loc.name === destino)?.id;
   
     // Redirigimos con los valores como query params se hace esto porque el router no permite pasar valores por el state
-    router.push(`/stock/mover?origen=${encodeURIComponent(origen)}&destino=${encodeURIComponent(destino)}`);
+    if (origenId && destinoId)
+      router.push(`/stock/mover?origen=${encodeURIComponent(origenId)}&destino=${encodeURIComponent(destinoId)}`);
+    else
+      console.error("Error al mover stock: Locaciones no encontradas");
+    
+  
     onClose();
   };
 
