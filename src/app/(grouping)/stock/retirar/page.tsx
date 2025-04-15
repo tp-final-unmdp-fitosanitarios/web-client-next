@@ -1,40 +1,38 @@
 "use client";
-import { useEffect, useState } from "react";
 import ItemList from "@/components/itemList/ItemList";
-import styles from "./moverStock.module.scss";
-import { useAuth } from "@/components/Auth/AuthProvider";
-import { Stock } from "@/domain/models/Stock";
-import { ResponseItems } from "@/domain/models/ResponseItems";
 import MenuBar from "@/components/menuBar/MenuBar";
 import { useSearchParams } from "next/navigation";
-import { useRouter } from "next/navigation";
+import styles from "./retirarStock.module.scss";
+import { useEffect, useState } from "react";
+import { Stock } from "@/domain/models/Stock";
+import { ResponseItems } from "@/domain/models/ResponseItems";
+import { useAuth } from "@/components/Auth/AuthProvider";
 import { transformToItems } from "@/utilities/transform";
 import MoverProductModal from "@/components/MoverProductModal/MoverProductModal";
 import ResultModal from "@/components/MoverSockResumenOperacion/ModalResumenOperacion";
+import router from "next/router";
 import ForceMovementModal from "@/components/ForceMovementModal/ForceMovementModal";
+import { useRouter } from "next/navigation";
 
-const MoverStock = () => {
-  const searchParams = useSearchParams();
-  const origen = searchParams.get("origen");
-  const destino = searchParams.get("destino");
-  const originName = searchParams.get("oid");
-  const destinationName = searchParams.get("did");
+const RetirarStock = () => {
+const searchParams = useSearchParams();
+const origen = searchParams.get("origen");
+const originName = searchParams.get("oid");
 
+const actualLocation = origen
+const [stockFromServer, setStockFromServer] = useState<Stock[]>([]);
+const [productsToWithdraw, setProductsToWithdraw] = useState<(Stock & {flag: string, cantidad: number})[]>([]);
+const [error, setError] = useState<string>("");
+const [loading, setLoading] = useState<boolean>(true);
+const [showWithdrawProductModal, setShowWithdrawProductModal] = useState<boolean>(false);
+const [showResultModal, setShowResultModal] = useState<boolean>(false);
+const [showForceModal, setShowForceModal] = useState<boolean>(false);
+const [selectedItem, setSelectedItem] = useState<Stock | null>(null);
+const { getApiService, isReady } = useAuth();
+const apiService = getApiService();
+const router = useRouter();
 
-  const actualLocation = origen
-  const [stockFromServer, setStockFromServer] = useState<Stock[]>([]);
-  const [productsToMove, setProductsToMove] = useState<(Stock & {flag: string, cantidad: number})[]>([]);
-  const [selectedItem, setSelectedItem] = useState<Stock | null>(null);
-  const [error, setError] = useState<string>("");
-  const [loading, setLoading] = useState<boolean>(true);
-  const [showMoverProductModal, setShowMoverProductModal] = useState<boolean>(false);
-  const [showResultModal, setShowResultModal] = useState<boolean>(false);
-  const [showForceModal, setShowForceModal] = useState<boolean>(false);
-  const { getApiService, isReady } = useAuth();
-  const apiService = getApiService();
-  const router = useRouter();
-
-  const fetchStock = async () => { 
+const fetchStock = async () => { 
     try {
       const response = await apiService.get<ResponseItems<Stock>>(
         `stock?location=${actualLocation}`
@@ -57,7 +55,6 @@ const MoverStock = () => {
     fetchStock();
   }, [isReady]);
 
-
   const currentStockToDisplay = stockFromServer.map((item) => ({
     id: item.id,
     producto: item.product.name,
@@ -66,7 +63,7 @@ const MoverStock = () => {
     location: item.location.name,
   }));
 
-  const stockToMoveToDisplay = productsToMove.map((item) => ({
+  const stockToWithdrawToDisplay = productsToWithdraw.map((item) => ({
     id: item.id,
     producto: item.product.name,
     amount: item.product.amount.toString(),
@@ -80,37 +77,139 @@ const MoverStock = () => {
   const handleSelectSingleItem = (id: string) => {
     setSelectedItem(stockFromServer.find((item) => item.id === id) || null);
     if(selectedItem){
-      setShowMoverProductModal(true);
+      setShowWithdrawProductModal(true);
     }
   };
 
+  const handleDeleteProduct = (id: string) => {
+    setProductsToWithdraw(productsToWithdraw.filter((item) => item.id !== id));
+  };
+
   const handleModalClose = () => {
-    setShowMoverProductModal(false);
+    setShowWithdrawProductModal(false);
     setSelectedItem(null);
   };
 
-  const addProductToMove = (stock: Stock,cantidadBultos: number | null, total: number | null) => {
+  const handleResultModalClose = () => {
+    setShowResultModal(false);
+  }
+
+  const handleWithdrawProducts = () => {
+    if(productsToWithdraw.length > 0)
+        setShowResultModal(true);
+  };
+
+  const addProductToWithdraw = (stock: Stock,cantidadBultos: number | null, total: number | null) => {
     if(cantidadBultos)
-      setProductsToMove([...productsToMove,
+        setProductsToWithdraw([...productsToWithdraw,
         {...stock,
-          flag: "unitAmount",
-          cantidad: cantidadBultos
+            flag: "unitAmount",
+            cantidad: cantidadBultos
         }
-      ]);
+        ]);
 
     if(total)
-      setProductsToMove([...productsToMove,
+        setProductsToWithdraw([...productsToWithdraw,
         {...stock,
-          flag: "totalAmount",
-          cantidad: total
+            flag: "totalAmount",
+            cantidad: total
         }
-      ]);
-  };
+        ]);
+    };
 
+  async function handleFinish(): Promise<void> {
+    const stockToMove = productsToWithdraw.map((item) => {
+      console.log(item);
+      if(item.flag === "unitAmount")
+        return{
+        product_id: item.product.id,
+        amount_of_units: item.cantidad,
+        total_amount: null,
+        unit: item.product.unit,
+        lot_number: item.lot_number,
+        expiration_date: item.expiration_date}
 
-  const handleDeleteProduct = (id: string) => {
-    setProductsToMove(productsToMove.filter((item) => item.id !== id));
-  };
+      if(item.flag === "totalAmount")
+        return{
+          product_id: item.product.id,
+          amount_of_units: null,
+          total_amount: item.cantidad,
+          unit: item.product.unit,
+          lot_number: item.lot_number,
+          expiration_date: item.expiration_date}
+    });
+    const moveStockRequest = {
+      origin_id: origen,
+      destination_id: null,
+      stock_to_move: stockToMove
+    }
+
+    console.log(moveStockRequest);
+
+    const response = await apiService.create<ResponseItems<Stock>>("stock/retire", moveStockRequest);
+
+    if(response.success){
+      console.log("Stock retirado correctamente");
+      setShowResultModal(false);
+      setProductsToWithdraw([]);
+      router.push("/stock");  
+    }
+    else{
+      console.log("Error al mover stock");
+      console.log(response);
+      if(response.status === 400)
+        setShowForceModal(true);
+      else{
+        setError(response.error || "Error al mover stock");
+      }
+    }
+  }
+
+  const handleForceModalClose = () => {
+    setShowForceModal(false);
+  }
+
+  const handleForceFinish = async() => {
+    console.log("Force finish");
+    const stockToMove = productsToWithdraw.map((item) => {
+      console.log(item);
+      if(item.flag === "unitAmount")
+        return{
+        product_id: item.product.id,
+        amount_of_units: item.cantidad,
+        total_amount: null,
+        unit: item.product.unit,
+        lot_number: item.lot_number,
+        expiration_date: item.expiration_date}
+
+      if(item.flag === "totalAmount")
+        return{
+          product_id: item.product.id,
+          amount_of_units: null,
+          total_amount: item.cantidad,
+          unit: item.product.unit,
+          lot_number: item.lot_number,
+          expiration_date: item.expiration_date}
+    });
+
+    const moveStockRequest = {
+      origin_id: origen,
+      destination_id: null,
+      stock_to_move: stockToMove
+    }
+
+    const response = await apiService.create<ResponseItems<Stock>>("stock/retire?force=true", moveStockRequest);
+
+    if(response.success){
+      console.log("Stock retirado correctamente");
+      setShowForceModal(false);
+      setProductsToWithdraw([]);
+      router.push("/stock");  
+    }
+    else{
+      setError(response.error || "Error al mover stock");
+    }
+  }
 
   const itemsCurrentStock = transformToItems(currentStockToDisplay, "id", ["producto", "amount", "unit"]).map((item) => {
     return {
@@ -119,7 +218,7 @@ const MoverStock = () => {
     };
     });
 
-    const itemsStockToMove = transformToItems(stockToMoveToDisplay, "id", ["producto", "amount","unit","flag", "cantidad"]).map((item) => {
+    const itemsStockToWithdraw = transformToItems(stockToWithdrawToDisplay, "id", ["producto", "amount","unit","flag", "cantidad"]).map((item) => {
       if (item.flag === "unitAmount")
         return {
             ...item,
@@ -140,117 +239,10 @@ const MoverStock = () => {
 
 const campos = ["display"];
 
-  function handleMoveProducts(e: any): void {
-    if(productsToMove.length > 0)
-      setShowResultModal(true);
-  }
+if (loading) return <div>Cargando...</div>;
+if (error) return <div>Error: {error}</div>;
 
-  const handleResultModalClose = () => {
-    setShowResultModal(false);
-  }
-
-  const handleForceModalClose = () => {
-    setShowForceModal(false);
-  }
-
-  async function handleFinish(): Promise<void> {
-    const stockToMove = productsToMove.map((item) => {
-      console.log(item);
-      if(item.flag === "unitAmount")
-        return{
-        product_id: item.product.id,
-        amount_of_units: item.cantidad,
-        total_amount: null,
-        unit: item.product.unit,
-        lot_number: item.lot_number,
-        expiration_date: item.expiration_date}
-
-      if(item.flag === "totalAmount")
-        return{
-          product_id: item.product.id,
-          amount_of_units: null,
-          total_amount: item.cantidad,
-          unit: item.product.unit,
-          lot_number: item.lot_number,
-          expiration_date: item.expiration_date}
-    });
-
-
-
-    const moveStockRequest = {
-      origin_id: origen,
-      destination_id: destino,
-      stock_to_move: stockToMove
-    }
-
-    console.log(moveStockRequest);
-
-    const response = await apiService.create<ResponseItems<Stock>>("stock/movement", moveStockRequest);
-
-    if(response.success){
-      console.log("Stock movido correctamente");
-      setShowResultModal(false);
-      setProductsToMove([]);
-      router.push("/stock");  
-    }
-    else{//TODO: Agregar logica  para el caso del stock negativo y el flag force
-      console.log("Error al mover stock");
-      console.log(response);
-      if(response.status === 400)
-        setShowForceModal(true);
-      else{
-        setError(response.error || "Error al mover stock");
-      }
-    }
-  }
-
-  async function handleForceFinish(): Promise<void> {
-    console.log("Force finish");
-    const stockToMove = productsToMove.map((item) => {
-      console.log(item);
-      if(item.flag === "unitAmount")
-        return{
-        product_id: item.product.id,
-        amount_of_units: item.cantidad,
-        total_amount: null,
-        unit: item.product.unit,
-        lot_number: item.lot_number,
-        expiration_date: item.expiration_date}
-
-      if(item.flag === "totalAmount")
-        return{
-          product_id: item.product.id,
-          amount_of_units: null,
-          total_amount: item.cantidad,
-          unit: item.product.unit,
-          lot_number: item.lot_number,
-          expiration_date: item.expiration_date}
-    });
-
-    const moveStockRequest = {
-      origin_id: origen,
-      destination_id: destino,
-      stock_to_move: stockToMove
-    }
-
-    const response = await apiService.create<ResponseItems<Stock>>("stock/movement?force=true", moveStockRequest);
-
-    if(response.success){
-      console.log("Stock movido correctamente");
-      setShowForceModal(false);
-      setProductsToMove([]);
-      router.push("/stock");  
-    }
-    else{
-      setError(response.error || "Error al mover stock");
-    }
-  }
-
-
-  if (loading) return <div>Cargando...</div>;
-  if (error) return <div>Error: {error}</div>;
-
-  return (
+return (
     <div className={styles.pageContainer}>
       <MenuBar showMenu={false} showArrow={true} path="/stock" />
       <div className={styles.mainContainer}>
@@ -266,9 +258,9 @@ const campos = ["display"];
           />
         </div>
         <div className={styles.column}>
-          <h2 className={styles.subtitle}>Productos a mover hacia {destinationName}</h2>
+          <h2 className={styles.subtitle}>Productos a Retirar</h2>
           <ItemList
-            items={itemsStockToMove}
+            items={itemsStockToWithdraw}
             displayKeys={campos}
             selectItems={false}
             deleteItems={true}
@@ -279,20 +271,20 @@ const campos = ["display"];
         
       </div>
       <div className={styles.buttonContainer}>
-        <button className={`${styles.button} button-primary ${styles.buttonHome}`} onClick={handleMoveProducts}>Mover productos</button>
+        <button className={`${styles.button} button-primary ${styles.buttonHome}`} onClick={handleWithdrawProducts}>Retirar productos</button>
       </div>
       
-      {showMoverProductModal && selectedItem && (
-        <MoverProductModal open={showMoverProductModal} setModalClose={handleModalClose} stock={selectedItem} addProductToMove={addProductToMove} withdraw={false}/>
+      {showWithdrawProductModal && selectedItem && (
+        <MoverProductModal open={showWithdrawProductModal} setModalClose={handleModalClose} stock={selectedItem} addProductToMove={addProductToWithdraw} withdraw={true}/>
       )}
       {showResultModal && (
-        <ResultModal open={showResultModal} setModalClose={handleResultModalClose} stock={productsToMove} origen={originName} destino={destinationName} handleFinish={handleFinish} withdraw={false}/>
+        <ResultModal open={showResultModal} setModalClose={handleResultModalClose} stock={productsToWithdraw} origen={originName} destino={""} handleFinish={handleFinish} withdraw={true}/>
       )}
       {showForceModal && (
-        <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToMove} actualStock={stockFromServer} origen={originName} destino={destinationName} handleForceFinish={handleForceFinish} withdraw={false}/>
+        <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToWithdraw} actualStock={stockFromServer} origen={originName} destino={""} handleForceFinish={handleForceFinish} withdraw={true}/>
       )}
     </div>
   );
-};
+}
 
-export default MoverStock;
+export default RetirarStock;

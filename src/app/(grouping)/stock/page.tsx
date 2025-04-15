@@ -14,10 +14,10 @@ import { Locacion } from "@/domain/models/Locacion";
 import { Autocomplete, TextField } from "@mui/material";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import MoverStockModal from "@/components/MoverStockModal/MoverStockModal";
+import RetirarStockModal from "@/components/RetirarStockModal/RetirarStockModal";
 
 const buttons = [
     { label: "Agregar", path: "/stock/agregar" },
-    { label: "Retirar", path: "/stock/retirar" },
     { label: "Ver Movimientos", path: "/stock/movimientos" },
     { label: "Proveedores", path: "/stock/proveedores" },
 ];
@@ -29,6 +29,7 @@ export default function StockView() {
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [actualLocation, setActualLocation] = useState<string>("");
     const [showMoverModal, setShowMoverModal] = useState(false);
+    const [showRetirarModal, setShowRetirarModal] = useState(false);
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
 
@@ -199,7 +200,12 @@ export default function StockView() {
                 >
                     Mover
                 </button>
-
+                <button
+                    className={`button button-primary ${styles.buttonHome}`}
+                    onClick={() => setShowRetirarModal(true)}
+                >
+                    Retirar
+                </button>
                 {buttons.map((button, index) => (
                     <Link key={index} href={button.path}>
                         <button className={`button button-primary ${styles.buttonHome}`}>
@@ -221,6 +227,9 @@ export default function StockView() {
 
             {showMoverModal && (
                 <MoverStockModal onClose={() => setShowMoverModal(false)} />
+            )}
+            {showRetirarModal && (
+                <RetirarStockModal onClose={() => setShowRetirarModal(false)} />
             )}
         </div>
     );

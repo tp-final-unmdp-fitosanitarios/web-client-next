@@ -6,31 +6,45 @@ import styles from "./ModalResumenOperacion.module.scss";
 interface Props {
     open: boolean;
     setModalClose: () => void;
-    stock: Stock[];
+    stock: (Stock & {flag: string, cantidad: number})[];
     origen: string | null;
     destino: string | null;
     handleFinish: () => void;
+    withdraw: boolean;
 }
 
-const ModalResumenOperacion: React.FC<Props> = ({open, setModalClose, stock, origen, destino, handleFinish}) => {
+const ModalResumenOperacion: React.FC<Props> = ({open, setModalClose, stock, origen, destino, handleFinish, withdraw}) => {
     
     const stockToMoveToDisplay = stock.map((item) => ({
         id: item.id,
         producto: item.product.name,
-        amount: item.amount.toString(),
+        amount: item.product.amount.toString(),
+        cantidad: item.cantidad.toString(),
         unit: item.product.unit,
         location: item.location.name,
-    }));
+        flag: item.flag
+      }));
 
-    const items = transformToItems(stockToMoveToDisplay, "id", ["producto", "amount", "unit"]).map((item) => {
-        return {
-          ...item,
-          display: `${item.producto} : ${item.amount}${item.unit}`,
-      };
+    const items = transformToItems(stockToMoveToDisplay, "id", ["producto", "amount","unit","flag", "cantidad"]).map((item) => {
+        if (item.flag === "unitAmount")
+          return {
+              ...item,
+              display: `${item.producto}: ${item.amount} ${item.unit} x ${item.cantidad}U`,
+          };
+        
+          if (item.flag === "totalAmount")
+          return {
+              ...item,
+              display: `${item.producto}: ${item.cantidad} ${item.unit}`,
+          };
+  
+          return {
+            ...item,
+            display: `${item.producto}: ${item.cantidad} ${item.unit}`,
+        };
     });
   
   const campos = ["display"];
-
 
     return (
         <div>
@@ -51,15 +65,17 @@ const ModalResumenOperacion: React.FC<Props> = ({open, setModalClose, stock, ori
                 <h3 className={styles.title}>Resumen de Operación</h3>
                 <div className={styles.outputContainer}>
                     <div className={styles.dataPresentation}>
-                        <h5>Origen: </h5>
-                        <h5>{origen? origen : ""}</h5>
+                        <h4>Origen: </h4>
+                        <h4>{origen? origen : ""}</h4>
                     </div>
+                    {!withdraw ? (
                     <div className={styles.dataPresentation}>
-                        <h5>Destino: </h5>
-                        <h5>{destino? destino : ""}</h5>
+                        <h4>Destino: </h4>
+                        <h4>{destino? destino : ""}</h4>
                     </div>
+                    ) : null}
                 </div>
-                <p className={styles.message}>Movera los siguientes produtos</p>
+                <p className={styles.message}>{withdraw ? "Retirar" : "Mover"} los siguientes produtos</p>
                 {stock.length > 0 ? (
                         <ItemList
                             items={items}

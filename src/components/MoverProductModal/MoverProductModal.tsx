@@ -8,10 +8,11 @@ interface Props {
     stock: Stock;
     open: boolean;
     addProductToMove: (stock: Stock,cantidadBultos: number | null, total: number | null) => void;
+    withdraw: boolean;
   }
 
 
-const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProductToMove}) => {
+const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProductToMove, withdraw}) => {
     const [selectedSize, setSelectedSize] = useState('unitAmount');
     const [cantidad, setCantidad] = useState('');
     const product = stock.product;
@@ -45,7 +46,7 @@ const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProd
                     }}
                      aria-labelledby="Ventana modal para mover producto"
                 >
-                    <h1 className={styles.title}>Mover Producto</h1>
+                    <h1 className={styles.title}>{withdraw ? "Retirar Producto" : "Mover Producto"}</h1>
                     <h4 className={styles.title}>{product.name}</h4>
                     <h4 className={styles.title}>Stock actual en {stock.location.name}: {stock.amount} {stock.unit}</h4>
                     <form onSubmit={handleSubmit}>

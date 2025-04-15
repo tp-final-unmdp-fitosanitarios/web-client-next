@@ -125,7 +125,7 @@ const AgregarStockPage: React.FC = () => {
         fetchData();
     }, [isReady])
     
-    const handleFormSubmit = (inputData: Record<string, string>) => {
+    const handleFormSubmit = (inputData: Record<string, string>) => {  //TODO: Cambiar logica para ver los campos del form en tiempo real
         setRemito({
             campo: String(inputData.campo),
             cantProductos: inputData.cantProductos,
@@ -171,7 +171,7 @@ const AgregarStockPage: React.FC = () => {
         console.log(addStockRequest);
         apiService.create("/delivery", addStockRequest).then((response: any) => {
             if (response.success) {
-                console.log("Stock agregado correctamente");
+                console.log("Stock agregado correctamente"); //Aca estaria la llamada a la api de wpp. Tambien podria ser un modal
                 handleCancel();
             } else {
                 console.error("Error al agregar stock:", response.error);

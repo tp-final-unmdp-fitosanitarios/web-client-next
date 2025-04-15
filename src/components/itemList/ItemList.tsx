@@ -34,18 +34,30 @@ const ItemList: React.FC<GenericListProps> = ({
         {items.map((item) => {
 
           return (
-            <label key={item.id} className={styles.item}>
+            <div 
+              key={item.id} 
+              className={styles.item} 
+              onClick={() => {
+                if (selectSingleItem && onSelectSingleItem) {
+                  onSelectSingleItem(item.id);
+                }
+              }}
+            >
               {onSelect && selectItems ? (
                 <input
                   type="checkbox"
                   checked={selectedIds.includes(item.id)}
-                  onChange={() => onSelect(item.id)}
+                  onChange={(e) => {
+                    e.stopPropagation();
+                    onSelect(item.id)}}
                   className={styles.checkbox}
                 />
               ) : null}
               {deleteItems && onDelete ? (
                 <IconButton
-                  onClick={() => onDelete(item.id)}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onDelete(item.id)}}
                   color="error"
                   size="small"
                 >
@@ -56,13 +68,12 @@ const ItemList: React.FC<GenericListProps> = ({
                 <span 
                   key={key} 
                   className={styles.itemField} 
-                  onClick={selectSingleItem && onSelectSingleItem ? () => onSelectSingleItem(item.id) : undefined}
                 >
                   {item[key]}
                 </span>
               ))}
 
-            </label>
+            </div>
           );
         })}
       </div>

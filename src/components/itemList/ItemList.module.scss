@@ -48,6 +48,10 @@
   padding: 10px 0;
   font-size: 18px;
   line-height: 1.5;
+  &:hover {
+    border: 1px solid #cbcabd;
+    border-radius: 5px;
+  }
 }
 
 
@@ -95,4 +99,8 @@
   .container {
     max-height: 340px;
   }
+}
+
+.itemField {
+  white-space: pre-line;
 }
