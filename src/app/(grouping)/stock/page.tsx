@@ -113,19 +113,6 @@ export default function StockView() {
 
     const campos = ["display"];
 
-    // Para backend: agregar esta función para sincronizar eliminaciones con el servidor
-    // const handleQuitarItems = async () => {
-    //     try {
-    //         const response = await apiService.delete('stock', { ids: selectedIds });
-    //         if (response.success) {
-    //             quitarItems(); // Solo llamamos a quitarItems si la eliminación en el backend es exitosa
-    //         } else {
-    //             alert("Error al eliminar items del stock");
-    //         }
-    //     } catch (err) {
-    //         alert("Error al conectar con el servidor");
-    //     }
-    // };
 
     const modalText = deletedItems.length > 0
         ? `Se han eliminado los siguientes productos del stock:\n${deletedItems.map((s) => s.product.name).join("\n")}`
@@ -175,9 +162,7 @@ export default function StockView() {
                 <ItemList
                     items={items}
                     displayKeys={campos}
-                    onSelect={toggleSelectItem}
-                    selectedIds={selectedIds}
-                    selectItems={true}
+                    selectItems={false}
                     deleteItems={false}
                     selectSingleItem={false}
                 />
@@ -186,14 +171,6 @@ export default function StockView() {
             )}
 
             <div className={styles.buttonContainer}>
-                {selectedIds.length > 0 && (
-                    <button
-                        className={`button button-secondary ${styles.buttonHome}`}
-                        onClick={quitarItems} // Para backend: usar handleQuitarItems en lugar de quitarItems
-                    >
-                        Quitar
-                    </button>
-                )}
                 <button
                     className={`button button-primary ${styles.buttonHome}`}
                     onClick={() => setShowMoverModal(true)}
