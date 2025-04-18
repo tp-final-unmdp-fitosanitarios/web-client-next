@@ -2,6 +2,6 @@ export interface Proveedor {
   id: string;
   name: string;
   description: string;
-  companyId: string;
+  company_id: string;
   products?: string[]; 
 }

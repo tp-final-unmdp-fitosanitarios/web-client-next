@@ -2,8 +2,8 @@ export interface Maquina {
     id: string;
     name: string;
     model: string;
-    internalPlate: string;
+    internal_plate: string;
     companyId: string;
-    createdAt: Date;
-    updatedAt: Date;
+    createdAt: string;
+    updatedAt: string;
   }

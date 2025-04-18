@@ -15,6 +15,16 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import styles from "./agregarProductos.module.scss";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 
+interface CreateProductPayload {
+  name: string;
+  unit: string;
+  amount: number;
+  brand: string;
+  created_at: string;
+  agrochemical_id: string;
+  provider_ids: string[];
+}
+
 
 export default function AgregarProductos() {
   const title = "Agregar Producto";
@@ -29,17 +39,17 @@ export default function AgregarProductos() {
     unit: Unidad.Litros,
     amount: 0,
     brand: "",
-    agrochemicalId: "",
-    createdAt: new Date().toISOString(),
+    agrochemical_id: "",
+    created_at: new Date().toISOString(),
     providers: [],
     agrochemical: {
       id: "",
       active_principle: "",
       description: "",
-      companyId: "",
+      company_id: "",
       category: "HERBICIDE",
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
     },
   });
 
@@ -71,8 +81,7 @@ export default function AgregarProductos() {
   const handleOpenModal = useCallback(() => setModalOpen(true), []);
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
-    router.push("/productos");
-  }, [router]);
+  }, []);
 
   const handleFormSubmit = (inputData: Record<string, string | number>) => {
     const agroquimicoSeleccionado = agroquimicos.find(
@@ -94,39 +103,28 @@ export default function AgregarProductos() {
     }
    
 
-    const nuevoProducto: Producto = {// actualizar cuando facu cambie la DTO desde el back
-      id: null,
+    const payload: CreateProductPayload = {
       name: String(inputData.nombre),
-      unit: inputData.unidad as Unidad,
+      unit: inputData.unidad as string,
       amount: Number(inputData.cantidad),
       brand: String(inputData.marca),
-      createdAt: new Date().toISOString(),
-      agrochemicalId: agroquimicoSeleccionado.id,
-      agrochemical: {
-        ...agroquimicoSeleccionado,
-        activePrinciple: agroquimicoSeleccionado.active_principle,
-      },
-      providers: [
-        {
-          ...proveedorSeleccionado,
-          companyId: proveedorSeleccionado.companyId, 
-          products: [],
-        }
-      ]
+      agrochemical_id: agroquimicoSeleccionado.id,
+      created_at: new Date().toISOString(),
+      provider_ids: [proveedorSeleccionado.id]
     };
-    
-
-    setnewProducto(nuevoProducto);
-    createProduct();
+  
+    createProduct(payload);
   }
-    const createProduct = async () => {
+    const createProduct = async (payload:CreateProductPayload) => {
       try {
-        const response = await apiService.create<Producto>("/products", newProducto);
+        const response = await apiService.create<Producto>("/products", payload);
 
         if (response.success) {
           console.log("Producto creado:", response.data);
           setnewProducto(response.data);
+          console.log("new producto",newProducto);
           handleOpenModal();
+          router.push("/productos");
         } else {
           console.error("Error al crear el producto:", response.error);
         }
