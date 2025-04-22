@@ -3,13 +3,13 @@ import { Agroquimico } from "./Agroquimico";
 import { Proveedor } from "./Proveedor";
 
 export interface Producto {
-  id: string | null; 
+  id: string; 
   name: string;
   unit: Unidad; // Backend expects "KG", "L", etc.
   amount: number; // BigDecimal mapped to number
   brand: string;
-  createdAt: string; // ZonedDateTime serialized as ISO string
-  agrochemicalId: string;
+  created_at: string; // ZonedDateTime serialized as ISO string
+  agrochemical_id: string;
   agrochemical: Agroquimico;
   providers?: Proveedor[]; // Optional
 }

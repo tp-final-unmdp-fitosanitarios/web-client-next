@@ -1,10 +1,9 @@
 export interface Agroquimico{
 id: string;
 active_principle: string;
-activePrinciple?:string;//se usa para enviar como parte del payload al backend
 description: string;
-companyId: string;
+company_id: string;
   category: "HERBICIDE" | "INSECTICIDE" | "FUNGICIDE"; 
-  createdAt: string;
-  updatedAt: string;
+  created_at: string;
+  updated_at: string;
 }
