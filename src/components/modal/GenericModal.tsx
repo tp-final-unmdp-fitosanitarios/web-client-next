@@ -23,31 +23,31 @@ export default function GenericModal({
 
 
   const lines = modalText.split("\n");
-  const header = lines[0]; 
-  const productos = lines.slice(1); 
+  const header = lines[0];
+  const productos = lines.slice(1);
 
   return (
     <div className={styles["modal-overlay"]}>
       <div className={styles["modal-content"]}>
-        <h2 className="title">{title}</h2>
-        <div className="text">
-          <p>
+        <h2 className={styles["title"]}>{title}</h2>
+        <div className={styles["text"]}>
+          <p className={styles["message"]}>
             <strong>{header}</strong>
           </p>
-          {productos.length > 0 ? (
-            productos.map((producto, index) => (
-              <p key={index}><strong> {producto}</strong>.</p>
-            ))
-          ) : (
-            <p></p>
-          )}
+          <ul className={styles["product-list"]}>
+            {productos.map((producto, index) => (
+              <li key={index} className={styles["product-item"]}>
+                {producto}
+              </li>
+            ))}
+          </ul>
         </div>
-        <div className="button-container">
-          <button className="button button-primary" onClick={onClose}>
+        <div className={styles["button-container"]}>
+          <button className={`button button-primary`} onClick={onClose}>
             {buttonTitle}
           </button>
           {showSecondButton && (
-            <button onClick={onClose} className="button button-secondary">
+            <button onClick={onClose} className={`button button-secondary`}>
               {secondButtonTitle}
             </button>
           )}

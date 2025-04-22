@@ -1,106 +1,102 @@
+@use './../../app/styles/variables' as *;
+
 .container {
-  border: 1px solid #cbcabd;
-  border-radius: 10px;
-  padding: 10px;
-  width: 80%;
-  height: 40%;
   display: flex;
   flex-direction: column;
-  background-color:#e1e5e4;
+  gap: $spacing-small;
+  padding: $spacing-medium;
+  max-width: 800px;
   margin: 0 auto;
-  max-width: 400px;
-  font-weight: 600;
+  background-color: $background-color; // gris claro
+  border: 4px solid $dark-color;
+  border-radius: 8px;
+  font-family: $font-family-primary; 
+  font-weight: 700;
 }
 
-.header {
+.card {
+  display: flex;
+  justify-content:center;
+  align-items: center;
+  background-color: transparent;
+  color: $dark-color;
+  border: 3px solid #999;
+  border-radius: $border-radius;
+  padding: $spacing-medium;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  font-size: 18px;
+
+  &:hover {
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+    transform: scale(1.01);
+  }
+}
+
+.selected {
+  border: 3px solid $primary-color;
+  background-color: lighten($primary-color, 30%);
+}
+
+.cardContent {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  margin-bottom: 10px;
-}
-
-.back {
-  align-self: flex-start;
-  font-size: 14px;
-  color: #000;
-  cursor: pointer;
-}
-
-.title {
-  font-size: 18px;
-  font-weight: bold;
-}
-
-.secondary {
-  font-size: 14px;
-  color: #666;
-}
-
-.itemList {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px 2px;
-}
-
-.item {
-  display: flex;
-  align-items: center;
-  padding: 10px 0;
-  font-size: 18px;
-  line-height: 1.5;
-  &:hover {
-    border: 1px solid #cbcabd;
-    border-radius: 5px;
-  }
-}
-
-
-.checkbox {
-  margin-right: 15px;
-  height: 20px;
-}
-
-.itemName {
-  margin-right: 8px;
-}
-
-.itemCode {
-  color: #666;
-}
-
-.buttonContainer {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
-
-.actionButton {
-  padding: 10px;
-  font-size: 16px;
-  border: 2px solid #000;
-  border-radius: 5px;
-  background-color: #fff;
-  cursor: pointer;
-  flex: 1;
-}
-
-.actionButton:hover {
-  background-color: #f0f0f0;
-}
-
-@media (max-width: 500px) {
-  .item {
-    font-size: 14px;
-  }
-
-  .buttonContainer {
-    flex-direction: column;
-  }
-  .container {
-    max-height: 340px;
-  }
+  gap: $spacing-small;
 }
 
 .itemField {
-  white-space: pre-line;
+  display: flex;
+  gap: $spacing-small;
+}
+
+.itemLabel {
+  font-weight: 600;
+  color: $dark-color;
+  min-width: 80px;
+}
+
+.itemValue {
+  color: darken($dark-color, 10%);
+}
+
+.cardActions {
+  display: flex;
+  align-items: center;
+  gap: $spacing-small;
+}
+
+// Ocultar checkbox si existe en algún remanente
+.checkbox {
+  display: none;
+}
+
+@media (max-width: 1000px) {
+
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-small;
+    padding: $spacing-small;
+    max-width: 800px;
+    margin: 0 auto;
+    background-color: $background-color; // gris claro
+    border: 4px solid $dark-color;
+    border-radius: 8px;
+    font-family: $font-family-primary; 
+    font-weight: 700;
+  }
+
+  .selected {
+    border: 3px solid $primary-color;
+    background-color: lighten($primary-color, 30%);
+  }
+  
+  .card {
+    flex-direction: column;
+    font-size: 16px;
+  }
+
+  .cardActions {
+    margin-top: $spacing-small;
+  }
 }

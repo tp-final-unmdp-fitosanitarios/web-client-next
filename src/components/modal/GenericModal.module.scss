@@ -1,38 +1,105 @@
 @import '../../app/styles/variables.scss';
 
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
 .modal-content {
-    border: 2px solid $dark-color;
-    background-color: #fff;
+  background-color: $background-color-2;
+  border: 3px solid $dark-color;
+  border-radius: $border-radius;
+  padding: 2rem;
+  min-width: 80%;
+  max-width: 500px;
+  min-height: 30%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: $dark-color;
+  margin-bottom: 1.5rem;
+  text-align: center;
+}
+
+.text {
+  width: 100%;
+  text-align: center;
+  color: $dark-color;
+
+  .message {
+    font-size: 1rem;
+    font-weight: 500;
+    margin-bottom: 1rem;
+  }
+
+  .product-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
     display: flex;
     flex-direction: column;
-    align-items: center;
-    justify-content: space-around;
+    gap: 0.5rem;
+
+    .product-item {
+      background-color: #eef5e8;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: $dark-color;
+      width: fit-content;
+      margin: 0 auto;
+    }
+  }
+}
+
+.button-container {
+  margin-top: 2rem;
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+
+  .button {
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.6rem 1.4rem;
+    border-radius: 8px;
+    cursor: pointer;
+    border: none;
+    transition: all 0.2s ease-in-out;
+  }
+
+  .button-primary {
+    background-color: #b5c88d;
     color: $dark-color;
-    border-radius: $border-radius;
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    z-index: 1000;
-    min-height: 50%;
-    min-width: 80%;
-}
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
-    background-color: rgba(0, 0, 0, 0.5);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-}
+    &:hover {
+      background-color: #a5b879;
+    }
+  }
 
-.text{
-    p {
-        margin: 0.5rem 0; 
-      }
-    font-weight: 700;
+  .button-secondary {
+    background-color: #e4e4e4;
+    color: $dark-color;
+
+    &:hover {
+      background-color: #d0d0d0;
+    }
+  }
 }

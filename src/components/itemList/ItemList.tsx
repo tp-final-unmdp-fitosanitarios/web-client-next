@@ -1,20 +1,18 @@
 "use client";
 import { IconButton } from "@mui/material";
-import styles from "./ItemList.module.scss";
 import DeleteIcon from "@mui/icons-material/Delete";
-
-
+import styles from "./ItemList.module.scss";
 
 interface GenericListProps {
   items: Record<string, string>[];
-  displayKeys: string[]; // Lista de claves a mostrar
-  onSelect?: (id: string) => void; // Función para manejar selección (opcional)
-  selectedIds?: string[]; // IDs de los elementos seleccionados (opcional)
+  displayKeys: string[];
+  onSelect?: (id: string) => void;
+  selectedIds?: string[];
   selectItems: boolean;
   deleteItems: boolean;
-  onDelete?: (id: string) => void; // Función para manejar selección (opcional)
+  onDelete?: (id: string) => void;
   selectSingleItem: boolean;
-  onSelectSingleItem?: (id: string) => void; // Función para manejar selección de un solo item (opcional)
+  onSelectSingleItem?: (id: string) => void;
 }
 
 const ItemList: React.FC<GenericListProps> = ({
@@ -26,57 +24,52 @@ const ItemList: React.FC<GenericListProps> = ({
   onDelete,
   displayKeys,
   selectSingleItem,
-  onSelectSingleItem
+  onSelectSingleItem,
 }) => {
+  const isSelected = (id: string) => selectedIds.includes(id);
+
   return (
     <div className={styles.container}>
-      <div className={styles.itemList}>
-        {items.map((item) => {
+      {items.map((item) => {
+        const handleClick = () => {
+          if (selectSingleItem && onSelectSingleItem) {
+            onSelectSingleItem(item.id);
+          } else if (selectItems && onSelect) {
+            onSelect(item.id);
+          }
+        };
 
-          return (
-            <div 
-              key={item.id} 
-              className={styles.item} 
-              onClick={() => {
-                if (selectSingleItem && onSelectSingleItem) {
-                  onSelectSingleItem(item.id);
-                }
-              }}
-            >
-              {onSelect && selectItems ? (
-                <input
-                  type="checkbox"
-                  checked={selectedIds.includes(item.id)}
-                  onChange={(e) => {
-                    e.stopPropagation();
-                    onSelect(item.id)}}
-                  className={styles.checkbox}
-                />
-              ) : null}
-              {deleteItems && onDelete ? (
+        return (
+          <div
+            key={item.id}
+            className={`${styles.card} ${isSelected(item.id) ? styles.selected : ""}`}
+            onClick={handleClick}
+          >
+            <div className={styles.cardContent}>
+              {displayKeys.map((key) => (
+                <div key={key} className={styles.itemField}>
+                  <span className={styles.itemValue}>{item[key]}</span>
+                </div>
+              ))}
+            </div>
+
+            {deleteItems && onDelete && (
+              <div className={styles.cardActions}>
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
-                    onDelete(item.id)}}
+                    onDelete(item.id);
+                  }}
                   color="error"
                   size="small"
                 >
                   <DeleteIcon />
                 </IconButton>
-              ) : null}
-              {displayKeys.map((key) => (
-                <span 
-                  key={key} 
-                  className={styles.itemField} 
-                >
-                  {item[key]}
-                </span>
-              ))}
-
-            </div>
-          );
-        })}
-      </div>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 };

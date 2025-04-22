@@ -14,6 +14,7 @@
     align-self: center;
     color: $dark-color;
     display: flex;
+    font-size: 30px;
 }
 
 .container_blurred {
@@ -34,6 +35,9 @@
   }
 
   @media (max-width: 1000px) {
+    .title{
+      font-size: 24px;
+    }
     .buttonContainer{
       margin-top: $spacing-extra-large;
       flex-direction: column;

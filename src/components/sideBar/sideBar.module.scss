@@ -1,27 +1,65 @@
 @import '../../app/styles/variables.scss';
 
-.buttonLogOut {
-    background-color: $primary-color;
-    margin: 40px auto;
-  }
-
-.logOutContainer{
-    width: 100%;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+.drawerContainer {
+  width: 260px;
+  padding: 1rem 0;
+  background-color: #ffffff;
+  height: 100%;
 }
 
-.paths {
-  border: 0px;
+.menuButton {
+  color: $dark-color;
+  height: 34px;
+}
+
+.link {
   text-decoration: none;
-  color: $dark-color;
   width: 100%;
-}
-
-.paths:hover {
-  border-bottom: 2px solid $dark-color;
-  cursor: pointer;
   color: $dark-color;
+
+  &:hover {
+    background-color: #f3f3f3;
+  }
 }
 
+.listItemButton {
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  transition: background-color 0.2s ease-in-out;
+  font-family: $font-family-primary;
+  font-weight: 700;
+  color: $dark-color;
+
+  &:hover {
+    background-color: #eef5e8;
+  }
+}
+
+.icon {
+  color: $dark-color;
+  min-width: 40px;
+}
+
+.logoutSection {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 2rem 1rem 1rem;
+}
+
+.logoutButton {
+  display: flex;
+  align-items: center;
+  background-color: $primary-color;
+  color: $dark-color;
+  font-weight: 600;
+  border: none;
+  padding: 0.6rem 1.2rem;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.2s ease-in-out;
+
+  &:hover {
+    background-color: darken($primary-color, 8%);
+  }
+}
