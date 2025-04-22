@@ -105,6 +105,7 @@ export default function MaquinasView() {
                     selectedIds={selectedIds}
                     selectItems={true}
                     deleteItems={false}
+                    selectSingleItem={false}
                 />
             ) : (
                 <p>No hay máquinas disponibles</p>

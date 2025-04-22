@@ -79,14 +79,14 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName }: Fo
       </form>
 
       <div className={styles["button-container"]}>
-        <button type="submit" className={`${styles.button} ${styles["button-primary"]}`} onClick={handleSubmit}>
-          {buttonName}
-        </button>
         {onCancel && (
           <button type="button" onClick={handleCancel} className={`${styles.button} ${styles["button-secondary"]}`}>
             Cancelar
           </button>
         )}
+        <button type="submit" className={`${styles.button} ${styles["button-primary"]}`} onClick={handleSubmit}>
+          {buttonName}
+        </button>
       </div>
     </>
   );
