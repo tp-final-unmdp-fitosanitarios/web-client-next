@@ -20,7 +20,7 @@ export default function Home() {
     { label: "Stock", path: "/stock" },
   ];
 
-  useEffect(() => {
+ useEffect(() => {
     if (isReady && userId) {
       fetchUser().then(user => {
         setUser(user);
@@ -31,6 +31,8 @@ export default function Home() {
       });
     }
   }, [isReady, userId]);
+
+  console.log(userId);
 
   if (loading) {
     return <div>Cargando...</div>;

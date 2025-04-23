@@ -11,19 +11,23 @@ import { Field } from "@/domain/models/Field";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import GenericModal from "@/components/modal/GenericModal";
 import AddProviderModal from "@/components/AddProviderModal/AddProviderModal";
-
+import { Producto } from "@/domain/models/Producto";
 const ProvidersPage = () => { //TODO: Modificar los proveedores
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
     const [providers, setProviders] = useState<Proveedor[]>([]);
-    const [selectedProvider, setSelectedProvider] = useState<Proveedor | null>(null);
     const [showAddProvider, setShowAddProvider] = useState(false);
+    const [formData, setFormData] = useState<{ name: string, description: string }>({ name: "", description: "" });
+    //const [selectedProviderProducts, setSelectedProviderProducts] = useState<Producto[]>([]);
 
     useEffect(() => {
         const fetchProviders = async () => {
             const providers = await apiService.get<ResponseItems<Proveedor>>("/providers");
             setProviders(providers.data.content);
-            setSelectedProvider(providers.data.content[0]);
+            setFormData({
+                name: providers.data.content[0].name,
+                description: providers.data.content[0].description,
+            });
         };
         
         if (isReady)
@@ -33,9 +37,13 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
     
     const handleSelectSingleItem = (id: string) => {
         const provider = providers.find(provider => provider.id === id);
-        if (provider) 
-            setSelectedProvider(provider);
-    };
+        if (provider) {
+          setFormData({
+            name: provider.name,
+            description: provider.description,
+          });
+        }
+      };
     
     const items = providers ? transformToItems(providers, "id", ["name", "description"]).map((item) => {
         return {
@@ -65,8 +73,21 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
         setShowAddProvider(true);
     }
 
-    const handleModifyProvider = async () => {
-        console.log("");
+    const handleModifyProvider = async (event: React.FormEvent<HTMLFormElement>) => {
+        event.preventDefault();
+        const formData = new FormData(event.target as HTMLFormElement);
+        const name = formData.get("providerName") as string;
+        const description = formData.get("providerDescription") as string;
+        
+        const provider = providers.find(provider => provider.name === name);
+        if (provider){
+            const modifyProviderRequest = {
+                name: name,
+                description: description
+            }
+            const res = await apiService.update("/providers", provider.id, modifyProviderRequest);
+            console.log(res);
+        }
     }
 
 
@@ -87,17 +108,29 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
             </div>
             <div className={styles.formContainer}>
                 <h2 className={styles.subtitle}>Detalle</h2>
-                <form className={styles.form}>
+                <form className={styles.form} onSubmit={handleModifyProvider}>
                     <div className={styles.formRow}>
                         <label htmlFor="providerName" className={styles.label}>Nombre del proveedor</label>
-                        <input type="text" id="providerName" name="providerName" value={selectedProvider?.name} className={styles.input}/>
+                        <input 
+                        type="text" 
+                        id="providerName" 
+                        name="providerName" 
+                        value={formData.name} 
+                        className={styles.input}
+                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}/>
                     </div>
                     <div className={styles.formRow}>
                         <label htmlFor="providerDescription" className={styles.label}>Descripcion</label>
-                        <input type="text" id="providerDescription" name="providerDescription" value={selectedProvider?.description} className={styles.input}/>
+                        <input 
+                        type="text" 
+                        id="providerDescription" 
+                        name="providerDescription" 
+                        value={formData.description} 
+                        className={styles.input}
+                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}/>
                     </div>
                     <div className={styles.formButtons}>
-                    <button className={`button button-primary ${styles.buttonHome}`} onClick={handleModifyProvider}>
+                    <button className={`button button-primary ${styles.buttonHome}`} type="submit">
                         Modificar
                     </button>
                     </div>

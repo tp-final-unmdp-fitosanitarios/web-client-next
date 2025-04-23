@@ -6,7 +6,7 @@ import React, { createContext, useContext, useEffect, useState, ReactNode } from
 interface AuthContextType {
   isAuthenticated: boolean;
   token: string | null;
-  login: (updatedToken: string) => void;
+  login: (updatedToken: string, userId: string) => void;
   logout: () => void;
   getApiService: () => ApiService;
   isReady: boolean; // Agregado para indicar si el contexto está listo
@@ -39,23 +39,33 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
+    const storedUserId = localStorage.getItem("userId");
+  
     if (storedToken) {
       setToken(storedToken);
       setIsAuthenticated(true);
     }
+  
+    if (storedUserId) {
+      set_UserId(storedUserId);
+    }
+  
     setIsReady(true);
   }, []);
 
-  const getApiService = () => new ApiService(token, logout);
-
-  const login = (updatedToken: string) => {
+  const login = (updatedToken: string, userId: string) => {
     localStorage.setItem("token", updatedToken);
+    localStorage.setItem("userId", userId);
     setToken(updatedToken);
+    setUserId(userId);
     setIsAuthenticated(true);
   };
 
   const getUserId = () => userId;
-  const setUserId = (id: string) => set_UserId(id);
+  const setUserId = (id: string) => {
+    set_UserId(id);
+  };
+  const getApiService = () => new ApiService(token, logout);
 
   return (
     <AuthContext.Provider value={{ isAuthenticated, token, login, logout, getApiService, isReady, getUserId, setUserId }}>

@@ -16,7 +16,7 @@ export const dynamic = "force-dynamic";
 
 export default function Login() {
   const [errorReq, setErrorReq] = useState(false);
-  const { getApiService , login, setUserId} = useAuth(); // Hook para manejar el token de autenticación
+  const { getApiService , login} = useAuth(); // Hook para manejar el token de autenticación
   const fields: Field[] = [
     { name: "email", label: "Nombre", type: "text" },
     { name: "password", label: "Contraseña", type: "password" }, 
@@ -34,8 +34,7 @@ export default function Login() {
       const res = await apiService.create("/auth/login", body);
       console.log(res);
       const { token, user_id } = res.data as { token: string, user_id: string };
-      login(token); /// Login del provider
-      setUserId(user_id);
+      login(token, user_id); /// Login del provider
       setErrorReq(false);
       router.push("/home"); // Redirigir a la página de inicio después del login exitoso
     } catch (e: any) {
