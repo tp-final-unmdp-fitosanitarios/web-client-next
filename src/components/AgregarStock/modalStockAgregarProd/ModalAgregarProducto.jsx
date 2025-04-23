@@ -1,25 +1,51 @@
 import React, { useState } from 'react';
-import { Modal, Box, TextField, Autocomplete} from '@mui/material';
+import { Modal, Box, TextField, Autocomplete } from '@mui/material';
 import styles from "./modalAgregarProducto.module.scss"
 import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 
-const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto, limite, cantActual}) => {
+const ModalAgregarProducto = ({ open, setModalClose, products, handleAddProducto, limite, cantActual }) => {
     const [selectedSize, setSelectedSize] = useState('unitAmount');
     const [cantidad, setCantidad] = useState(0);
     const [lotNumber, setLotNumber] = useState("");
     const [expirationDate, setExpirationDate] = useState(null);
     const [selectedProduct, setSelectedProduct] = useState(null);
 
+    const customInputSx = {
+        '& .MuiInputBase-root': {
+            borderRadius: '10px',
+            backgroundColor: '#e6ebea',
+            paddingX: 1,
+            fontWeight: 'bold',
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+            borderWidth: '2px',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '& .MuiInputLabel-root': {
+            fontWeight: 'bold',
+            color: '#404e5c',
+        },
+        '&.Mui-focused .MuiInputLabel-root': {
+            color: '#404e5c',
+        },
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setModalClose();
         if (selectedSize === "totalAmount")
-            handleAddProducto(e.target[0].value,lotNumber, expirationDate,null,Math.round(cantidad));
+            handleAddProducto(e.target[0].value, lotNumber, expirationDate, null, Math.round(cantidad));
         else if (selectedSize === "unitAmount")
-            handleAddProducto(e.target[0].value,lotNumber, expirationDate,Math.round(cantidad),null);
+            handleAddProducto(e.target[0].value, lotNumber, expirationDate, Math.round(cantidad), null);
 
     };
 
@@ -42,12 +68,12 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto,
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: 400,
-                        bgcolor: "background.paper",
+                        bgcolor: '#f5f7f6',
                         boxShadow: 24,
                         p: 4,
-                        borderRadius: 2,
+                        borderRadius: 8,
+                        border: '3px solid #404e5c',
                     }}
-                     aria-labelledby="Ventana modal para agregar producto"
                 >
                     <h3 className={styles.title}>Agregar Producto {cantActual}/{limite}</h3>
                     {cantActual < limite ? (
@@ -55,7 +81,7 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto,
                             <Autocomplete
                                 disablePortal
                                 options={options}
-                                renderInput={(params) => <TextField {...params} label="Producto" required />}
+                                renderInput={(params) => <TextField {...params} label="Producto" required sx={customInputSx} />}
                                 onChange={handleSelectedProduct}
                             />
                             <div className={styles.radioContainer}>
@@ -88,6 +114,7 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto,
                                 onChange={(e) => setCantidad(e.target.value)}
                                 disabled={selectedSize !== 'unitAmount'}
                                 required={selectedSize === 'unitAmount'}
+                                sx={customInputSx}
                             />
                             <TextField
                                 fullWidth
@@ -98,6 +125,7 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto,
                                 onChange={(e) => setCantidad(e.target.value)}
                                 disabled={selectedSize !== 'totalAmount'}
                                 required={selectedSize === 'totalAmount'}
+                                sx={customInputSx}
                             />
                             <TextField
                                 fullWidth
@@ -107,14 +135,21 @@ const ModalAgregarProducto = ({open, setModalClose, products, handleAddProducto,
                                 type="text"
                                 onChange={(e) => setLotNumber(e.target.value)}
                                 required
+                                sx={customInputSx}
                             />
                             <LocalizationProvider dateAdapter={AdapterDayjs}>
-                                <DemoContainer components={['DesktopDatePicker']}>
-                                <DatePicker
-                                    label="Fecha de Vencimiento"
-                                    value={expirationDate}
-                                    onChange={(newDate) => setExpirationDate(newDate)}
-                                />
+                                <DemoContainer components={['DesktopDatePicker']}
+                                    sx={{ overflow: 'hidden' }} >
+                                    <DatePicker
+                                        label="Fecha de Vencimiento"
+                                        value={expirationDate}
+                                        onChange={(newDate) => setExpirationDate(newDate)}
+                                        slotProps={{
+                                            textField: {
+                                                sx: customInputSx
+                                            },
+                                        }}
+                                    />
                                 </DemoContainer>
                             </LocalizationProvider>
                             <div className={`${styles.buttonContainer}`}>

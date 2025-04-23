@@ -50,7 +50,7 @@ export default function Login() {
   return (
     <>
       <MenuBar showMenu={false}showArrow={false} path="home" />
-      <h1 className={styles.title}>Login</h1>
+      <h1 className={styles.title}>Iniciar Sesión</h1>
       <div className={styles.mainContainer}>
         <div className={styles.formContainer}>
           <Formulario fields={fields} onSubmit={log_in} buttonName="Ingresar" />

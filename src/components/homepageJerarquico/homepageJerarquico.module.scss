@@ -1,5 +1,22 @@
 @import "../../app/styles/variables.scss";
 
+.welcomeTitle {
+  font-size: 2.2rem;
+  font-weight: 600;
+  color: $dark-color;
+  margin-top: 40px;
+  text-align: center;
+}
+
+.username {
+  font-size: 2.6rem;
+  font-weight: bold;
+  color: $dark-color;
+  margin-bottom: 30px;
+  text-align: center;
+}
+
+
 .homeContainer {
   display: flex;
   flex-direction: column;

@@ -33,6 +33,33 @@ export default function StockView() {
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
 
+    const customInputSx = {
+        '& .MuiInputBase-root': {
+            borderRadius: '10px',
+            backgroundColor: '#e6ebea',
+            paddingX: 1,
+            fontWeight: 'bold',
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+            borderWidth: '2px',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '& .MuiInputLabel-root': {
+            fontWeight: 'bold',
+            color: '#404e5c',
+        },
+        '&.Mui-focused .MuiInputLabel-root': {
+            color: '#404e5c',
+        },
+    };
+
+
     const fetchLocations = async (): Promise<void> => {
         try {
             const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE&type=FIELD");
@@ -148,7 +175,14 @@ export default function StockView() {
                 disablePortal
                 options={options}
                 defaultValue={locations[0]?.name ? {label: locations[0].name} : null}
-                renderInput={(params) => <TextField {...params} label="Locacion" required />}
+                renderInput={(params) => (
+                    <TextField
+                      {...params}
+                      label="Locación"
+                      required
+                      sx={{...customInputSx}}
+                    />
+                  )}
                 onChange={(e, newValue) => {
                   if (newValue) {
                     setActualLocation(locations.find(l => l.name === newValue.label)?.id || '');

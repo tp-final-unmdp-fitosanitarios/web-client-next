@@ -4,6 +4,7 @@
   margin-top: $spacing-medium;
   background-color: $background-color;
   max-width: 600px;
+  min-width: 40%;
   margin-inline: auto;
   padding: $spacing-large;
   border: 2px solid $dark-color;
@@ -31,20 +32,31 @@
 
 .input,
 .select {
-  width: 100%; 
+  width: 100%;
   box-sizing: border-box;
-  padding: $spacing-small;
-  border: 1px solid #ccc;
-  border-radius: $spacing-petite;
+  padding: $spacing-small $spacing-medium;
+  border: 2px solid #404e5c;
+  border-radius: 10px;
   font-size: 14px;
   font-family: $font-family-secondary;
-  background-color: #fdfdfd;
+  background-color: #fafafa;
+  font-weight: bold;
+  color: $dark-color;
   transition: border-color 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+
+  &:hover {
+    border-color: #404e5c;
+  }
 
   &:focus {
     outline: none;
-    border-color: $primary-color;
-    box-shadow: 0 0 0 3px rgba($primary-color, 0.2);
+    border-color: #404e5c;
+    box-shadow: 0 0 0 3px rgba(#404e5c, 0.2);
+  }
+
+  &::placeholder {
+    color: lighten($dark-color, 30%);
+    font-weight: normal;
   }
 }
 

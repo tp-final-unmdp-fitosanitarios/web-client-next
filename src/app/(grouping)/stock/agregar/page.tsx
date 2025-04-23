@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation';
 import { ResponseItems } from '@/domain/models/ResponseItems';
 import { useAuth } from '@/components/Auth/AuthProvider';
 
+
 type ProductoAAgregar = {
     id: string;
     name: string;
