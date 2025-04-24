@@ -10,6 +10,7 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import { useRouter } from "next/navigation";
 
 import { Maquina } from "@/domain/models/Maquina";
+import Footer from "@/components/Footer/Footer";
 
 
 export default function AgregarMaquinas() {
@@ -75,29 +76,32 @@ export default function AgregarMaquinas() {
 
   return (
     <div className="page-container">
-      <MenuBar showMenu={false} path="/maquinas" />
-      <h1 className={styles.title}>{title}</h1>
+      <div className="content-wrap">
+        <MenuBar showMenu={false} path="/maquinas" />
+        <h1 className={styles.title}>{title}</h1>
 
-      <Formulario
-        fields={fields}
-        onSubmit={handleFormSubmit}
-        onCancel={handleCancel}
-        buttonName={"Guardar Máquina"}
-      />
-
-      {newMaquina && (
-        <GenericModal
-          isOpen={modalOpen}
-          onClose={handleCloseModal}
-          title="Máquina añadida"
-          modalText={`Se añadió la máquina: ${newMaquina.name}`}
-          buttonTitle="Cerrar"
-          showSecondButton={false}
+        <Formulario
+          fields={fields}
+          onSubmit={handleFormSubmit}
+          onCancel={handleCancel}
+          buttonName={"Guardar Máquina"}
         />
-      )}
-      {creationError && (
-        <div className={styles.error}>Error al crear la máquina: {creationError}</div>
-      )}
+
+        {newMaquina && (
+          <GenericModal
+            isOpen={modalOpen}
+            onClose={handleCloseModal}
+            title="Máquina añadida"
+            modalText={`Se añadió la máquina: ${newMaquina.name}`}
+            buttonTitle="Cerrar"
+            showSecondButton={false}
+          />
+        )}
+        {creationError && (
+          <div className={styles.error}>Error al crear la máquina: {creationError}</div>
+        )}
+      </div>
+      <Footer />
     </div>
   );
 }

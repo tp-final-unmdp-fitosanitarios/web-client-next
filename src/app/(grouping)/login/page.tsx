@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import { useRouter } from 'next/navigation';
+import Footer from "@/components/Footer/Footer";
 
 // Forzar que esta página sea dinámica y no se prerenderice en el servidor
 export const dynamic = "force-dynamic";
@@ -47,20 +48,25 @@ export default function Login() {
   };
 
   return (
-    <>
-      <MenuBar showMenu={false}showArrow={false} path="home" />
-      <h1 className={styles.title}>Iniciar Sesión</h1>
-      <div className={styles.mainContainer}>
-        <div className={styles.formContainer}>
-          <Formulario fields={fields} onSubmit={log_in} buttonName="Ingresar" />
-          {errorReq && (
-            <p className={styles.error}>Usuario y/o contraseña incorrectos.</p>
-          )}
-          <Link className={styles.forgot} href="/forgot">
-            <span>Olvidaste tu contraseña</span>
-          </Link>
+    <div className="page-container">
+      <div className="content-wrap">
+        <MenuBar showMenu={false}showArrow={false} path="home" />
+        <div className={styles.container}>
+          <h1 className={styles.title}>Iniciar Sesión</h1>
+          <div className={styles.mainContainer}>
+            <div className={styles.formContainer}>
+              <Formulario fields={fields} onSubmit={log_in} buttonName="Ingresar" />
+              {errorReq && (
+                <p className={styles.error}>Usuario y/o contraseña incorrectos.</p>
+              )}
+              <Link className={styles.forgot} href="/forgot">
+                <span>Olvidaste tu contraseña</span>
+              </Link>
+          </div>
+          </div>
         </div>
       </div>
-    </>
+      <Footer />
+    </div>
   );
 }

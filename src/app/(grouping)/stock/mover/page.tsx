@@ -12,6 +12,7 @@ import { transformToItems } from "@/utilities/transform";
 import MoverProductModal from "@/components/MoverProductModal/MoverProductModal";
 import ResultModal from "@/components/MoverSockResumenOperacion/ModalResumenOperacion";
 import ForceMovementModal from "@/components/ForceMovementModal/ForceMovementModal";
+import Footer from "@/components/Footer/Footer";
 
 const MoverStock = () => {
   const searchParams = useSearchParams();
@@ -251,7 +252,8 @@ const campos = ["display"];
   if (error) return <div>Error: {error}</div>;
 
   return (
-    <div className={styles.pageContainer}>
+    <div className="page-container">
+      <div className="content-wrap">
       <MenuBar showMenu={false} showArrow={true} path="/stock" />
       <div className={styles.mainContainer}>
         <div className={styles.column}>
@@ -291,6 +293,8 @@ const campos = ["display"];
       {showForceModal && (
         <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToMove} actualStock={stockFromServer} origen={originName} destino={destinationName} handleForceFinish={handleForceFinish} withdraw={false}/>
       )}
+      </div>
+      <Footer />
     </div>
   );
 };

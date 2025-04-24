@@ -12,6 +12,7 @@ import { ResponseItems } from "@/domain/models/ResponseItems";
 import GenericModal from "@/components/modal/GenericModal";
 import AddProviderModal from "@/components/AddProviderModal/AddProviderModal";
 import { Producto } from "@/domain/models/Producto";
+import Footer from "@/components/Footer/Footer";
 const ProvidersPage = () => { //TODO: Modificar los proveedores
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
@@ -92,7 +93,8 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
 
 
     return (
-        <div className={styles.pageContainer}>
+        <div className="page-container">
+            <div className="content-wrap">
             <MenuBar showMenu={false} showArrow={true} path="/stock" />
             <div className={styles.formAndItemListContainer}>
                 <div className={styles.itemListContainer}>
@@ -145,6 +147,8 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
             {showAddProvider && (
                 <AddProviderModal open={showAddProvider} setModalClose={() => setShowAddProvider(false)} saveProvider={handleAddProvider}/>
             )}
+            </div>
+            <Footer />
         </div>
     )
 };

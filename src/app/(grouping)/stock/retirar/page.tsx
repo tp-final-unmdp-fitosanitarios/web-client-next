@@ -243,7 +243,7 @@ if (loading) return <div>Cargando...</div>;
 if (error) return <div>Error: {error}</div>;
 
 return (
-    <div className={styles.pageContainer}>
+    <div className="page-container">
       <MenuBar showMenu={false} showArrow={true} path="/stock" />
       <div className={styles.mainContainer}>
         <div className={styles.column}>

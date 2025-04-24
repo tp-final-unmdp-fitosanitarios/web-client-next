@@ -19,6 +19,7 @@ import { useItemsManager } from '@/hooks/useItemsManager';
 import { useRouter } from 'next/navigation';
 import { ResponseItems } from '@/domain/models/ResponseItems';
 import { useAuth } from '@/components/Auth/AuthProvider';
+import Footer from '@/components/Footer/Footer';
 
 
 type ProductoAAgregar = {
@@ -227,7 +228,8 @@ const AgregarStockPage: React.FC = () => {
 
     
     return (
-        <div className={styles.pageContainer}>
+        <div className="page-container">
+            <div className="content-wrap">
             <MenuBar showMenu={false} showArrow={true} path='/stock' />
             <h1 className={styles.title}>{title}</h1>
             {!addProductModalOpen && !finishModalOpen ? 
@@ -277,6 +279,8 @@ const AgregarStockPage: React.FC = () => {
             ) : (
                 <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} locacion={remito.campo} remito={remito.archivo}/>
             )}
+            </div>
+            <Footer />
         </div>
     );
 };

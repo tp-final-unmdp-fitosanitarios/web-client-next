@@ -15,6 +15,7 @@ import { Autocomplete, TextField } from "@mui/material";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import MoverStockModal from "@/components/MoverStockModal/MoverStockModal";
 import RetirarStockModal from "@/components/RetirarStockModal/RetirarStockModal";
+import Footer from "@/components/Footer/Footer";
 
 const buttons = [
     { label: "Agregar", path: "/stock/agregar" },
@@ -168,6 +169,7 @@ export default function StockView() {
 
     return (
         <div className="page-container">
+            <div className="content-wrap">
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Stock</h1>
 
@@ -226,7 +228,8 @@ export default function StockView() {
                 ))}
 
             </div>
-
+            </div>
+            <Footer />
             <GenericModal
                 isOpen={isModalOpen}
                 onClose={closeModal}

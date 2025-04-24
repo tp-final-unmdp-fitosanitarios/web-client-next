@@ -14,6 +14,7 @@ import { Proveedor } from "@/domain/models/Proveedor";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import styles from "./agregarProductos.module.scss";
 import { ResponseItems } from "@/domain/models/ResponseItems";
+import Footer from "@/components/Footer/Footer";
 
 interface CreateProductPayload {
   name: string;
@@ -172,6 +173,7 @@ export default function AgregarProductos() {
 
     return (
       <div className="page-container">
+        <div className="content-wrap">
         <MenuBar showMenu={true} path="/productos" />
         <h1 className={styles.title}>{title}</h1>
 
@@ -181,7 +183,8 @@ export default function AgregarProductos() {
           onCancel={handleCancel}
           buttonName="Continuar"
         />
-
+        </div>
+        <Footer />
         <GenericModal
           isOpen={modalOpen}
           onClose={handleCloseModal}

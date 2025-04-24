@@ -10,7 +10,7 @@ import { useEffect, useState } from "react";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import { Maquina } from "@/domain/models/Maquina";
 import { useAuth } from "@/components/Auth/AuthProvider";
-
+import Footer from "@/components/Footer/Footer";
 const buttons = [{ label: "Agregar", path: "/maquinas/agregar" }];
 
 export default function MaquinasView() {
@@ -99,6 +99,7 @@ export default function MaquinasView() {
 
   return (
     <div className="page-container">
+      <div className="content-wrap">
       <MenuBar showMenu={false} showArrow={true} path="home"/>
       <h1 className={styles.title}>Máquinas</h1>
 
@@ -133,7 +134,8 @@ export default function MaquinasView() {
           </Link>
         ))}
       </div>
-
+      </div>
+      <Footer />
       <GenericModal
         isOpen={isModalOpen}
         onClose={closeModal}

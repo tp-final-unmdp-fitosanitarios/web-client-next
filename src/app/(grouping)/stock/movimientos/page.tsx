@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { useAuth } from "@/components/Auth/AuthProvider";
 import { ResponseItems } from '@/domain/models/ResponseItems';
 import MovementDetailModal from '@/components/MovementDetailModal/MovementDetailModal';
+import Footer from '@/components/Footer/Footer';
 
 const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los producos y depositos. Evaluar cuando hacer los fetch. Anular el y-scroll.
     const [movements, setMovements] = useState<any[]>([]);
@@ -48,7 +49,8 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
         setSelectedMovement(null);
     }
     return (
-        <div className={styles.pageContainer}>
+        <div className="page-container">
+            <div className="content-wrap">
             <MenuBar showMenu={false} showArrow={true} path="/stock" />
             <h1 className={styles.title}>Movimientos de stock</h1>
             <div className={styles.container}>
@@ -91,8 +93,10 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                 </div>
             </div>
             { showDetailModal && (
-            <MovementDetailModal open={showDetailModal} setModalClose={handleDetailModalClose} movement={selectedMovement} />
-      )}
+                <MovementDetailModal open={showDetailModal} setModalClose={handleDetailModalClose} movement={selectedMovement} />
+            )}
+            </div>
+            <Footer />
         </div>
     )
 }

@@ -11,6 +11,7 @@ import GenericModal from "@/components/modal/GenericModal";
 import { useEffect, useState } from "react";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import { useAuth } from "@/components/Auth/AuthProvider";
+import Footer from "@/components/Footer/Footer";
 
 const buttons = [{ label: "Agregar", path: "/productos/agregar" }];
 
@@ -105,6 +106,7 @@ export default function ProductosView() {
 
     return (
         <div className="page-container">
+            <div className="content-wrap">
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Productos</h1>
 
@@ -135,7 +137,8 @@ export default function ProductosView() {
                     </Link>
                 ))}
             </div>
-
+            </div>
+            <Footer />
             <GenericModal
                 isOpen={isModalOpen}
                 onClose={closeModal}

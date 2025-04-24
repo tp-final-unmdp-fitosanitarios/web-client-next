@@ -1,0 +1,51 @@
+@import '../../app/styles/variables.scss';
+
+.footer {
+    background-color: $secondary-color;
+    color: white;
+    padding: 1.5rem 0;
+  }
+  
+  .footerContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+  }
+  
+    .footerText {
+    margin-bottom: 1rem;
+    font-size: 0.875rem;
+    text-align: center;
+  }
+  
+  .footerLinks {
+    display: flex;
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+  
+  .footerLinks a {
+    color: white;
+    text-decoration: none;
+    font-size: 0.875rem;
+    transition: text-decoration 0.3s;
+  }
+  
+  .footerLinks a:hover {
+    text-decoration: underline;
+  }
+  
+  @media (min-width: 768px) {
+    .footerContainer {
+      flex-direction: row;
+    }
+  
+    .footerText {
+      margin-bottom: 0;
+    }
+  }

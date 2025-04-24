@@ -6,6 +6,7 @@ import { Roles } from "@/domain/enum/Roles";
 import HomepageJerarquico from "../../../components/homepageJerarquico/HomepageJerarquico";
 import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador";
 import { useAuth } from "@/components/Auth/AuthProvider";
+import Footer from "@/components/Footer/Footer";
 
 export default function Home() {
 
@@ -55,5 +56,12 @@ export default function Home() {
   if (!user)
     return (<h3>Loading...</h3>)
 
-  return user.roles[0] === Roles.Admin || user.roles[0] === Roles.Encargado ? <HomepageJerarquico user={user} buttons={buttons} /> : <HomepageAplicador user={user} />
+  return (
+    <div className="page-container">
+      <div className="content-wrap">
+        {user.roles[0] === Roles.Admin || user.roles[0] === Roles.Encargado ? <HomepageJerarquico user={user} buttons={buttons} /> : <HomepageAplicador user={user} />}
+      </div>
+      <Footer />
+    </div>
+  )
 }
