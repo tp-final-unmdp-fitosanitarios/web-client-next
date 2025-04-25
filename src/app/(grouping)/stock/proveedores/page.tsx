@@ -19,12 +19,13 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
     const [providers, setProviders] = useState<Proveedor[]>([]);
     const [showAddProvider, setShowAddProvider] = useState(false);
     const [formData, setFormData] = useState<{ name: string, description: string }>({ name: "", description: "" });
-    //const [selectedProviderProducts, setSelectedProviderProducts] = useState<Producto[]>([]);
+    const [selectedProviderProducts, setSelectedProviderProducts] = useState<Producto[]>([]);
 
     useEffect(() => {
         const fetchProviders = async () => {
             const providers = await apiService.get<ResponseItems<Proveedor>>("/providers");
             setProviders(providers.data.content);
+            setSelectedProviderProducts(providers.data.content[0].products || []);
             setFormData({
                 name: providers.data.content[0].name,
                 description: providers.data.content[0].description,
@@ -43,6 +44,7 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
             name: provider.name,
             description: provider.description,
           });
+          setSelectedProviderProducts(provider.products || []);
         }
       };
     
@@ -92,6 +94,16 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
     }
 
 
+    const productItems = transformToItems(selectedProviderProducts, "id", ["name", "unit","amount"]).map((item) => {
+        return {
+            ...item,
+            display: `${item.name} x ${item.amount}${item.unit}`,
+        }; 
+        });
+
+    const productCampos = ["display"];
+
+
     return (
         <div className="page-container">
             <div className="content-wrap">
@@ -132,7 +144,17 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}/>
                     </div>
                     <div className={styles.formButtons}>
-                    <button className={`button button-primary ${styles.buttonHome}`} type="submit">
+                    <h4 className={styles.subtitle}>Productos</h4>
+                    {productItems.length > 0 ? 
+                    (<ItemList
+                    items={productItems}
+                    displayKeys={productCampos}
+                    selectItems={false}
+                    deleteItems={false}
+                    selectSingleItem={false} />
+                    ) : (<p>El proveedor no tiene productos asociados</p>)
+                    }
+                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonSubmit}`} type="submit">
                         Modificar
                     </button>
                     </div>
@@ -141,7 +163,7 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
             </div>
             <div className={styles.buttonContainer}>
                 <button className={`button button-primary ${styles.buttonHome}`} onClick={handleShowAddProvider}>
-                    Agregar proveedor
+                    Agregar
                 </button>
             </div>
             {showAddProvider && (
