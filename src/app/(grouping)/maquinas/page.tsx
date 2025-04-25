@@ -114,7 +114,7 @@ export default function MaquinasView() {
           selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
         />
       ) : (
-        <p>No hay máquinas disponibles</p>
+        <p style={{textAlign: "center"}}>No hay máquinas disponibles</p>
       )}
 
       <div className={styles.buttonContainer}>

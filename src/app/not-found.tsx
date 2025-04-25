@@ -1,10 +1,13 @@
 import MenuBar from "@/components/menuBar/MenuBar";
-
+import Footer from "@/components/Footer/Footer";
 const NotFound = () => {
     return (
-      <div>
-        <MenuBar showMenu={true}/>
-        <h1 style={{textAlign: "center"}}>Página no encontrada :(</h1>
+      <div className="page-container">
+        <div className="content-wrap">
+          <MenuBar showMenu={true}/>
+          <h1 style={{textAlign: "center"}}>Página no encontrada :(</h1>
+        </div>
+        <Footer />
       </div>
     )
 }
