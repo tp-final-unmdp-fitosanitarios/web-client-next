@@ -25,7 +25,10 @@ export default function AgregarMaquinas() {
   const [creationError, setCreationError] = useState<string | null>(null);
 
   const handleOpenModal = useCallback(() => setModalOpen(true), []);
-  const handleCloseModal = useCallback(() => setModalOpen(false), []);
+  const handleCloseModal = useCallback(() => {
+    setModalOpen(false)
+    router.push("/maquinas"); // Redirige a la página de máquinas
+  }, []);
 
   const handleFormSubmit = (inputData: Record<string, string | number>) => {
    
@@ -52,7 +55,6 @@ export default function AgregarMaquinas() {
         console.log("Máquina creada:", response.data);
         setNewMaquina(response.data);
         handleOpenModal();
-        router.push("/maquinas"); // Redirige a la página de máquinas
       } else {
         console.error("Error al crear la máquina:", response.error);
         setCreationError(response.error || "Error desconocido al crear la máquina.");

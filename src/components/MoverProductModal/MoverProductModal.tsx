@@ -47,8 +47,8 @@ const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProd
                      aria-labelledby="Ventana modal para mover producto"
                 >
                     <h1 className={styles.title}>{withdraw ? "Retirar Producto" : "Mover Producto"}</h1>
-                    <h4 className={styles.title}>{product.name}</h4>
-                    <h4 className={styles.title}>Stock actual en {stock.location.name}: {stock.amount} {stock.unit}</h4>
+                    <h3 className={styles.title}>{product.name}</h3>
+                    <h3 className={styles.title}>Stock actual en {stock.location.name}: {stock.amount} {stock.unit}</h3>
                     <form onSubmit={handleSubmit}>
                         <div className={styles.radioContainer}>
                             <label>
@@ -83,7 +83,7 @@ const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProd
                             <div className={`${styles.buttonContainer}`}>
                                 <button
                                     type="button"
-                                    className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`}
+                                    className={`button button-secondary ${styles.buttonHome} ${styles.buttonCancel}`}
                                     onClick={setModalClose}
                                 >
                                     Cancelar

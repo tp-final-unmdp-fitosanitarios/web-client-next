@@ -31,16 +31,16 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
                     <div className={styles.outputContainer}>
                         <div className={styles.dataPresentation}>
                             <h4>Origen: </h4>
-                            <h4>{movement.origin_id}</h4>
+                            <h4>{movement.origin.name}</h4>
                         </div>
                         <div className={styles.dataPresentation}>
                             <h4>Destino: </h4>
-                            <h4>{movement.destination_id}</h4>
+                            <h4>{movement.destination.name}</h4>
                         </div>
                     </div>
                     <div className={styles.productContainer}>
                         <p className={styles.message}>Se traslado el siguiente produto</p>
-                        <p className={styles.message}>{movement.product_id}</p>
+                        <p className={styles.message}>{movement.product.name}</p>
                     </div>
                 </div>
                 <div className={`${styles.buttonContainer}`}>

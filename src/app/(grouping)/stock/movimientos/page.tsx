@@ -72,8 +72,8 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                                     className={styles.item} 
                                     onClick={() => handleClickMovement(movement)}
                                 >
-                                    <p className={styles.movementInfo}>{`${movement.product_id} - ${movement.amount} ${movement.unit}`}</p>
-                                    <p className={styles.movementInfo}>{`Origen: ${movement.origin_id} - Destino: ${movement.destination_id}`}</p>
+                                    <p className={styles.movementInfo}>{`${movement.product.name} - ${movement.amount} ${movement.unit}`}</p>
+                                    <p className={styles.movementInfo}>{`Origen: ${movement.origin.name} - Destino: ${movement.destination.name}`}</p>
                                 </div>
                             </>
                             )
@@ -85,8 +85,8 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                                 className={styles.item} 
                                 onClick={() => handleClickMovement(movement)}
                             >
-                                <p className={styles.movementInfo}>{`${movement.product_id} - ${movement.amount} ${movement.unit}`}</p>
-                                <p className={styles.movementInfo}>{`Origen: ${movement.origin_id} - Destino: ${movement.destination_id}`}</p>
+                                <p className={styles.movementInfo}>{`${movement.product.name} - ${movement.amount} ${movement.unit}`}</p>
+                                <p className={styles.movementInfo}>{`Origen: ${movement.origin.name} - Destino: ${movement.destination.name}`}</p>
                             </div>
                         )
                 })}

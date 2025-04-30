@@ -13,6 +13,8 @@ import ResultModal from "@/components/MoverSockResumenOperacion/ModalResumenOper
 import router from "next/router";
 import ForceMovementModal from "@/components/ForceMovementModal/ForceMovementModal";
 import { useRouter } from "next/navigation";
+import Footer from "@/components/Footer/Footer";
+import GenericModal from "@/components/modal/GenericModal";
 
 const RetirarStock = () => {
 const searchParams = useSearchParams();
@@ -28,6 +30,7 @@ const [showWithdrawProductModal, setShowWithdrawProductModal] = useState<boolean
 const [showResultModal, setShowResultModal] = useState<boolean>(false);
 const [showForceModal, setShowForceModal] = useState<boolean>(false);
 const [selectedItem, setSelectedItem] = useState<Stock | null>(null);
+const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
 const { getApiService, isReady } = useAuth();
 const apiService = getApiService();
 const router = useRouter();
@@ -149,10 +152,9 @@ const fetchStock = async () => {
     const response = await apiService.create<ResponseItems<Stock>>("stock/retire", moveStockRequest);
 
     if(response.success){
-      console.log("Stock retirado correctamente");
       setShowResultModal(false);
       setProductsToWithdraw([]);
-      router.push("/stock");  
+      setConfirmationModalOpen(true); 
     }
     else{
       console.log("Error al mover stock");
@@ -201,10 +203,9 @@ const fetchStock = async () => {
     const response = await apiService.create<ResponseItems<Stock>>("stock/retire?force=true", moveStockRequest);
 
     if(response.success){
-      console.log("Stock retirado correctamente");
       setShowForceModal(false);
       setProductsToWithdraw([]);
-      router.push("/stock");  
+      setConfirmationModalOpen(true); 
     }
     else{
       setError(response.error || "Error al mover stock");
@@ -217,6 +218,11 @@ const fetchStock = async () => {
         display: `${item.producto} : ${item.amount}${item.unit}`,
     };
     });
+
+    const handleCloseConfirmationModal = () => {
+      setConfirmationModalOpen(false);
+      router.push("/stock");
+  }
 
     const itemsStockToWithdraw = transformToItems(stockToWithdrawToDisplay, "id", ["producto", "amount","unit","flag", "cantidad"]).map((item) => {
       if (item.flag === "unitAmount")
@@ -244,29 +250,40 @@ if (error) return <div>Error: {error}</div>;
 
 return (
     <div className="page-container">
+      <div className="content-wrap">
       <MenuBar showMenu={false} showArrow={true} path="/stock" />
       <div className={styles.mainContainer}>
         <div className={styles.column}>
           <h2 className={styles.subtitle}>Stock disponible en {originName}</h2>
-          <ItemList
-            items={itemsCurrentStock}
-            displayKeys={campos}
-            selectItems={false}
-            deleteItems={false}
-            selectSingleItem={true}
-            onSelectSingleItem={handleSelectSingleItem}
-          />
+          { itemsCurrentStock.length > 0 ? (
+              <ItemList
+                items={itemsCurrentStock}
+                displayKeys={campos}
+                selectItems={false}
+                deleteItems={false}
+                selectSingleItem={true}
+                onSelectSingleItem={handleSelectSingleItem}
+              />
+            ):(
+              <p>No hay stock en la locacion seleccionada</p>
+            )
+          }
         </div>
         <div className={styles.column}>
           <h2 className={styles.subtitle}>Productos a Retirar</h2>
-          <ItemList
-            items={itemsStockToWithdraw}
-            displayKeys={campos}
-            selectItems={false}
-            deleteItems={true}
-            onDelete={handleDeleteProduct}
-            selectSingleItem={false}
-          />
+          { itemsStockToWithdraw.length > 0 ? (
+            <ItemList
+              items={itemsStockToWithdraw}
+              displayKeys={campos}
+              selectItems={false}
+              deleteItems={true}
+              onDelete={handleDeleteProduct}
+              selectSingleItem={false}
+            />
+          ):(
+            <p>Seleccione productos a retirar</p>
+          )
+          }
         </div>
         
       </div>
@@ -283,6 +300,16 @@ return (
       {showForceModal && (
         <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToWithdraw} actualStock={stockFromServer} origen={originName} destino={""} handleForceFinish={handleForceFinish} withdraw={true}/>
       )}
+      </div>
+      <GenericModal
+          isOpen={confirmationModalOpen}
+          onClose={handleCloseConfirmationModal}
+          title="Retiro exitoso"
+          modalText={`Se retiro stock correctamente`}
+          buttonTitle="Cerrar"
+          showSecondButton={false}
+      />
+      <Footer />
     </div>
   );
 }

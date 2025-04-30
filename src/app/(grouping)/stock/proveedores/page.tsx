@@ -13,13 +13,16 @@ import GenericModal from "@/components/modal/GenericModal";
 import AddProviderModal from "@/components/AddProviderModal/AddProviderModal";
 import { Producto } from "@/domain/models/Producto";
 import Footer from "@/components/Footer/Footer";
-const ProvidersPage = () => { //TODO: Modificar los proveedores
+import axios from "axios";
+const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de proveedores.
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
     const [providers, setProviders] = useState<Proveedor[]>([]);
     const [showAddProvider, setShowAddProvider] = useState(false);
     const [formData, setFormData] = useState<{ name: string, description: string }>({ name: "", description: "" });
+    const [selectedId, setSelectedId] = useState<String>("");
     const [selectedProviderProducts, setSelectedProviderProducts] = useState<Producto[]>([]);
+    const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
 
     useEffect(() => {
         const fetchProviders = async () => {
@@ -30,6 +33,7 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
                 name: providers.data.content[0].name,
                 description: providers.data.content[0].description,
             });
+            setSelectedId(providers.data.content[0].id);
         };
         
         if (isReady)
@@ -45,6 +49,7 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
             description: provider.description,
           });
           setSelectedProviderProducts(provider.products || []);
+          setSelectedId(provider.id);
         }
       };
     
@@ -67,13 +72,26 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
             name: name,
             description: description
         }
-        const addProviderResponse = await apiService.create("/providers", addProviderRequest);
+
+        const addProviderResponse = await apiService.create<Proveedor>("/providers", addProviderRequest);
         
-        console.log(addProviderResponse);
+        if(addProviderResponse.success){
+            const newProvider = addProviderResponse.data
+            setConfirmationModalOpen(true);
+            setProviders([...providers, newProvider]);
+        }
     }
     
     const handleShowAddProvider = () => {
         setShowAddProvider(true);
+    }
+
+    const handleDeleteProduct = (id: string) => {
+        setSelectedProviderProducts(selectedProviderProducts.filter(p => p.id!==id))
+    }
+
+    const handleDeleteProvider = (id: string) => {
+        console.log("Deleting provider: "+id);
     }
 
     const handleModifyProvider = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -82,15 +100,22 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
         const name = formData.get("providerName") as string;
         const description = formData.get("providerDescription") as string;
         
-        const provider = providers.find(provider => provider.name === name);
+        const provider = providers.find(provider => provider.id===selectedId);
         if (provider){
-            const modifyProviderRequest = {
+            /*const modifyProviderRequest = {
                 name: name,
                 description: description
-            }
-            const res = await apiService.update("/providers", provider.id, modifyProviderRequest);
-            console.log(res);
+            }*/
+           provider.name = name;
+           provider.description = description;
+           //const res = await apiService.update(`/providers/${provider.id}`,provider.id, provider);
+           const res = await axios.put("http://localhost:8080/providers/"+provider.id,provider);
+           console.log(res);
         }
+    }
+
+    const handleCloseConfirmationModal = () => {
+        setConfirmationModalOpen(false);
     }
 
 
@@ -115,7 +140,8 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
                     items={items}
                     displayKeys={campos}
                     selectItems={false}
-                    deleteItems={false}
+                    deleteItems={true}
+                    onDelete={handleDeleteProvider}
                     selectSingleItem={true}
                     onSelectSingleItem={handleSelectSingleItem}
                     />
@@ -144,19 +170,20 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
                         onChange={(e) => setFormData({ ...formData, description: e.target.value })}/>
                     </div>
                     <div className={styles.formButtons}>
+                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonSubmit}`} type="submit">
+                        Modificar
+                    </button>
                     <h4 className={styles.subtitle}>Productos</h4>
                     {productItems.length > 0 ? 
                     (<ItemList
                     items={productItems}
                     displayKeys={productCampos}
                     selectItems={false}
-                    deleteItems={false}
+                    deleteItems={true}
+                    onDelete={handleDeleteProduct}
                     selectSingleItem={false} />
                     ) : (<p>El proveedor no tiene productos asociados</p>)
                     }
-                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonSubmit}`} type="submit">
-                        Modificar
-                    </button>
                     </div>
                 </form>           
             </div>
@@ -169,6 +196,14 @@ const ProvidersPage = () => { //TODO: Modificar los proveedores
             {showAddProvider && (
                 <AddProviderModal open={showAddProvider} setModalClose={() => setShowAddProvider(false)} saveProvider={handleAddProvider}/>
             )}
+            <GenericModal
+                isOpen={confirmationModalOpen}
+                onClose={handleCloseConfirmationModal}
+                title="Provedor Añadido"
+                modalText={`Se agrego el proveedor correctamente`}
+                buttonTitle="Cerrar"
+                showSecondButton={false}
+            />
             </div>
             <Footer />
         </div>

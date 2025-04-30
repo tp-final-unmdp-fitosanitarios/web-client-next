@@ -20,6 +20,7 @@ import { useRouter } from 'next/navigation';
 import { ResponseItems } from '@/domain/models/ResponseItems';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import Footer from '@/components/Footer/Footer';
+import GenericModal from '@/components/modal/GenericModal';
 
 
 type ProductoAAgregar = {
@@ -42,6 +43,7 @@ const AgregarStockPage: React.FC = () => {
     const [productosAAgregar, setProductosAAgregar] = useState<ProductoAAgregar[]>([]);
     const [addProductModalOpen, setAddProductModalOpen] = useState(false);
     const [finishModalOpen, setFinishModalOpen] = useState(false);
+    const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
     const title = 'Agregar Stock'
@@ -144,9 +146,6 @@ const AgregarStockPage: React.FC = () => {
     }
 
     const handleFinish = () => {
-        //Armo la request
-        //Envio
-        //Si sale bien vuelvo a
         const loc = locations?.find((l) => l.name === remito.campo)?.id;
         if (!loc) throw new Error("No se encontro la locacion");
 
@@ -173,8 +172,10 @@ const AgregarStockPage: React.FC = () => {
         console.log(addStockRequest);
         apiService.create("/delivery", addStockRequest).then((response: any) => {
             if (response.success) {
-                console.log("Stock agregado correctamente"); //Aca estaria la llamada a la api de wpp. Tambien podria ser un modal
-                handleCancel();
+                setConfirmationModalOpen(true);
+                setAddProductModalOpen(false);
+                setFinishModalOpen(false);
+                setProductosAAgregar([]);
             } else {
                 console.error("Error al agregar stock:", response.error);
             }
@@ -224,7 +225,12 @@ const AgregarStockPage: React.FC = () => {
 
     const quitarItem = (id: string) => {
         setProductosAAgregar((prev) => prev.filter((item) => item.id !== id));
-      };
+    };
+
+    const handleCloseConfirmationModal = () => {
+        setConfirmationModalOpen(false);
+        router.push("/stock");
+    }
 
     
     return (
@@ -279,6 +285,14 @@ const AgregarStockPage: React.FC = () => {
             ) : (
                 <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} locacion={remito.campo} remito={remito.archivo}/>
             )}
+            <GenericModal
+            isOpen={confirmationModalOpen}
+            onClose={handleCloseConfirmationModal}
+            title="Producto añadido"
+            modalText={`Se agrego stock correctamente`}
+            buttonTitle="Cerrar"
+            showSecondButton={false}
+            />
             </div>
             <Footer />
         </div>

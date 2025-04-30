@@ -13,6 +13,7 @@ import MoverProductModal from "@/components/MoverProductModal/MoverProductModal"
 import ResultModal from "@/components/MoverSockResumenOperacion/ModalResumenOperacion";
 import ForceMovementModal from "@/components/ForceMovementModal/ForceMovementModal";
 import Footer from "@/components/Footer/Footer";
+import GenericModal from "@/components/modal/GenericModal";
 
 const MoverStock = () => {
   const searchParams = useSearchParams();
@@ -31,6 +32,7 @@ const MoverStock = () => {
   const [showMoverProductModal, setShowMoverProductModal] = useState<boolean>(false);
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [showForceModal, setShowForceModal] = useState<boolean>(false);
+  const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
   const { getApiService, isReady } = useAuth();
   const apiService = getApiService();
   const router = useRouter();
@@ -189,12 +191,11 @@ const campos = ["display"];
     const response = await apiService.create<ResponseItems<Stock>>("stock/movement", moveStockRequest);
 
     if(response.success){
-      console.log("Stock movido correctamente");
       setShowResultModal(false);
       setProductsToMove([]);
-      router.push("/stock");  
+      setConfirmationModalOpen(true);
     }
-    else{//TODO: Agregar logica  para el caso del stock negativo y el flag force
+    else{
       console.log("Error al mover stock");
       console.log(response);
       if(response.status === 400)
@@ -237,15 +238,19 @@ const campos = ["display"];
     const response = await apiService.create<ResponseItems<Stock>>("stock/movement?force=true", moveStockRequest);
 
     if(response.success){
-      console.log("Stock movido correctamente");
       setShowForceModal(false);
       setProductsToMove([]);
-      router.push("/stock");  
+      setConfirmationModalOpen(true);
     }
     else{
       setError(response.error || "Error al mover stock");
     }
   }
+
+  const handleCloseConfirmationModal = () => {
+    setConfirmationModalOpen(false);
+    router.push("/stock");
+}
 
 
   if (loading) return <div>Cargando...</div>;
@@ -269,6 +274,7 @@ const campos = ["display"];
         </div>
         <div className={styles.column}>
           <h2 className={styles.subtitle}>Productos a mover hacia {destinationName}</h2>
+          {itemsStockToMove.length > 0 ? (
           <ItemList
             items={itemsStockToMove}
             displayKeys={campos}
@@ -277,6 +283,9 @@ const campos = ["display"];
             onDelete={handleDeleteProduct}
             selectSingleItem={false}
           />
+          ) : (
+            <p>Seleccione productos a mover</p>
+          )}
         </div>
         
       </div>
@@ -293,6 +302,14 @@ const campos = ["display"];
       {showForceModal && (
         <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToMove} actualStock={stockFromServer} origen={originName} destino={destinationName} handleForceFinish={handleForceFinish} withdraw={false}/>
       )}
+      <GenericModal
+          isOpen={confirmationModalOpen}
+          onClose={handleCloseConfirmationModal}
+          title="Movimiento exitoso"
+          modalText={`Se movio stock correctamente`}
+          buttonTitle="Cerrar"
+          showSecondButton={false}
+      />
       </div>
       <Footer />
     </div>

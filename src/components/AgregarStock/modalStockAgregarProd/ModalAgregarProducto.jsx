@@ -39,6 +39,30 @@ const ModalAgregarProducto = ({ open, setModalClose, products, handleAddProducto
         },
     };
 
+    const disabledInputSx = {
+        '& .MuiInputBase-root': {
+            borderRadius: '10px',
+            backgroundColor: '#f5f5f5', // gris muy claro
+            paddingX: 1,
+            fontWeight: 'bold',
+            color: '#9e9e9e', // gris claro para el texto
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#d3d3d3', // gris claro para el borde
+            borderWidth: '2px',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#d3d3d3',
+        },
+        '& .MuiInputLabel-root': {
+            fontWeight: 'bold',
+            color: '#9e9e9e', // gris claro para el label
+        },
+        '&.Mui-focused .MuiInputLabel-root': {
+            color: '#9e9e9e',
+        },
+    };
+
     const handleSubmit = (e) => {
         e.preventDefault();
         setModalClose();
@@ -114,7 +138,7 @@ const ModalAgregarProducto = ({ open, setModalClose, products, handleAddProducto
                                 onChange={(e) => setCantidad(e.target.value)}
                                 disabled={selectedSize !== 'unitAmount'}
                                 required={selectedSize === 'unitAmount'}
-                                sx={customInputSx}
+                                sx={ selectedSize === 'unitAmount' ? customInputSx : disabledInputSx}
                             />
                             <TextField
                                 fullWidth
@@ -125,7 +149,7 @@ const ModalAgregarProducto = ({ open, setModalClose, products, handleAddProducto
                                 onChange={(e) => setCantidad(e.target.value)}
                                 disabled={selectedSize !== 'totalAmount'}
                                 required={selectedSize === 'totalAmount'}
-                                sx={customInputSx}
+                                sx={ selectedSize === 'totalAmount' ? customInputSx : disabledInputSx}
                             />
                             <TextField
                                 fullWidth
