@@ -1,72 +1,133 @@
 @import "../../../styles/variables.scss";
-.title{
-    display: flex;
-    justify-content: center;
-    color: $dark-color;
-   }
 
-   .formAndItemListContainer{
-    display: flex;
-    justify-content: space-around;
-   }
+.title {
+  display: flex;
+  justify-content: center;
+  color: $dark-color;
+}
 
-   .formContainer{
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
+.formAndItemListContainer {
+  display: flex;
+  justify-content: space-around;
+}
+
+.formContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.itemListContainer {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 40%;
+  max-width: 90%;
+}
+
+.fileLabelText {
+  margin: 0px;
+  margin-bottom: $spacing-medium;
+  font-size: 15px;
+  font-weight: 600;
+  color: $dark-color;
+  padding-left: 15px;
+}
+
+
+.filePreviewContainer {
+  padding-top: 20px;
+  display: flex;
+  align-items: center;
+  gap: $spacing-medium; 
+  margin-top: $spacing-petite;
+}
+
+.fileName {
+  font-style: italic;
+  font-size: 14px;
+  color: $dark-color;
+}
+
+.fileIcon {
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
+
+  &:hover {
+    opacity: 0.7;
+  }
+
+}
+
+.fileIconDisabled {
+  cursor: not-allowed;
+  opacity: 0.3;
+}
+
+.button {
+  min-width: 30%;
+  max-width: 80%;
+  padding: $spacing-small $spacing-medium;
+  border: none;
+  border-radius: $border-radius;
+  font-weight: $button-font-weight;
+  cursor: pointer;
+  color: $dark-color;
+  margin-top: $spacing-large;
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.buttonPrimary {
+  margin-right: $spacing-large;
+  background-color: $primary-color;
+}
+
+.buttonSelect {
+  margin-left: $spacing-medium;
+  margin-right: $spacing-large;
+  border: 2px solid $dark-color;
+  background-color: $light-color;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  margin-top: $spacing-extra-large;
+}
+
+.buttonCancel {
+  margin-right: $spacing-medium;
+}
+
+.buttonFinish {
+  margin-left: $spacing-medium;
+}
+
+.buttonChange {  
+  margin-left: $spacing-medium;
+  margin-right: $spacing-large;
+  border: 2px solid $dark-color;
+  background-color:  $light-color; 
+}
+
+@media (max-width:500px) {
+  .formAndItemListContainer {
+    flex-direction: column-reverse;
     align-items: center;
-   }
-
-   .itemListContainer{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    min-width: 40%;
-    max-width: 90%;
-   }
-
-   .button {
-    min-width: 30%;
-    max-width: 80%;
-    padding: $spacing-small $spacing-medium;
-    border: none;
-    border-radius: $border-radius;
-    font-weight: $button-font-weight;
-    cursor: pointer;
-    color: $dark-color;
-    margin-top: $spacing-large;
-  }
-  
-  .buttonPrimary {
-    margin-right: $spacing-large;
-    background-color: $primary-color;
   }
 
-  .buttonContainer{
-    display: flex;
-    justify-content: center;
-    margin-top: $spacing-extra-large;
+  .itemListContainer {
+    min-width: 90%;
   }
+}
 
-  .buttonCancel{
-    margin-right: $spacing-medium;
-  }
-
-  .buttonFinish{
-    margin-left: $spacing-medium;
-  }
-
-  @media (max-width:500px) {
-    .formAndItemListContainer {
-      flex-direction: column-reverse;
-      align-items: center;
-    }
-    .itemListContainer {
-      min-width: 90%;
-    }
-  }
-
-  .button:disabled{
-    background-color: $light-color;
-  }
+.button:disabled {
+  background-color: $light-color;
+}

@@ -8,7 +8,10 @@ import { Field } from '@/domain/models/Field';
 import { Remito } from '@/domain/models/Remito';
 import React, { useEffect, useState } from 'react';
 import styles from "./agregarStock.module.scss"
-import { Link} from '@mui/material';
+import { Box, Modal } from '@mui/material';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import ClearIcon from '@mui/icons-material/Clear';
+import Link from 'next/link';
 import ItemList from '@/components/itemList/ItemList';
 import { transformToItems } from '@/utilities/transform';
 import { Producto } from '@/domain/models/Producto';
@@ -21,7 +24,7 @@ import { ResponseItems } from '@/domain/models/ResponseItems';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import Footer from '@/components/Footer/Footer';
 import GenericModal from '@/components/modal/GenericModal';
-
+import Image from 'next/image';
 
 type ProductoAAgregar = {
     id: string;
@@ -36,14 +39,18 @@ type ProductoAAgregar = {
 
 const AgregarStockPage: React.FC = () => {
     const router = useRouter();
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const [remito, setRemito] = useState<any>(null);
     const [productosExistentes, setProductosExistentes] = useState<Producto[]>([]);
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [productosAAgregar, setProductosAAgregar] = useState<ProductoAAgregar[]>([]);
     const [addProductModalOpen, setAddProductModalOpen] = useState(false);
     const [finishModalOpen, setFinishModalOpen] = useState(false);
-    const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
+    const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
     const title = 'Agregar Stock'
@@ -53,14 +60,48 @@ const AgregarStockPage: React.FC = () => {
     const handleFinishCloseModal = () => setFinishModalOpen(false);
     const handleFinishOpenModal = () => {
         //Valido los campos del form
-        if(!remito)
+        if (!remito)
             return
-        if(productosAAgregar.length != remito.cantProductos) //CantProductos es de tipo any, si comparo tambien tipos, explota
+        if (productosAAgregar.length != remito.cantProductos) //CantProductos es de tipo any, si comparo tambien tipos, explota
             return
 
         setFinishModalOpen(true);
     }
-    
+
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreviewUrl(null);
+            return;
+        }
+        const url = URL.createObjectURL(selectedFile);
+        setPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+    }, [selectedFile]);
+
+    const handleVerRemito = () => {
+        if (!previewUrl) {
+
+            alert("Aún no has cargado un remito.");
+            return;
+        }
+        if (selectedFile?.type.startsWith("image/")) {
+
+            setIsPreviewOpen(true);
+        } else {
+
+            window.open(previewUrl, "_blank");
+        }
+    };
+
+    const handleFileSelect = (file: File | null) => {
+        setSelectedFile(file);
+    };
+
+    const handleClearFile = () => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+    };
+
     const handleAddProducto = (producto: string, lotNumber: string, expirationDate: any, amount_of_units: number | null, total_amount: number | null) => {
         if (!amount_of_units && !total_amount) return;
 
@@ -81,46 +122,48 @@ const AgregarStockPage: React.FC = () => {
         } else {
             setProductosAAgregar(
                 [...productosAAgregar,
-                    { id: prod.id,
-                     name: producto,
-                     size: prod.amount,
-                     unit: prod.unit,
-                     total_amount: total_amount,
-                     amount_of_units: amount_of_units,
-                     expirationDate: formattedExpirationDate,
-                     lotNumber }]);
+                {
+                    id: prod.id,
+                    name: producto,
+                    size: prod.amount,
+                    unit: prod.unit,
+                    total_amount: total_amount,
+                    amount_of_units: amount_of_units,
+                    expirationDate: formattedExpirationDate,
+                    lotNumber
+                }]);
         }
     };
 
     const fetchProductos = async () => {
-        try{
+        try {
             const response = await apiService.get<ResponseItems<Producto>>("/products");
-            const productos  = response.data.content;
+            const productos = response.data.content;
             return productos;
         }
-        catch(e: any){
+        catch (e: any) {
             console.log(e.message);
             return [];
         }
-        
-    } 
+
+    }
 
     const fetchLocations = async (): Promise<Locacion[]> => {
-        try{
+        try {
             const response = await apiService.get<Locacion[]>("/locations?type=ZONE");
             const locaciones = response.data;
             console.log("locaciones", locaciones);
-            
+
             return locaciones;
         }
-        catch(e: any){
+        catch (e: any) {
             console.log(e.message);
             return []; //Aca puede caer por falta de conexion o forbbiden. Chequear como lo manejamos
         }
-    } 
+    }
 
     useEffect(() => {
-        if(!isReady) return;
+        if (!isReady) return;
         const fetchData = async () => {
             const [prods, locs] = await Promise.all([fetchProductos(), fetchLocations()]);
             setProductosExistentes(prods);
@@ -128,12 +171,12 @@ const AgregarStockPage: React.FC = () => {
         };
         fetchData();
     }, [isReady])
-    
+
     const handleFormSubmit = (inputData: Record<string, string>) => {  //TODO: Cambiar logica para ver los campos del form en tiempo real
         setRemito({
             campo: String(inputData.campo),
             cantProductos: inputData.cantProductos,
-            archivo: String(inputData.archRemito),
+            archivo: selectedFile?.name,
             fecha: new Date()
         });
     };
@@ -153,16 +196,18 @@ const AgregarStockPage: React.FC = () => {
             company_id: 1,
             products: productosAAgregar.map((p) => {
                 const prod = productosExistentes.find((prod) => prod.id === p.id);
-                const prodReq ={   product_id: p.id,
+                const prodReq = {
+                    product_id: p.id,
                     unit: p.unit,
                     lot_number: p.lotNumber,
-                    expiration_date: p.expirationDate}
+                    expiration_date: p.expirationDate
+                }
 
                 if (p.amount_of_units)
-                    return {...prodReq, amount_of_units: p.amount_of_units, total_amount: null};
+                    return { ...prodReq, amount_of_units: p.amount_of_units, total_amount: null };
 
-                if(p.total_amount)
-                    return {...prodReq, total_amount: p.total_amount, amount_of_units: null};
+                if (p.total_amount)
+                    return { ...prodReq, total_amount: p.total_amount, amount_of_units: null };
 
             }),
             attachment: remito.archivo,
@@ -179,14 +224,13 @@ const AgregarStockPage: React.FC = () => {
             } else {
                 console.error("Error al agregar stock:", response.error);
             }
-        })   
+        })
     }
 
     const fields: Field[] = [
-        { name: "nroRemito", label: "Numero de Remito", type: "text"},
-        { name: "campo", label: "Campo", type: "select" , options:locations ? locations.map((l) => l.name) : []},
-        { name: "cantProductos", label: "Cantidad de Productos", type: "number"},
-        { name: "archRemito", label: "Cargar Remito", type: "file" },
+        { name: "nroRemito", label: "Numero de Remito", type: "text" },
+        { name: "campo", label: "Campo", type: "select", options: locations ? locations.map((l) => l.name) : [] },
+        { name: "cantProductos", label: "Cantidad de Productos", type: "number" },
     ];
 
     const items = transformToItems(productosAAgregar, "id", ["name", "size", "unit", "amount_of_units", "total_amount"]).map((item) => {
@@ -212,7 +256,7 @@ const AgregarStockPage: React.FC = () => {
         { label: "Retirar", path: "/stock/retirar" },
         { label: "Ver Movimientos", path: "/stock/movimientos" },
         { label: "Proveedores", path: "/stock/proveedores" },
-        ];
+    ];
 
     const {
         selectedIds,
@@ -232,68 +276,149 @@ const AgregarStockPage: React.FC = () => {
         router.push("/stock");
     }
 
-    
+
     return (
         <div className="page-container">
             <div className="content-wrap">
-            <MenuBar showMenu={false} showArrow={true} path='/stock' />
-            <h1 className={styles.title}>{title}</h1>
-            {!addProductModalOpen && !finishModalOpen ? 
-            (
-            <>
-                <div className={styles.formAndItemListContainer}>
-                    <div className={styles.formContainer}>
-                        <h3>Nuevo Remito</h3>
-                        <Formulario fields={fields} onSubmit={handleFormSubmit} buttonName="Guardar Remito" />
-                        
-                    </div>
-                    <div className={styles.itemListContainer}>
-                        <h3>Agregar Stock</h3>
-                        
-                        {productosAAgregar.length > 0 ? (
-                            <ItemList
-                                items={items}
-                                displayKeys={campos}
-                                onSelect={toggleSelectItem}
-                                selectedIds={selectedIds}
-                                selectItems={false}
-                                deleteItems={true}
-                                onDelete={quitarItem}
-                                selectSingleItem={false}
-                            />
-                        ) : (
-                            <p>Ingrese productos para agregar stock</p>
-                        )}
-                        <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal} disabled={!remito}>
-                            Agregar Producto
-                        </button> 
-                    </div>
-                </div>
-                <div className={styles.buttonContainer}>
-                    <Link href="/stock">
-                        <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} >
-                            Cancelar
-                        </button>
-                    </Link>
-                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleFinishOpenModal}>
-                        Finalizar
-                    </button>
-                </div>
-            </>
-            ) : addProductModalOpen ? (
-                <ModalAgregarProducto handleAddProducto={handleAddProducto} products={productosExistentes} open={addProductModalOpen} setModalClose={handleAddProductCloseModal} cantActual={productosAAgregar.length}limite={remito.cantProductos}/>
-            ) : (
-                <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} locacion={remito.campo} remito={remito.archivo}/>
-            )}
-            <GenericModal
-            isOpen={confirmationModalOpen}
-            onClose={handleCloseConfirmationModal}
-            title="Producto añadido"
-            modalText={`Se agrego stock correctamente`}
-            buttonTitle="Cerrar"
-            showSecondButton={false}
-            />
+                <MenuBar showMenu={false} showArrow={true} path='/stock' />
+                <h1 className={styles.title}>{title}</h1>
+                {!addProductModalOpen && !finishModalOpen ?
+                    (
+                        <>
+                            <div className={styles.formAndItemListContainer}>
+                                <div className={styles.formContainer}>
+                                    <h3>Nuevo Remito</h3>
+                                    <Formulario
+                                        fields={fields}
+                                        onSubmit={handleFormSubmit}
+                                        buttonName="Guardar Remito"
+                                    >
+                                        <div className={styles["input-group"]}>
+                                            <label htmlFor="remitoFile" className={styles.label}>
+                                                Cargar Remito
+                                            </label>
+
+                                            {/* input oculto */}
+                                            <input
+                                                id="remitoFile"
+                                                type="file"
+                                                accept="image/*,application/pdf"
+                                                onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
+                                                style={{ display: "none" }}
+                                            />
+
+                                            {/* botón estilizado para disparar el file selector */}
+                                            <label
+                                                htmlFor="remitoFile"
+                                                className={`   ${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
+                                                style={{ cursor: "pointer" }}
+                                            >
+                                                {selectedFile ? "Cambiar archivo" : "Seleccionar archivo"}
+                                            </label>
+
+                                            {/* una vez cargado, mostramos solo el nombre y los iconos */}
+                                            {selectedFile && (
+                                                <div className={styles.filePreviewContainer}>
+                                                    <span className={styles.fileName}>{selectedFile.name}</span>
+                                                    <VisibilityIcon
+                                                        className={styles.fileIcon}
+                                                        onClick={handleVerRemito}
+                                                    />
+                                                    <ClearIcon
+                                                        className={styles.fileIcon}
+                                                        onClick={handleClearFile}
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
+                                    </Formulario>
+                                </div>
+
+
+                                {<div className={styles.itemListContainer}>
+                                    <h3>Agregar Stock</h3>
+
+                                    {productosAAgregar.length > 0 ? (
+                                        <ItemList
+                                            items={items}
+                                            displayKeys={campos}
+                                            onSelect={toggleSelectItem}
+                                            selectedIds={selectedIds}
+                                            selectItems={false}
+                                            deleteItems={true}
+                                            onDelete={quitarItem}
+                                            selectSingleItem={false}
+                                        />
+                                    ) : (
+                                        <p>Ingrese productos para agregar stock</p>
+                                    )}
+                                    <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal} disabled={!remito}>
+                                        Agregar Producto
+                                    </button>
+                                </div>}
+                            </div>
+                            <div className={styles.buttonContainer}>
+                                <Link href="/stock">
+                                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} >
+                                        Cancelar
+                                    </button>
+                                </Link>
+                                <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleFinishOpenModal}>
+                                    Continuar
+                                </button>
+                            </div>
+                        </>
+                    ) : addProductModalOpen ? (
+                        <ModalAgregarProducto handleAddProducto={handleAddProducto} products={productosExistentes} open={addProductModalOpen} setModalClose={handleAddProductCloseModal} cantActual={productosAAgregar.length} limite={remito.cantProductos} />
+                    ) : (
+                        <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} locacion={remito.campo} remito={remito.archivo} />
+                    )}
+                <GenericModal
+                    isOpen={confirmationModalOpen}
+                    onClose={handleCloseConfirmationModal}
+                    title="Producto añadido"
+                    modalText={`Se agrego stock correctamente`}
+                    buttonTitle="Cerrar"
+                    showSecondButton={false}
+                />
             </div>
+
+            {/* Modal sólo para imágenes */}
+
+            <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
+                <Box
+                    sx={{
+                        position: 'absolute' as const,
+                        top: '50%', left: '50%',
+                        transform: 'translate(-50%, -50%)',
+                        bgcolor: 'background.paper',
+                        boxShadow: 24,
+                        p: 2,
+                        width: '80vw',
+                        height: '80vh',
+                        overflow: 'hidden',
+                    }}
+                >
+                    {previewUrl && selectedFile?.type.startsWith('image/') && (
+                        <Box
+                            sx={{
+                                position: 'relative',
+                                width: '100%',
+                                height: '100%',
+                            }}
+                        >
+                            <Image
+                                src={previewUrl!}
+                                alt={`Remito — ${selectedFile.name}`}
+                                fill
+                                style={{ objectFit: 'contain' }}
+                                unoptimized
+                            />
+                        </Box>
+                    )}
+                </Box>
+            </Modal>
+
             <Footer />
         </div>
     );
