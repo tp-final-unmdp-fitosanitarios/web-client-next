@@ -19,6 +19,14 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import Link from 'next/link';
 import styles from "./sideBar.module.scss";
 import { useAuth } from '../Auth/AuthProvider';
+import PersonIcon from '@mui/icons-material/Person';
+import WorkIcon from '@mui/icons-material/Work';
+import { useUserStore } from '@/contexts/userStore';
+
+const userDataIcons = [
+  <PersonIcon />,
+  <WorkIcon />
+]
 
 const icons = [
   <HomeIcon />,
@@ -28,18 +36,42 @@ const icons = [
   <BarChartIcon />,
 ];
 
-export default function SideBar () {
-  const [open, setOpen] = React.useState(false);
-  const { logout } = useAuth(); 
 
+
+export default function SideBar() {
+  const [open, setOpen] = React.useState(false);
+  const { logout } = useAuth();
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
 
+const user = useUserStore(state => state.user)
+
+const userData = {
+  name: user?.first_name + " " + user?.last_name,
+  role: user?.roles[0] || 'Sin rol asignado',
+}
+
   const DrawerList = (
     <Box className={styles.drawerContainer} role="presentation" onClick={toggleDrawer(false)}>
+<p className={styles.userData}>Datos de usuario</p>
       <List>
-        {['Home','Productos', 'Aplicaciones','Stock', 'Estadísticas'].map((text, index) => (
+        {[userData.name, userData.role].map((text, index) => (
+          <ListItem key={text} disablePadding>
+            <ListItemButton className={styles.listItemButton}>
+              <ListItemIcon className={styles.icon}>
+                {userDataIcons[index]}
+              </ListItemIcon>
+              <ListItemText className={styles.userName} primary={text} />
+            </ListItemButton>
+          </ListItem>
+        ))}
+      </List>
+
+      <Divider />
+      <p className={styles.userData}>Navegacion </p>
+      <List>
+        {['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadísticas'].map((text, index) => (
           <ListItem key={text} disablePadding>
             <Link href={`/${text.toLowerCase()}`} className={styles.link}>
               <ListItemButton className={styles.listItemButton}>
@@ -67,7 +99,7 @@ export default function SideBar () {
       <IconButton onClick={toggleDrawer(true)} className={styles.menuButton}>
         <MenuIcon />
       </IconButton>
-      <Drawer  variant="temporary" open={open} onClose={toggleDrawer(false)}>
+      <Drawer variant="temporary" open={open} onClose={toggleDrawer(false)}>
         {DrawerList}
       </Drawer>
     </div>

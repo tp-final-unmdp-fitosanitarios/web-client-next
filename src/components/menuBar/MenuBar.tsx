@@ -15,7 +15,7 @@ interface MenuBarProps {
 }
 
 
-export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
+export default function MenuBar({ showMenu, showArrow, path}: MenuBarProps) {
     const router = useRouter();
     const date: Date = new Date()
     const dateWithoutTime: string = date.toLocaleDateString();
@@ -31,7 +31,7 @@ export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
             <div className={styles.header}>
                 <div>
                 {showMenu ? (
-                    <SideBar />
+                    <SideBar/>
                 ) : (
                     showArrow && (
                     <button className={styles.backButton} onClick={handleBackClick}>

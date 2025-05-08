@@ -7,6 +7,19 @@
   height: 100%;
 }
 
+.userData{
+  display: flex;
+  justify-content: center;
+  font-weight: 600;
+  font-family: $font-family-primary ;
+}
+
+.userName {
+  font-size: 18px;
+  font-weight: 600;
+  color: $dark-color;
+}
+
 .menuButton {
   color: $dark-color;
   height: 34px;

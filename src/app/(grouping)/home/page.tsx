@@ -7,9 +7,11 @@ import HomepageJerarquico from "../../../components/homepageJerarquico/HomepageJ
 import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
+import { useUserStore } from "@/contexts/userStore";
 
 export default function Home() {
 
+  const { setUserGlobally } = useUserStore()
   const [user, setUser] = useState<User | null>(null)
   const [loading, setLoading] = useState(true);
   const { getApiService, isReady, getUserId } = useAuth();
@@ -25,6 +27,7 @@ export default function Home() {
     if (isReady && userId) {
       fetchUser().then(user => {
         setUser(user);
+        setUserGlobally(user);
         setLoading(false);
       }).catch(error => {
         console.error('Error fetching user:', error);
@@ -49,7 +52,7 @@ export default function Home() {
 
   async function fetchUser(): Promise<User> {
    const res = await apiService.get<User>(`/users/${userId}`)
-   console.log(res.data)
+
    return res.data
   }
 

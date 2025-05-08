@@ -17,13 +17,14 @@ interface homePageProps {
 
 
 export default function HomepageJerarquico({ user,buttons }: homePageProps) {
+const userName = user.first_name+" "+user.last_name;
 
   return (
     <>
       <div className={styles.homeContainer}>
         <MenuBar  showMenu={true }/>
         <h1 className={styles.welcomeTitle} >Bienvenido/a</h1>
-        <h1 className={styles.username} >{user.first_name+" "+user.last_name}</h1>
+        <h1 className={styles.username} >{userName}</h1>
         <div className={styles.buttonContainer}>
           {buttons.map((button, index) => (
             <Link key={index} href={button.path}>
