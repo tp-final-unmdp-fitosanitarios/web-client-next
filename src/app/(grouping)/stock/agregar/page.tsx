@@ -8,7 +8,7 @@ import { Field } from '@/domain/models/Field';
 import { Remito } from '@/domain/models/Remito';
 import React, { useEffect, useState } from 'react';
 import styles from "./agregarStock.module.scss"
-import { Box, Modal } from '@mui/material';
+import { Box, Modal, Step, StepLabel, Stepper } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ClearIcon from '@mui/icons-material/Clear';
 import Link from 'next/link';
@@ -50,6 +50,7 @@ const AgregarStockPage: React.FC = () => {
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [activeStep, setActiveStep] = useState(0);
 
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
@@ -278,149 +279,190 @@ const AgregarStockPage: React.FC = () => {
 
 
     return (
-        <div className="page-container">
-            <div className="content-wrap">
-                <MenuBar showMenu={false} showArrow={true} path='/stock' />
-                <h1 className={styles.title}>{title}</h1>
-                {!addProductModalOpen && !finishModalOpen ?
-                    (
-                        <>
-                            <div className={styles.formAndItemListContainer}>
-                                <div className={styles.formContainer}>
-                                    <h3>Nuevo Remito</h3>
-                                    <Formulario
-                                        fields={fields}
-                                        onSubmit={handleFormSubmit}
-                                        buttonName="Guardar Remito"
-                                    >
-                                        <div className={styles["input-group"]}>
-                                            <label htmlFor="remitoFile" className={styles.label}>
-                                                Cargar Remito
-                                            </label>
+    <div className="page-container">
+    <div className="content-wrap">
+        <MenuBar showMenu={false} showArrow={true} path='/stock' />
+        <h1 className={styles.title}>Agregar Stock</h1>
 
-                                            {/* input oculto */}
-                                            <input
-                                                id="remitoFile"
-                                                type="file"
-                                                accept="image/*,application/pdf"
-                                                onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
-                                                style={{ display: "none" }}
-                                            />
+        {/* STEPPER */}
+        <Box sx={{ width: '100%', mb: 4 }}>
+        <Stepper activeStep={activeStep} alternativeLabel>
+            {['Remito', 'Agregar Productos', 'Confirmación'].map((label) => (
+            <Step key={label}>
+                <StepLabel>{label}</StepLabel>
+            </Step>
+            ))}
+        </Stepper>
+        </Box>
 
-                                            {/* botón estilizado para disparar el file selector */}
-                                            <label
-                                                htmlFor="remitoFile"
-                                                className={`   ${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
-                                                style={{ cursor: "pointer" }}
-                                            >
-                                                {selectedFile ? "Cambiar archivo" : "Seleccionar archivo"}
-                                            </label>
-
-                                            {/* una vez cargado, mostramos solo el nombre y los iconos */}
-                                            {selectedFile && (
-                                                <div className={styles.filePreviewContainer}>
-                                                    <span className={styles.fileName}>{selectedFile.name}</span>
-                                                    <VisibilityIcon
-                                                        className={styles.fileIcon}
-                                                        onClick={handleVerRemito}
-                                                    />
-                                                    <ClearIcon
-                                                        className={styles.fileIcon}
-                                                        onClick={handleClearFile}
-                                                    />
-                                                </div>
-                                            )}
-                                        </div>
-                                    </Formulario>
-                                </div>
-
-
-                                {<div className={styles.itemListContainer}>
-                                    <h3>Agregar Stock</h3>
-
-                                    {productosAAgregar.length > 0 ? (
-                                        <ItemList
-                                            items={items}
-                                            displayKeys={campos}
-                                            onSelect={toggleSelectItem}
-                                            selectedIds={selectedIds}
-                                            selectItems={false}
-                                            deleteItems={true}
-                                            onDelete={quitarItem}
-                                            selectSingleItem={false}
-                                        />
-                                    ) : (
-                                        <p>Ingrese productos para agregar stock</p>
-                                    )}
-                                    <button type="submit" className={`${styles.button} ${styles.buttonPrimary}`} onClick={handleAddProductOpenModal} disabled={!remito}>
-                                        Agregar Producto
-                                    </button>
-                                </div>}
-                            </div>
-                            <div className={styles.buttonContainer}>
-                                <Link href="/stock">
-                                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} >
-                                        Cancelar
-                                    </button>
-                                </Link>
-                                <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleFinishOpenModal}>
-                                    Continuar
-                                </button>
-                            </div>
-                        </>
-                    ) : addProductModalOpen ? (
-                        <ModalAgregarProducto handleAddProducto={handleAddProducto} products={productosExistentes} open={addProductModalOpen} setModalClose={handleAddProductCloseModal} cantActual={productosAAgregar.length} limite={remito.cantProductos} />
-                    ) : (
-                        <ResumenOperacion handleFinish={handleFinish} products={productosAAgregar} open={finishModalOpen} setModalClose={handleFinishCloseModal} locacion={remito.campo} remito={remito.archivo} />
-                    )}
-                <GenericModal
-                    isOpen={confirmationModalOpen}
-                    onClose={handleCloseConfirmationModal}
-                    title="Producto añadido"
-                    modalText={`Se agrego stock correctamente`}
-                    buttonTitle="Cerrar"
-                    showSecondButton={false}
-                />
+    {/* PASO 1: Formulario */}
+    {activeStep === 0 && (
+      <div className={styles.formAndItemListContainer}>
+        <div className={styles.formContainer}>
+          <h3>Nuevo Remito</h3>
+          <Formulario
+            fields={fields}
+            onSubmit={handleFormSubmit}
+            buttonName="Guardar Remito"
+          >
+            <div className={styles["input-group"]}>
+              <label htmlFor="remitoFile" className={styles.label}>
+                Cargar Remito
+              </label>
+              <input
+                id="remitoFile"
+                type="file"
+                accept="image/*,application/pdf"
+                onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
+                style={{ display: "none" }}
+              />
+              <label
+                htmlFor="remitoFile"
+                className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
+                style={{ cursor: "pointer" }}
+              >
+                {selectedFile ? "Cambiar archivo" : "Seleccionar archivo"}
+              </label>
+              {selectedFile && (
+                <div className={styles.filePreviewContainer}>
+                  <span className={styles.fileName}>{selectedFile.name}</span>
+                  <VisibilityIcon className={styles.fileIcon} onClick={handleVerRemito} />
+                  <ClearIcon className={styles.fileIcon} onClick={handleClearFile} />
+                </div>
+              )}
             </div>
+          </Formulario>
 
-            {/* Modal sólo para imágenes */}
-
-            <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
-                <Box
-                    sx={{
-                        position: 'absolute' as const,
-                        top: '50%', left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        bgcolor: 'background.paper',
-                        boxShadow: 24,
-                        p: 2,
-                        width: '80vw',
-                        height: '80vh',
-                        overflow: 'hidden',
-                    }}
-                >
-                    {previewUrl && selectedFile?.type.startsWith('image/') && (
-                        <Box
-                            sx={{
-                                position: 'relative',
-                                width: '100%',
-                                height: '100%',
-                            }}
-                        >
-                            <Image
-                                src={previewUrl!}
-                                alt={`Remito — ${selectedFile.name}`}
-                                fill
-                                style={{ objectFit: 'contain' }}
-                                unoptimized
-                            />
-                        </Box>
-                    )}
-                </Box>
-            </Modal>
-
-            <Footer />
+          <div className={styles.buttonContainer}>
+            <Link href="/stock">
+              <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`}>
+                Cancelar
+              </button>
+            </Link>
+            <button
+              className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`}
+              onClick={() => setActiveStep(1)}
+              disabled={!remito}
+            >
+              Continuar
+            </button>
+          </div>
         </div>
+      </div>
+    )}
+
+    {/* PASO 2: Agregar productos */}
+    {activeStep === 1 && (
+      <div className={styles.itemListContainer}>
+        <h3>Agregar Stock</h3>
+
+        {productosAAgregar.length > 0 ? (
+          <ItemList
+            items={items}
+            displayKeys={campos}
+            onSelect={toggleSelectItem}
+            selectedIds={selectedIds}
+            selectItems={false}
+            deleteItems={true}
+            onDelete={quitarItem}
+            selectSingleItem={false}
+          />
+        ) : (
+          <p>Ingrese productos para agregar stock</p>
+        )}
+        <button
+          type="submit"
+          className={`${styles.button} ${styles.buttonPrimary}`}
+          onClick={() => setAddProductModalOpen(true)}
+          disabled={!remito}
+        >
+          Agregar Producto
+        </button>
+
+        <div className={styles.buttonContainer}>
+          <button
+            className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`}
+            onClick={() => setActiveStep(0)}
+          >
+            Volver
+          </button>
+          <button
+            className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`}
+            onClick={() => setActiveStep(2)}
+            disabled={productosAAgregar.length !== Number(remito?.cantProductos)}
+          >
+            Confirmar
+          </button>
+        </div>
+      </div>
+    )}
+
+    {/* PASO 3: Confirmación */}
+    {activeStep === 2 && (
+      <ResumenOperacion
+        handleFinish={handleFinish}
+        products={productosAAgregar}
+        open={true}
+        setModalClose={() => setActiveStep(1)}
+        locacion={remito.campo}
+        remito={remito.archivo}
+      />
+    )}
+
+    {/* MODALES */}
+    {addProductModalOpen && (
+      <ModalAgregarProducto
+        handleAddProducto={handleAddProducto}
+        products={productosExistentes}
+        open={addProductModalOpen}
+        setModalClose={() => setAddProductModalOpen(false)}
+        cantActual={productosAAgregar.length}
+        limite={remito?.cantProductos}
+      />
+    )}
+
+    <GenericModal
+      isOpen={confirmationModalOpen}
+      onClose={handleCloseConfirmationModal}
+      title="Producto añadido"
+      modalText="Se agregó stock correctamente"
+      buttonTitle="Cerrar"
+      showSecondButton={false}
+    />
+
+    {/* Modal imagen remito */}
+    <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
+      <Box
+        sx={{
+          position: 'absolute' as const,
+          top: '50%',
+          left: '50%',
+          transform: 'translate(-50%, -50%)',
+          bgcolor: 'background.paper',
+          boxShadow: 24,
+          p: 2,
+          width: '80vw',
+          height: '80vh',
+          overflow: 'hidden',
+        }}
+      >
+        {previewUrl && selectedFile?.type.startsWith('image/') && (
+          <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+            <Image
+              src={previewUrl}
+              alt={`Remito — ${selectedFile.name}`}
+              fill
+              style={{ objectFit: 'contain' }}
+              unoptimized
+            />
+          </Box>
+        )}
+      </Box>
+    </Modal>
+
+    <Footer />
+        </div>
+    </div>
     );
 };
 
