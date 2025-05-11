@@ -1,5 +1,4 @@
-@import '../../styles/variables.scss';
-
+@use '../../styles/variables' as *;
 
 .homeContainer {
   display: flex;

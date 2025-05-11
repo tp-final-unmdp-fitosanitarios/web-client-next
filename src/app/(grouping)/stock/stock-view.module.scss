@@ -1,8 +1,6 @@
-@import '../../styles/variables.scss';
+@use '../../styles/variables' as *;
 
-
-
-.page-container ,.container{
+.page-container, .container {
     display: flex;
     justify-content: center;
     flex-direction: column;

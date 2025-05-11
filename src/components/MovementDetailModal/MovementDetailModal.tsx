@@ -39,7 +39,7 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
                         </div>
                     </div>
                     <div className={styles.productContainer}>
-                        <p className={styles.message}>Se traslado el siguiente produto</p>
+                        <p className={styles.message}>Se traslado el siguiente producto</p>
                         <p className={styles.message}>{movement.product.name}</p>
                     </div>
                 </div>

@@ -75,7 +75,7 @@ const ModalResumenOperacion: React.FC<Props> = ({open, setModalClose, stock, ori
                     </div>
                     ) : null}
                 </div>
-                <p className={styles.message}>{withdraw ? "Retirar" : "Mover"} los siguientes produtos</p>
+                <p className={styles.message}>{withdraw ? "Retirar" : "Mover"} los siguientes productos</p>
                 {stock.length > 0 ? (
                         <ItemList
                             items={items}

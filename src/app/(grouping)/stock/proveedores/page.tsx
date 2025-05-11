@@ -13,7 +13,7 @@ import GenericModal from "@/components/modal/GenericModal";
 import AddProviderModal from "@/components/AddProviderModal/AddProviderModal";
 import { Producto } from "@/domain/models/Producto";
 import Footer from "@/components/Footer/Footer";
-import axios from "axios";
+
 const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de proveedores.
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
@@ -102,15 +102,14 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
         
         const provider = providers.find(provider => provider.id===selectedId);
         if (provider){
-            /*const modifyProviderRequest = {
-                name: name,
-                description: description
-            }*/
-           provider.name = name;
-           provider.description = description;
-           //const res = await apiService.update(`/providers/${provider.id}`,provider.id, provider);
-           const res = await axios.put("http://localhost:8080/providers/"+provider.id,provider);
-           console.log(res);
+            provider.name = name;
+            provider.description = description;
+            const res = await apiService.update(`/providers`,provider.id,provider);
+            if (res.success) {
+                setConfirmationModalOpen(true);
+            } else {
+                console.error("Error al modificar proveedor:", res.error);
+            }
         }
     }
 

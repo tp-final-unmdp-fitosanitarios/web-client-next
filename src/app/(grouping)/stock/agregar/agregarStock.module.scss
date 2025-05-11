@@ -1,9 +1,11 @@
-@import "../../../styles/variables.scss";
+@use '../../../styles/variables' as *;
 
 .title {
   display: flex;
   justify-content: center;
   color: $dark-color;
+  margin-bottom: $spacing-large;
+  text-align: center;
 }
 
 .formAndItemListContainer {
