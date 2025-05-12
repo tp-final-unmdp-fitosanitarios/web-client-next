@@ -11,9 +11,11 @@ interface FormularioProps {
   onCancel?: () => void;
   buttonName:string;
   children?: React.ReactNode; 
+  equalButtonWidth?: boolean;
+  isSubmitDisabled?: (formData: Record<string, string>) => boolean;
 }
 
-export default function Formulario({ fields, onSubmit, onCancel,buttonName,children }: FormularioProps) {
+export default function Formulario({ fields, onSubmit, onCancel,buttonName,children, equalButtonWidth, isSubmitDisabled }: FormularioProps) {
   const initialState: Record<string, string > = fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {} as Record<string, string>);
   const [formData, setFormData] = useState(initialState);
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -81,11 +83,16 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName,child
 
       <div className={styles["button-container"]}>
         {onCancel && (
-          <button type="button" onClick={handleCancel} className={`${styles.button} ${styles["button-secondary"]}`}>
+          <button type="button" onClick={handleCancel} className={`${styles.button} ${styles["button-secondary"]} ${equalButtonWidth ? styles["equal-width"] : ""}`}>
             Cancelar
           </button>
         )}
-        <button type="submit" className={`${styles.button} ${styles["button-primary"]}`} onClick={handleSubmit}>
+        <button 
+          type="submit" 
+          className={`${styles.button} ${styles["button-primary"]} ${equalButtonWidth ? styles["equal-width"] : ""}`} 
+          onClick={handleSubmit}
+          disabled={isSubmitDisabled ? isSubmitDisabled(formData) : false}
+        >
           {buttonName}
         </button>
       </div>

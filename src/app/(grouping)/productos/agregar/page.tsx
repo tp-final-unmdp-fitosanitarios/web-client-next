@@ -103,7 +103,6 @@ export default function AgregarProductos() {
       return;
     }
    
-
     const payload: CreateProductPayload = {
       name: String(inputData.nombre),
       unit: inputData.unidad as string,
@@ -116,84 +115,98 @@ export default function AgregarProductos() {
   
     createProduct(payload);
   }
-    const createProduct = async (payload:CreateProductPayload) => {
-      try {
-        const response = await apiService.create<Producto>("/products", payload);
 
-        if (response.success) {
-          console.log("Producto creado:", response.data);
-          setnewProducto(response.data);
-          console.log("new producto",newProducto);
-          handleOpenModal();
-          router.push("/productos");
-        } else {
-          console.error("Error al crear el producto:", response.error);
-        }
-      } catch (error: any) {
-        console.error("Error en la solicitud:", error.message);
+  const isFormValid = (formData: Record<string, string>) => {
+    return formData.nombre && 
+           formData.cantidad && 
+           formData.unidad && 
+           formData.marca && 
+           formData.agroquimico && 
+           formData.categoria && 
+           formData.proveedor;
+  };
+
+  const createProduct = async (payload:CreateProductPayload) => {
+    try {
+      const response = await apiService.create<Producto>("/products", payload);
+
+      if (response.success) {
+        console.log("Producto creado:", response.data);
+        setnewProducto(response.data);
+        console.log("new producto",newProducto);
+        handleOpenModal();
+        router.push("/productos");
+      } else {
+        console.error("Error al crear el producto:", response.error);
       }
-    };
+    } catch (error: any) {
+      console.error("Error en la solicitud:", error.message);
+    }
+  };
 
-    const handleCancel = () => {
-      router.push("/productos");
-    };
-    const fields: Field[] = [
-      {
-        name: "nombre",
-        label: "Nombre",
-        type: "text",
-      },
-      { name: "cantidad", label: "Cantidad", type: "number" },
-      {
-        name: "unidad",
-        label: "Unidad",
-        type: "select",
-        options: Object.values(Unidad),
-      },
-      { name: "marca", label: "Marca", type: "text" },
-      {
-        name: "agroquimico",
-        label: "Agroquímico",
-        type: "select",
-        options: agroquimicos.map((a) => a.active_principle),
-      },
-      {
-        name: "categoria",
-        label: "Categoría",
-        type: "select",
-        options: ["HERBICIDE", "INSECTICIDE", "FUNGICIDE"],
-      },
-      {
-        name: "proveedor",
-        label: "Proveedor",
-        type: "select",
-        options: proveedores.map((p) => p.name),
-      },
-    ];
+  const handleCancel = () => {
+    router.push("/productos");
+  };
 
-    return (
-      <div className="page-container">
-        <div className="content-wrap">
-        <MenuBar showMenu={true} path="/productos" />
-        <h1 className={styles.title}>{title}</h1>
+  const fields: Field[] = [
+    {
+      name: "nombre",
+      label: "Nombre",
+      type: "text",
+    },
+    { name: "cantidad", label: "Cantidad", type: "number" },
+    {
+      name: "unidad",
+      label: "Unidad",
+      type: "select",
+      options: Object.values(Unidad),
+    },
+    { name: "marca", label: "Marca", type: "text" },
+    {
+      name: "agroquimico",
+      label: "Agroquímico",
+      type: "select",
+      options: agroquimicos.map((a) => a.active_principle),
+    },
+    {
+      name: "categoria",
+      label: "Categoría",
+      type: "select",
+      options: ["HERBICIDE", "INSECTICIDE", "FUNGICIDE"],
+    },
+    {
+      name: "proveedor",
+      label: "Proveedor",
+      type: "select",
+      options: proveedores.map((p) => p.name),
+    },
+  ];
 
-        <Formulario
-          fields={fields}
-          onSubmit={handleFormSubmit}
-          onCancel={handleCancel}
-          buttonName="Continuar"
-        />
-        </div>
-        <Footer />
-        <GenericModal
-          isOpen={modalOpen}
-          onClose={handleCloseModal}
-          title="Producto añadido"
-          modalText={`Se añadió el producto: ${newProducto.name}`}
-          buttonTitle="Cerrar"
-          showSecondButton={false}
-        />
+  return (
+    <div className="page-container">
+      <div className="content-wrap">
+      <MenuBar showMenu={true} path="/productos" />
+      <h1 className={styles.title}>{title}</h1>
+
+      <Formulario
+        fields={fields}
+        onSubmit={handleFormSubmit}
+        onCancel={handleCancel}
+        buttonName="Continuar"
+        equalButtonWidth={true}
+        isSubmitDisabled={(formData) => !isFormValid(formData)}
+      />
       </div>
-    );
-  }
+      <Footer />
+      <GenericModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        title="Producto añadido"
+        modalText={`Se añadió el producto: ${newProducto.name}`}
+        buttonTitle="Cerrar"
+        showSecondButton={false}
+      />
+    </div>
+  );
+}
 

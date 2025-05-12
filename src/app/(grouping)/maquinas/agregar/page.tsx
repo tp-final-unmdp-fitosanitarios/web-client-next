@@ -44,6 +44,12 @@ export default function AgregarMaquinas() {
     createMaquina(payload);
   };
 
+  const isFormValid = (formData: Record<string, string>) => {
+    return formData.nombre && 
+           formData.modelo && 
+           formData.patente_interna;
+  };
+
   const createMaquina = async (payload: Maquina) => {
     if (!isReady || !apiService) return;
     setCreationError(null);
@@ -87,6 +93,8 @@ export default function AgregarMaquinas() {
           onSubmit={handleFormSubmit}
           onCancel={handleCancel}
           buttonName={"Guardar Máquina"}
+          equalButtonWidth={true}
+          isSubmitDisabled={(formData) => !isFormValid(formData)}
         />
 
         {newMaquina && (

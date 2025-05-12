@@ -77,7 +77,6 @@
 }
 
 .button {
-  min-width: 150px;
   font-size: 14px;
   padding: $spacing-small $spacing-medium;
   border: 2px solid transparent;
@@ -89,6 +88,9 @@
   text-align: center;
   transition: all 0.2s ease-in-out;
   box-shadow: $box-shadow;
+  width: 200px;
+  height: 43px;
+  font-size: 18px;
 
   &:hover {
     transform: translateY(-1px);
@@ -98,6 +100,19 @@
   &:active {
     transform: scale(0.98);
   }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+}
+
+.equal-width {
+  width: 200px;
+  height: 43px;
+  font-size: 18px;
 }
 
 .button-primary {

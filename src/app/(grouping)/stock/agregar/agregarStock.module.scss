@@ -8,6 +8,13 @@
   text-align: center;
 }
 
+.label{
+  margin-left: $spacing-medium;
+  font-size: 15px;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
 .formAndItemListContainer {
   display: flex;
   justify-content: space-around;
@@ -79,6 +86,7 @@
   cursor: pointer;
   color: $dark-color;
   margin-top: $spacing-large;
+  height: 36px;
 
   &:disabled {
     opacity: 0.5;
@@ -91,32 +99,39 @@
   background-color: $primary-color;
 }
 
-.buttonSelect {
-  margin-left: $spacing-medium;
-  margin-right: $spacing-large;
-  border: 2px solid $dark-color;
-  background-color: $light-color;
-}
-
 .buttonContainer {
-  display: flex;
-  justify-content: center;
   margin-top: $spacing-extra-large;
 }
 
 .buttonCancel {
-  margin-right: $spacing-medium;
+  margin-bottom: $spacing-extra-large;
 }
 
 .buttonFinish {
   margin-left: $spacing-medium;
 }
+.buttonSelect {
+  border: 2px solid $dark-color;
+  background-color: $light-color;
+  width: 80px;
+  height: 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+}
 
 .buttonChange {  
-  margin-left: $spacing-medium;
-  margin-right: $spacing-large;
   border: 2px solid $dark-color;
-  background-color:  $light-color; 
+  background-color: $light-color;
+  width: 80px;
+  height: 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
 }
 
 @media (max-width:500px) {
@@ -132,4 +147,16 @@
 
 .button:disabled {
   background-color: $light-color;
+}
+
+.fileInputContainer {
+  display: flex;
+  align-items: center;
+  gap: $spacing-medium;
+  width: 100%;;
+}
+
+.fileInputWrapper {
+  display: flex;
+  align-items: center;
 }

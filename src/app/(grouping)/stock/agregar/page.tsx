@@ -180,6 +180,14 @@ const AgregarStockPage: React.FC = () => {
             archivo: selectedFile?.name,
             fecha: new Date()
         });
+        setActiveStep(1);
+    };
+
+    const isFormValid = (formData: Record<string, string>) => {
+        return formData.nroRemito && 
+               formData.campo && 
+               formData.cantProductos && 
+               selectedFile !== null;
     };
 
     const handleCancel = () => {
@@ -303,26 +311,32 @@ const AgregarStockPage: React.FC = () => {
           <Formulario
             fields={fields}
             onSubmit={handleFormSubmit}
-            buttonName="Guardar Remito"
+            buttonName="Continuar"
+            equalButtonWidth={true}
+            isSubmitDisabled={(formData) => !isFormValid(formData)}
           >
             <div className={styles["input-group"]}>
-              <label htmlFor="remitoFile" className={styles.label}>
-                Cargar Remito
-              </label>
-              <input
-                id="remitoFile"
-                type="file"
-                accept="image/*,application/pdf"
-                onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
-                style={{ display: "none" }}
-              />
-              <label
-                htmlFor="remitoFile"
-                className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
-                style={{ cursor: "pointer" }}
-              >
-                {selectedFile ? "Cambiar archivo" : "Seleccionar archivo"}
-              </label>
+              <div className={styles.fileInputContainer}>
+                <label htmlFor="remitoFile" className={styles.label}>
+                  Cargar Remito
+                </label>
+                <div className={styles.fileInputWrapper}>
+                  <input
+                    id="remitoFile"
+                    type="file"
+                    accept="image/*,application/pdf"
+                    onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
+                    style={{ display: "none" }}
+                  />
+                  <label
+                    htmlFor="remitoFile"
+                    className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
+                    style={{ cursor: "pointer" }}
+                  >
+                    {selectedFile ? "Cambiar" : "Seleccionar"}
+                  </label>
+                </div>
+              </div>
               {selectedFile && (
                 <div className={styles.filePreviewContainer}>
                   <span className={styles.fileName}>{selectedFile.name}</span>
@@ -335,17 +349,10 @@ const AgregarStockPage: React.FC = () => {
 
           <div className={styles.buttonContainer}>
             <Link href="/stock">
-              <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`}>
+              <button className={`button button-secondary ${styles.buttonHome} ${styles.buttonCancel}`}>
                 Cancelar
               </button>
             </Link>
-            <button
-              className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`}
-              onClick={() => setActiveStep(1)}
-              disabled={!remito}
-            >
-              Continuar
-            </button>
           </div>
         </div>
       </div>
@@ -460,9 +467,11 @@ const AgregarStockPage: React.FC = () => {
       </Box>
     </Modal>
 
-    <Footer />
+  
         </div>
+        <Footer />
     </div>
+    
     );
 };
 
