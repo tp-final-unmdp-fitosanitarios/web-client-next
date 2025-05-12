@@ -31,25 +31,32 @@
 }
 
 .button {
-    min-width: 15%;
-    max-width: 50%;
+    min-width: 200px;
     padding: $spacing-small $spacing-medium;
     border: none;
     border-radius: $border-radius;
     font-weight: $button-font-weight;
     cursor: pointer;
     color: $dark-color;
-    margin: $spacing-large auto;
-  }
-  
-  .buttonPrimary {
-    background-color: $primary-color;
-  }
+    margin-top: $spacing-large;
+    height: 40px;
+    font-size: 16px;
 
-  .buttonContainer{
-    width: 100%;
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+        background-color: $light-color;
+    }
+}
+
+.buttonPrimary {
+    background-color: $primary-color;
+}
+
+.buttonContainer {
+    margin-top: $spacing-medium;
     display: flex;
     justify-content: center;
-    align-items: center;
-    margin-top: 20px;
-  }
+    width: 100%;
+    padding: 0 $spacing-medium;
+}

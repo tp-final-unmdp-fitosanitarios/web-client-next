@@ -36,6 +36,7 @@ const MoverStock = () => {
   const { getApiService, isReady } = useAuth();
   const apiService = getApiService();
   const router = useRouter();
+  const [selectedId, setSelectedId] = useState<string | null>(null);
 
   const fetchStock = async () => { 
     try {
@@ -81,15 +82,15 @@ const MoverStock = () => {
 
 
   const handleSelectSingleItem = (id: string) => {
+    setSelectedId(id);
     setSelectedItem(stockFromServer.find((item) => item.id === id) || null);
-    if(selectedItem){
-      setShowMoverProductModal(true);
-    }
+    setShowMoverProductModal(true);
   };
 
   const handleModalClose = () => {
     setShowMoverProductModal(false);
     setSelectedItem(null);
+    setSelectedId(null);
   };
 
   const addProductToMove = (stock: Stock,cantidadBultos: number | null, total: number | null) => {
@@ -143,7 +144,7 @@ const MoverStock = () => {
 
 const campos = ["display"];
 
-  function handleMoveProducts(e: any): void {
+  function handleMoveProducts(): void {
     if(productsToMove.length > 0)
       setShowResultModal(true);
   }
@@ -270,27 +271,34 @@ const campos = ["display"];
             deleteItems={false}
             selectSingleItem={true}
             onSelectSingleItem={handleSelectSingleItem}
+            selectedIds={selectedId ? [selectedId] : []}
           />
         </div>
         <div className={styles.column}>
           <h2 className={styles.subtitle}>Productos a mover hacia {destinationName}</h2>
           {itemsStockToMove.length > 0 ? (
-          <ItemList
-            items={itemsStockToMove}
-            displayKeys={campos}
-            selectItems={false}
-            deleteItems={true}
-            onDelete={handleDeleteProduct}
-            selectSingleItem={false}
-          />
+            <ItemList
+              items={itemsStockToMove}
+              displayKeys={campos}
+              selectItems={false}
+              deleteItems={true}
+              onDelete={handleDeleteProduct}
+              selectSingleItem={false}
+            />
           ) : (
             <p>Seleccione productos a mover</p>
           )}
+          <div className={styles.buttonContainer}>
+            <button
+              className={`${styles.button} button-primary ${styles.buttonHome}`}
+              onClick={handleMoveProducts}
+              disabled={productsToMove.length === 0}
+            >
+              Mover productos
+            </button>
+          </div>
         </div>
         
-      </div>
-      <div className={styles.buttonContainer}>
-        <button className={`${styles.button} button-primary ${styles.buttonHome}`} onClick={handleMoveProducts}>Mover productos</button>
       </div>
       
       {showMoverProductModal && selectedItem && (

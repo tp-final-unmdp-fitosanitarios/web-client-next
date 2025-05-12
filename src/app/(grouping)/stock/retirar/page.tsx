@@ -10,7 +10,6 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import { transformToItems } from "@/utilities/transform";
 import MoverProductModal from "@/components/MoverProductModal/MoverProductModal";
 import ResultModal from "@/components/MoverSockResumenOperacion/ModalResumenOperacion";
-import router from "next/router";
 import ForceMovementModal from "@/components/ForceMovementModal/ForceMovementModal";
 import { useRouter } from "next/navigation";
 import Footer from "@/components/Footer/Footer";
@@ -34,6 +33,7 @@ const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
 const { getApiService, isReady } = useAuth();
 const apiService = getApiService();
 const router = useRouter();
+const [selectedIds, setSelectedIds] = useState<string[]>([]);
 
 const fetchStock = async () => { 
     try {
@@ -78,8 +78,10 @@ const fetchStock = async () => {
 
 
   const handleSelectSingleItem = (id: string) => {
-    setSelectedItem(stockFromServer.find((item) => item.id === id) || null);
-    if(selectedItem){
+    const item = stockFromServer.find((item) => item.id === id);
+    setSelectedItem(item || null);
+    setSelectedIds([id]);
+    if(item){
       setShowWithdrawProductModal(true);
     }
   };
@@ -91,6 +93,7 @@ const fetchStock = async () => {
   const handleModalClose = () => {
     setShowWithdrawProductModal(false);
     setSelectedItem(null);
+    setSelectedIds([]);
   };
 
   const handleResultModalClose = () => {
@@ -251,64 +254,72 @@ if (error) return <div>Error: {error}</div>;
 return (
     <div className="page-container">
       <div className="content-wrap">
-      <MenuBar showMenu={false} showArrow={true} path="/stock" />
-      <div className={styles.mainContainer}>
-        <div className={styles.column}>
-          <h2 className={styles.subtitle}>Stock disponible en {originName}</h2>
-          { itemsCurrentStock.length > 0 ? (
-              <ItemList
-                items={itemsCurrentStock}
-                displayKeys={campos}
-                selectItems={false}
-                deleteItems={false}
-                selectSingleItem={true}
-                onSelectSingleItem={handleSelectSingleItem}
-              />
+        <MenuBar showMenu={false} showArrow={true} path="/stock" />
+        <div className={styles.mainContainer}>
+          <div className={styles.column}>
+            <h2 className={styles.subtitle}>Stock disponible en {originName}</h2>
+            { itemsCurrentStock.length > 0 ? (
+                <ItemList
+                  items={itemsCurrentStock}
+                  displayKeys={campos}
+                  selectItems={false}
+                  deleteItems={false}
+                  selectSingleItem={true}
+                  onSelectSingleItem={handleSelectSingleItem}
+                  selectedIds={selectedIds}
+                />
+              ):(
+                <p>No hay stock en la locacion seleccionada</p>
+              )
+            }
+          </div>
+          <div className={styles.column}>
+            <h2 className={styles.subtitle}>Productos a Retirar</h2>
+            { itemsStockToWithdraw.length > 0 ? (
+              <>
+                <ItemList
+                  items={itemsStockToWithdraw}
+                  displayKeys={campos}
+                  selectItems={false}
+                  deleteItems={true}
+                  onDelete={handleDeleteProduct}
+                  selectSingleItem={false}
+                />
+                <div className={styles.buttonContainer}>
+                  <button 
+                    className={`${styles.button} button-primary ${styles.buttonHome}`} 
+                    onClick={handleWithdrawProducts}
+                    disabled={itemsStockToWithdraw.length === 0}
+                  >
+                    Retirar productos
+                  </button>
+                </div>
+              </>
             ):(
-              <p>No hay stock en la locacion seleccionada</p>
+              <p>Seleccione productos a retirar</p>
             )
-          }
-        </div>
-        <div className={styles.column}>
-          <h2 className={styles.subtitle}>Productos a Retirar</h2>
-          { itemsStockToWithdraw.length > 0 ? (
-            <ItemList
-              items={itemsStockToWithdraw}
-              displayKeys={campos}
-              selectItems={false}
-              deleteItems={true}
-              onDelete={handleDeleteProduct}
-              selectSingleItem={false}
-            />
-          ):(
-            <p>Seleccione productos a retirar</p>
-          )
-          }
+            }
+          </div>
         </div>
         
+        {showWithdrawProductModal && selectedItem && (
+          <MoverProductModal open={showWithdrawProductModal} setModalClose={handleModalClose} stock={selectedItem} addProductToMove={addProductToWithdraw} withdraw={true}/>
+        )}
+        {showResultModal && (
+          <ResultModal open={showResultModal} setModalClose={handleResultModalClose} stock={productsToWithdraw} origen={originName} destino={""} handleFinish={handleFinish} withdraw={true}/>
+        )}
+        {showForceModal && (
+          <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToWithdraw} actualStock={stockFromServer} origen={originName} destino={""} handleForceFinish={handleForceFinish} withdraw={true}/>
+        )}
+        <GenericModal
+            isOpen={confirmationModalOpen}
+            onClose={handleCloseConfirmationModal}
+            title="Retiro exitoso"
+            modalText={`Se retiro stock correctamente`}
+            buttonTitle="Cerrar"
+            showSecondButton={false}
+        />
       </div>
-      <div className={styles.buttonContainer}>
-        <button className={`${styles.button} button-primary ${styles.buttonHome}`} onClick={handleWithdrawProducts}>Retirar productos</button>
-      </div>
-      
-      {showWithdrawProductModal && selectedItem && (
-        <MoverProductModal open={showWithdrawProductModal} setModalClose={handleModalClose} stock={selectedItem} addProductToMove={addProductToWithdraw} withdraw={true}/>
-      )}
-      {showResultModal && (
-        <ResultModal open={showResultModal} setModalClose={handleResultModalClose} stock={productsToWithdraw} origen={originName} destino={""} handleFinish={handleFinish} withdraw={true}/>
-      )}
-      {showForceModal && (
-        <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToWithdraw} actualStock={stockFromServer} origen={originName} destino={""} handleForceFinish={handleForceFinish} withdraw={true}/>
-      )}
-      </div>
-      <GenericModal
-          isOpen={confirmationModalOpen}
-          onClose={handleCloseConfirmationModal}
-          title="Retiro exitoso"
-          modalText={`Se retiro stock correctamente`}
-          buttonTitle="Cerrar"
-          showSecondButton={false}
-      />
       <Footer />
     </div>
   );
