@@ -32,8 +32,7 @@
   flex-direction: column;
   justify-content: space-between;
   align-items: center;
-  min-width: 40%;
-  max-width: 90%;
+  width: 100%;
 }
 
 .fileLabelText {
@@ -74,24 +73,6 @@
 .fileIconDisabled {
   cursor: not-allowed;
   opacity: 0.3;
-}
-
-.button {
-  min-width: 30%;
-  max-width: 80%;
-  padding: $spacing-small $spacing-medium;
-  border: none;
-  border-radius: $border-radius;
-  font-weight: $button-font-weight;
-  cursor: pointer;
-  color: $dark-color;
-  margin-top: $spacing-large;
-  height: 36px;
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
 }
 
 .buttonPrimary {
@@ -145,9 +126,6 @@
   }
 }
 
-.button:disabled {
-  background-color: $light-color;
-}
 
 .fileInputContainer {
   display: flex;
@@ -159,4 +137,22 @@
 .fileInputWrapper {
   display: flex;
   align-items: center;
+}
+
+.button {
+  min-width: 30%;
+  max-width: 80%;
+  padding: $spacing-small $spacing-medium;
+  border: none;
+  border-radius: $border-radius;
+  font-weight: $button-font-weight;
+  cursor: pointer;
+  color: $dark-color;
+  margin-top: $spacing-large;
+  height: 36px;
+}
+
+.button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
 }

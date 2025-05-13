@@ -99,7 +99,7 @@ const ModalAgregarProducto = ({ open, setModalClose, products, handleAddProducto
                         border: '3px solid #404e5c',
                     }}
                 >
-                    <h3 className={styles.title}>Agregar Producto {cantActual}/{limite}</h3>
+                    <h3 className={styles.title}>Agregar Producto</h3>
                     {cantActual < limite ? (
                         <form onSubmit={handleSubmit}>
                             <Autocomplete

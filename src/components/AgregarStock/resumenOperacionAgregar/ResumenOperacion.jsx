@@ -5,8 +5,7 @@ import { transformToItems } from '@/utilities/transform';
 import styles from "./resumenOperacion.module.scss"
 import { useItemsManager } from '@/hooks/useItemsManager';
 
-const ResumenOperacion = ({open,setModalClose,handleFinish, products, locacion, remito}) => {
-    
+const ResumenOperacion = ({open, setModalClose, handleFinish, products, locacion, remito}) => {
     const handleSubmit = (e) => {
         handleFinish()
     }
@@ -30,64 +29,75 @@ const ResumenOperacion = ({open,setModalClose,handleFinish, products, locacion, 
 
     const {
         selectedIds,
-        deletedItems,
-        isModalOpen,
         toggleSelectItem,
-        quitarItems,
-        closeModal,
     } = useItemsManager(products);
 
     return (
-        <div>
-            <Modal open={open} onClose={setModalClose}>
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                        borderRadius: 2,
-                    }}
-                >
-                    <h3 className={styles.title}>Resumen de Operación</h3>
-                    <p className={styles.message}>Agregará los siguientes productos y cantidades</p>
-                    {products.length > 0 ? (
-                            <ItemList
-                                items={items}
-                                displayKeys={campos}
-                                onSelect={toggleSelectItem}
-                                selectedIds={selectedIds}
-                                selectItems={false}
-                                deleteItems={false}
-                            />
-                            ) : (
-                                <p>Ocurrio un error al cargar el stock :(</p>
-                            )}
-                    <div className={styles.outputContainer}>
-                        <div className={styles.dataPresentation}>
-                            <h5>Locacion: </h5>
-                            <h5>{locacion}</h5>
-                        </div>
-                        <div className={styles.dataPresentation}>
-                            <h5>Remito: </h5>
-                            <h5>{remito}</h5>
-                        </div>
+        <Modal 
+            open={open} 
+            onClose={setModalClose}
+            aria-labelledby="resumen-operacion-modal"
+        >
+            <Box
+                sx={{
+                    position: 'absolute',
+                    top: '50%',
+                    left: '50%',
+                    transform: 'translate(-50%, -50%)',
+                    width: { xs: '90%', sm: '500px' },
+                    maxHeight: '90vh',
+                    bgcolor: "background.paper",
+                    boxShadow: 24,
+                    p: { xs: 2, sm: 4 },
+                    borderRadius: 2,
+                    overflow: 'auto'
+                }}
+            >
+                <h3 className={styles.title}>Resumen de Operación</h3>
+                <p className={styles.message}>Agregará los siguientes productos y cantidades</p>
+                
+                {products.length > 0 ? (
+                    <div style={{ maxHeight: '300px', overflow: 'auto', marginBottom: '20px' }}>
+                        <ItemList
+                            items={items}
+                            displayKeys={campos}
+                            onSelect={toggleSelectItem}
+                            selectedIds={selectedIds}
+                            selectItems={false}
+                            deleteItems={false}
+                        />
                     </div>
-                    <div className={`${styles.buttonContainer}`}>
-                            <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} onClick={setModalClose}> 
-                                Cancelar
-                            </button>
-                            <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleSubmit}>
-                                Finalizar
-                            </button>
-                        </div>
-                </Box>
-            </Modal>
-        </div>
+                ) : (
+                    <p className={styles.message}>Ocurrió un error al cargar el stock :(</p>
+                )}
+
+                <div className={styles.outputContainer}>
+                    <div className={styles.dataPresentation}>
+                        <h5>Locación:</h5>
+                        <h5>{locacion}</h5>
+                    </div>
+                    <div className={styles.dataPresentation}>
+                        <h5>Remito:</h5>
+                        <h5>{remito}</h5>
+                    </div>
+                </div>
+
+                <div className={styles.buttonContainer}>
+                    <button 
+                        className={`button ${styles.buttonCancel}`} 
+                        onClick={setModalClose}
+                    > 
+                        Cancelar
+                    </button>
+                    <button 
+                        className={`button ${styles.buttonFinish}`} 
+                        onClick={handleSubmit}
+                    >
+                        Finalizar
+                    </button>
+                </div>
+            </Box>
+        </Modal>
     );
 };
 

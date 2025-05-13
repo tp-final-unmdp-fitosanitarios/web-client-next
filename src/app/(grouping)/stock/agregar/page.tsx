@@ -234,6 +234,7 @@ const AgregarStockPage: React.FC = () => {
                 console.error("Error al agregar stock:", response.error);
             }
         })
+        setActiveStep(0);
     }
 
     const fields: Field[] = [
@@ -362,6 +363,7 @@ const AgregarStockPage: React.FC = () => {
     {activeStep === 1 && (
       <div className={styles.itemListContainer}>
         <h3>Agregar Stock</h3>
+        <p>Ingresó {productosAAgregar.length}/{remito?.cantProductos} productos</p>
 
         {productosAAgregar.length > 0 ? (
           <ItemList
@@ -394,9 +396,9 @@ const AgregarStockPage: React.FC = () => {
             Volver
           </button>
           <button
-            className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`}
+            className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish} `}
             onClick={() => setActiveStep(2)}
-            disabled={productosAAgregar.length !== Number(remito?.cantProductos)}
+            disabled={productosAAgregar.length < Number(remito.cantProductos)}
           >
             Confirmar
           </button>
