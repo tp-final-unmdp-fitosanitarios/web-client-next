@@ -171,7 +171,7 @@ export default function StockView() {
         <div className="page-container">
             <div className="content-wrap">
             <MenuBar showMenu={true} path="" />
-            <h1 className={styles.title}>Gestion de Stock</h1>
+            <h1 className={styles.title}>Gestión de Stock</h1>
 
             <Autocomplete
                 disablePortal
