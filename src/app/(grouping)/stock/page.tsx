@@ -2,7 +2,7 @@
 "use client";
 import { useItemsManager } from "@/hooks/useItemsManager";
 import ItemList from "@/components/itemList/ItemList";
-import Link from "next/link";
+import NavigationLink from "@/components/NavigationLink/NavigationLink";
 import styles from "./stock-view.module.scss";
 import MenuBar from "@/components/menuBar/MenuBar";
 import { transformToItems } from "@/utilities/transform";
@@ -16,6 +16,8 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import MoverStockModal from "@/components/MoverStockModal/MoverStockModal";
 import RetirarStockModal from "@/components/RetirarStockModal/RetirarStockModal";
 import Footer from "@/components/Footer/Footer";
+import { useLoading } from "@/hooks/useLoading";
+import { sortAlphabeticallyUnique } from "@/utilities/sort";
 
 const buttons = [
     { label: "Agregar", path: "/stock/agregar" },
@@ -32,6 +34,7 @@ export default function StockView() {
     const [showMoverModal, setShowMoverModal] = useState(false);
     const [showRetirarModal, setShowRetirarModal] = useState(false);
     const { getApiService, isReady } = useAuth();
+    const { withLoading } = useLoading();
     const apiService = getApiService();
 
     const customInputSx = {
@@ -60,30 +63,43 @@ export default function StockView() {
         },
     };
 
-
-    const fetchLocations = async (): Promise<void> => {
+    const fetchLocations = async () => {
         try {
-            const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE&type=FIELD");
-            const locaciones = response.data;
-
-            setLocations(locaciones);
-            if (locaciones.length > 0) {
-                setActualLocation(locaciones[0].id); // Set the first location as the default
+            console.log('Fetching locations...');
+            const response = await withLoading(
+                apiService.get<Locacion[]>('/locations?type=WAREHOUSE&type=FIELD'),
+                "Cargando ubicaciones..."
+            );
+            console.log('Locations response:', response);
+            if (response.success) {
+                const locations = response.data as Locacion[];
+                const sortedLocations = sortAlphabeticallyUnique(locations, 'name', 'id');
+                console.log('Locations loaded:', sortedLocations);
+                setLocations(sortedLocations);
+                if (sortedLocations.length > 0) {
+                    setActualLocation(sortedLocations[0].id);
+                }
+            } else {
+                console.error('Error loading locations:', response.error);
+                setError(response.error || "Error al obtener las ubicaciones");
             }
-        } catch (e: any) {
-            console.log(e.message);
-            setLocations([]); // Handle connection or forbidden errors
+        } catch (err) {
+            console.error('Error in fetchLocations:', err);
+            setError("Error al conectar con el servidor: " + err);
+        } finally {
+            setLoading(false);
         }
     };
 
     const fetchStock = async (locationId: string) => {
         try {
-            const response = await apiService.get<ResponseItems<Stock>>(
-                `stock?location=${locationId}`
+            setLoading(true);
+            const response = await withLoading(
+                apiService.get<ResponseItems<Stock>>(`stock?location=${locationId}`),
+                "Cargando stock..."
             );
             if (response.success) {
                 const stock = response.data.content;
-                console.log(stock);
                 setStockFromServer(stock);
             } else {
                 setError(response.error || "Error al obtener el stock");
@@ -95,30 +111,23 @@ export default function StockView() {
         }
     };
 
-
-
     useEffect(() => {
-        if (!isReady) return; // Esperar a que el contexto esté listo
+        console.log('isReady changed:', isReady);
+        if (!isReady) return;
         fetchLocations();
     }, [isReady]);
 
     useEffect(() => {
-        if (!isReady) return;
-        if (actualLocation) {
-            fetchStock(actualLocation);
-        }
+        if (!isReady || !actualLocation) return;
+        fetchStock(actualLocation);
     }, [actualLocation, isReady]);
 
     const {
-        items: stock,  // Usamos los datos mockeados como base
-        selectedIds,
+        items: stock,
         deletedItems,
         isModalOpen,
-        toggleSelectItem,
-        quitarItems,
         closeModal,
     } = useItemsManager(stockFromServer);
-
 
     let displayStock: any[] = [];
     if (stock.length > 0) {
@@ -133,29 +142,18 @@ export default function StockView() {
     }
 
     const items = transformToItems(displayStock, "id", ["producto", "amount", "unit"]).map((item) => {
-            return {
-                ...item,
-                display: `${item.producto} : ${item.amount}${item.unit}`,
-            };
-            });
+        return {
+            ...item,
+            display: `${item.producto} : ${item.amount}${item.unit}`,
+        };
+    });
 
     const campos = ["display"];
-
 
     const modalText = deletedItems.length > 0
         ? `Se han eliminado los siguientes productos del stock:\n${deletedItems.map((s) => s.product.name).join("\n")}`
         : "";
 
-
-    if (loading) {
-        return (
-            <div className="page-container">
-                <MenuBar showMenu={true} path="" />
-                <div>Cargando...</div>
-            </div>
-        );
-    }
-    //
     if (error) {
         return (
             <div className="page-container">
@@ -165,7 +163,9 @@ export default function StockView() {
         );
     }
 
-    const options = locations.map((l) => ({ label: l.name }));
+    const options = Array.from(
+        new Set(locations?.map((l) => l.name))
+    ).map(name => ({ label: name }));
 
     return (
         <div className="page-container">
@@ -173,28 +173,35 @@ export default function StockView() {
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Gestión de Stock</h1>
 
-            <Autocomplete
-                disablePortal
-                options={options}
-                defaultValue={locations[0]?.name ? {label: locations[0].name} : null}
-                renderInput={(params) => (
-                    <TextField
-                      {...params}
-                      label="Locación"
-                      required
-                      sx={{...customInputSx}}
-                    />
-                  )}
-                onChange={(e, newValue) => {
-                  if (newValue) {
-                    setActualLocation(locations.find(l => l.name === newValue.label)?.id || '');
-                  }
-                }}
-                sx={{ width: 300, margin: '0 auto', marginBottom: '10px' }}
-                className=""
-            />
+            {options.length > 0 && (
+                <Autocomplete
+                    disablePortal
+                    options={options}
+                    defaultValue={options[0]}
+                    renderInput={(params) => (
+                        <TextField
+                          {...params}
+                          label="Locación"
+                          required
+                          sx={{...customInputSx}}
+                        />
+                      )}
+                    onChange={(e, newValue) => {
+                      if (newValue) {
+                        const selectedLocation = locations.find(l => l.name === newValue.label);
+                        if (selectedLocation) {
+                            setActualLocation(selectedLocation.id);
+                        }
+                      }
+                    }}
+                    sx={{ width: 300, margin: '0 auto', marginBottom: '10px' }}
+                    className=""
+                />
+            )}
 
-            {items.length > 0 ? (
+            {loading ? (
+                <div>Cargando stock...</div>
+            ) : items.length > 0 ? (
                 <ItemList
                     items={items}
                     displayKeys={campos}
@@ -203,7 +210,7 @@ export default function StockView() {
                     selectSingleItem={false}
                 />
             ) : (
-                <h3 className={styles.title}>No hay elementos en el stock</h3>
+                <h3 className={styles.title}>No hay elementos en el stock para esta ubicación</h3>
             )}
 
             <div className={styles.buttonContainer}>
@@ -220,13 +227,12 @@ export default function StockView() {
                     Retirar
                 </button>
                 {buttons.map((button, index) => (
-                    <Link key={index} href={button.path}>
+                    <NavigationLink key={index} href={button.path}>
                         <button className={`button button-primary ${styles.buttonHome}`}>
                             {button.label}
                         </button>
-                    </Link>
+                    </NavigationLink>
                 ))}
-
             </div>
             </div>
             <Footer />

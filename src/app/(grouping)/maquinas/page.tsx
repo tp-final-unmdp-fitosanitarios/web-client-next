@@ -11,10 +11,12 @@ import { ResponseItems } from "@/domain/models/ResponseItems";
 import { Maquina } from "@/domain/models/Maquina";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
+import { useLoading } from "@/hooks/useLoading";
 const buttons = [{ label: "Agregar", path: "/maquinas/agregar" }];
 
 export default function MaquinasView() {
   const { getApiService } = useAuth();
+  const { withLoading } = useLoading();
   const apiService = getApiService();
 
   const [maquinasFromServer, setMaquinasFromServer] = useState<Maquina[]>([]);
@@ -24,10 +26,12 @@ export default function MaquinasView() {
   useEffect(() => {
     const fetchMaquinas = async () => {
       try {
-        const response = await apiService.get<ResponseItems<Maquina>>('machines');
+        const response = await withLoading(
+          apiService.get<ResponseItems<Maquina>>('machines'),
+          "Cargando máquinas..."
+        );
         if (response.success) {
-          const machines = response.data.content;
-          setMaquinasFromServer(machines);
+          setMaquinasFromServer(response.data.content);
         } else {
           setError(response.error || "Error al obtener las máquinas");
         }

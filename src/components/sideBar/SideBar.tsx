@@ -16,7 +16,7 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import BarChartIcon from '@mui/icons-material/BarChart';
 import MenuIcon from '@mui/icons-material/Menu';
 import LogoutIcon from '@mui/icons-material/Logout';
-import Link from 'next/link';
+import NavigationLink from '@/components/NavigationLink/NavigationLink';
 import styles from "./sideBar.module.scss";
 import { useAuth } from '../Auth/AuthProvider';
 import PersonIcon from '@mui/icons-material/Person';
@@ -73,14 +73,14 @@ const userData = {
       <List>
         {['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadísticas'].map((text, index) => (
           <ListItem key={text} disablePadding>
-            <Link href={`/${text.toLowerCase()}`} className={styles.link}>
+            <NavigationLink href={`/${text.toLowerCase()}`} className={styles.link}>
               <ListItemButton className={styles.listItemButton}>
                 <ListItemIcon className={styles.icon}>
                   {icons[index]}
                 </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItemButton>
-            </Link>
+            </NavigationLink>
           </ListItem>
         ))}
       </List>

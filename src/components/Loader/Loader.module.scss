@@ -1,0 +1,63 @@
+@use '../../app/styles/variables' as *;
+
+.loaderOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.loaderContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: $spacing-medium;
+  padding: $spacing-large;
+  background-color: $background-color-2;
+  border: 3px solid $dark-color;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+}
+
+.spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid $light-color;
+  border-top: 4px solid $primary-color;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.text {
+  color: $dark-color;
+  font-family: $font-family-primary;
+  font-weight: 600;
+  font-size: 1.1rem;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// Responsive
+@media (max-width: 600px) {
+  .loaderContainer {
+    padding: $spacing-medium;
+  }
+
+  .spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .text {
+    font-size: 1rem;
+  }
+} 

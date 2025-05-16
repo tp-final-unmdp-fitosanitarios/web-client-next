@@ -11,18 +11,20 @@ import { useState } from "react";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import { useRouter } from 'next/navigation';
 import Footer from "@/components/Footer/Footer";
+import { useLoading } from "@/hooks/useLoading";
 
 // Forzar que esta página sea dinámica y no se prerenderice en el servidor
 export const dynamic = "force-dynamic";
 
 export default function Login() {
   const [errorReq, setErrorReq] = useState(false);
-  const { getApiService , login} = useAuth(); // Hook para manejar el token de autenticación
+  const { getApiService, login } = useAuth();
+  const { withLoading, showLoader } = useLoading();
   const fields: Field[] = [
     { name: "email", label: "Nombre", type: "text" },
     { name: "password", label: "Contraseña", type: "password" }, 
   ];
-  const router = useRouter(); // Hook para redirigir después del login
+  const router = useRouter();
 
   const log_in = async (formData: any) => {
     const apiService = getApiService();
@@ -31,13 +33,19 @@ export default function Login() {
         email: formData["email"],
         password: formData["password"],
       };
-      console.log(body);
-      const res = await apiService.create("/auth/login", body);
-      console.log(res);
+      
+      const res = await withLoading(
+        apiService.create("/auth/login", body),
+        "Iniciando sesión..."
+      );
+      
       const { token, user_id } = res.data as { token: string, user_id: string };
-      login(token, user_id); /// Login del provider
+      login(token, user_id);
       setErrorReq(false);
-      router.push("/home"); // Redirigir a la página de inicio después del login exitoso
+      
+      // Mantener el loader durante la navegación
+      showLoader("Cargando página principal...");
+      router.push("/home");
     } catch (e: any) {
       if (e.response?.status === 401) { 
         setErrorReq(true);
@@ -50,7 +58,7 @@ export default function Login() {
   return (
     <div className="page-container">
       <div className="content-wrap">
-        <MenuBar showMenu={false}showArrow={false} path="home" />
+        <MenuBar showMenu={false} showArrow={false} path="home" />
         <div className={styles.container}>
           <h1 className={styles.title}>Iniciar Sesión</h1>
           <div className={styles.mainContainer}>
@@ -62,7 +70,7 @@ export default function Login() {
               <Link className={styles.forgot} href="/forgot">
                 <span>Olvidaste tu contraseña</span>
               </Link>
-          </div>
+            </div>
           </div>
         </div>
       </div>

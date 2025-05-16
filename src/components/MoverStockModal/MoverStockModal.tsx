@@ -7,6 +7,7 @@ import GenericForm from '@/components/formulario/formulario';
 import styles from "./MoverStockModal.module.scss";
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { useRouter } from "next/navigation";
+import { sortAlphabeticallyUnique } from '@/utilities/sort';
 
 interface Props {
   onClose: () => void;
@@ -22,7 +23,9 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
     if (loaded || !isReady) return;
     try {
       const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE&type=FIELD");
-      setLocations(response.data);
+      // Ordenar y eliminar duplicados
+      const sortedLocations = sortAlphabeticallyUnique(response.data, 'name', 'id');
+      setLocations(sortedLocations);
       setLoaded(true);
     } catch (error: any) {
       console.error("Error al cargar locaciones:", error.message);
@@ -42,7 +45,6 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
     else
       console.error("Error al mover stock: Locaciones no encontradas");
     
-  
     onClose();
   };
 
@@ -65,7 +67,7 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
 
   return (
     <div className={styles.modalOverlay}>
-      <div className={styles.modalContent}>
+      <div className={`${styles.modalContent} modal-content`}>
         <h2 className={styles.title}>Mover Stock</h2>
         <GenericForm fields={fields} onSubmit={handleFormSubmit} onCancel={onClose} buttonName="Mover" />
       </div>

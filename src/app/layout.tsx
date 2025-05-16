@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./styles/globals.scss"
 import { AuthProvider } from "@/components/Auth/AuthProvider";
+import LoaderProvider from "@/components/Loader/LoaderProvider";
 
 export const metadata: Metadata = {
   title: "EPP gestion",
@@ -16,7 +17,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-      <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <LoaderProvider>
+            {children}
+          </LoaderProvider>
+        </AuthProvider>
       </body>
     </html>
   );

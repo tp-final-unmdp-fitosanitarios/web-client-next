@@ -3,7 +3,7 @@
 import { useState } from "react";
 import styles from "./formulario.module.scss";
 import { Field } from "@/domain/models/Field";
-
+import { sortStrings } from "@/utilities/sort";
 
 interface FormularioProps {
   fields: Field[];
@@ -47,7 +47,6 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName,child
       onSubmit(formData);
       setFormData(initialState);
     }
-
   };
 
   const handleCancel = () => {
@@ -66,7 +65,7 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName,child
             {field.type === "select" ? (
               <select name={field.name} value={formData[field.name]} onChange={handleChange}  onFocus={field.onFocus} className={styles.select}>
                 <option value="">Seleccione una opción</option>
-                {field.options?.map((option) => (
+                {field.options && sortStrings(field.options).map((option) => (
                   <option key={option} value={option}>
                     {option}
                   </option>

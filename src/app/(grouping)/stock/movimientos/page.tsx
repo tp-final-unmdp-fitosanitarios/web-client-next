@@ -9,6 +9,7 @@ import MovementDetailModal from '@/components/MovementDetailModal/MovementDetail
 import Footer from '@/components/Footer/Footer';
 import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
+import { useLoading } from "@/hooks/useLoading";
 
 interface Movement {
     id: string;
@@ -26,15 +27,23 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
     const [showDetailModal, setShowDetailModal] = useState<boolean>(false);
     const [selectedId, setSelectedId] = useState<string | null>(null);
     const { getApiService, isReady } = useAuth();
+    const { withLoading } = useLoading();
     const apiService = getApiService();
     let latestDate: Date | null = null;
 
     const fetchMovements = async () => {
-        const response = await apiService.get<ResponseItems<Movement>>('/stock/movement');
-        if (response.success) {
-            const movements = response.data.content;
-            movements.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-            setMovements(movements);
+        try {
+            const response = await withLoading(
+                apiService.get<ResponseItems<Movement>>('/stock/movement'),
+                "Cargando movimientos..."
+            );
+            if (response.success) {
+                const movements = response.data.content;
+                movements.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                setMovements(movements);
+            }
+        } catch (error) {
+            console.error('Error fetching movements:', error);
         }
     };
     useEffect(() => {

@@ -8,13 +8,13 @@ import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador"
 import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
 import { useUserStore } from "@/contexts/userStore";
+import { useLoading } from "@/hooks/useLoading";
 
 export default function Home() {
-
-  const { setUserGlobally } = useUserStore()
-  const [user, setUser] = useState<User | null>(null)
-  const [loading, setLoading] = useState(true);
+  const { setUserGlobally } = useUserStore();
+  const [user, setUser] = useState<User | null>(null);
   const { getApiService, isReady, getUserId } = useAuth();
+  const { withLoading } = useLoading();
   const apiService = getApiService();
   const userId = getUserId();
 
@@ -23,23 +23,27 @@ export default function Home() {
     { label: "Stock", path: "/stock" },
   ];
 
- useEffect(() => {
+  useEffect(() => {
     if (isReady && userId) {
-      fetchUser().then(user => {
-        setUser(user);
-        setUserGlobally(user);
-        setLoading(false);
-      }).catch(error => {
-        console.error('Error fetching user:', error);
-        setLoading(false);
-      });
+      fetchUser();
     }
   }, [isReady, userId]);
 
-  console.log(userId);
+  async function fetchUser() {
+    try {
+      const user = await withLoading(
+        apiService.get<User>(`/users/${userId}`).then(res => res.data),
+        "Cargando datos del usuario..."
+      );
+      setUser(user);
+      setUserGlobally(user);
+    } catch (error) {
+      console.error('Error fetching user:', error);
+    }
+  }
 
-  if (loading) {
-    return <div>Cargando...</div>;
+  if (!user) {
+    return null; // El loader se mostrará a través del withLoading
   }
 
   if (user && Array.isArray(user.roles) && user.roles.length > 0 && user.roles[0] === Roles.Admin) {
@@ -50,21 +54,15 @@ export default function Home() {
     );
   }
 
-  async function fetchUser(): Promise<User> {
-   const res = await apiService.get<User>(`/users/${userId}`)
-
-   return res.data
-  }
-
-  if (!user)
-    return (<h3>Loading...</h3>)
-
   return (
     <div className="page-container">
       <div className="content-wrap">
-        {user.roles[0] === Roles.Admin || user.roles[0] === Roles.Encargado ? <HomepageJerarquico user={user} buttons={buttons} /> : <HomepageAplicador user={user} />}
+        {user.roles[0] === Roles.Admin || user.roles[0] === Roles.Encargado ? 
+          <HomepageJerarquico user={user} buttons={buttons} /> : 
+          <HomepageAplicador user={user} />
+        }
       </div>
       <Footer />
     </div>
-  )
+  );
 }

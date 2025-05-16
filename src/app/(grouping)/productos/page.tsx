@@ -12,6 +12,7 @@ import { useEffect, useState } from "react";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
+import { useLoading } from "@/hooks/useLoading";
 
 const buttons = [{ label: "Agregar", path: "/productos/agregar" }];
 
@@ -20,20 +21,24 @@ export default function ProductosView() {
      const [loading, setLoading] = useState<boolean>(true);
      const [error, setError] = useState<string>("");
      const { getApiService } = useAuth();
+     const { withLoading } = useLoading();
      const apiService = getApiService();
 
     useEffect(() => {
-        const fetchProductos = async () => {//bearer token
+        const fetchProductos = async () => {
             try {
-                const response = await apiService.get<ResponseItems<Producto>>('products');
+                const response = await withLoading(
+                    apiService.get<ResponseItems<Producto>>('/products'),
+                    "Cargando productos..."
+                );
                 if (response.success) {
-                    const products = response.data.content;
-                    setProductosFromServer(products);
+                    setProductosFromServer(response.data.content);
                 } else {
                     setError(response.error || "Error al obtener los productos");
                 }
-            } catch (err) {
-                setError("Error al conectar con el servidor" + err);
+            } catch (error) {
+                console.error('Error fetching products:', error);
+                setError("Error al conectar con el servidor");
             } finally {
                 setLoading(false);
             }
