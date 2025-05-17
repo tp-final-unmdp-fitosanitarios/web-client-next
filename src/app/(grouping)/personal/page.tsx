@@ -102,10 +102,10 @@ export default function PersonalPage() {// to do falta el delete
 
     return (
         <div className="page-container">
-            <MenuBar showMenu={true} path="" />
-            <h1 className={styles.title}>Personal</h1>
 
             <div className="content-wrap">
+                <MenuBar showMenu={true} path="" />
+                <h1 className={styles.title}>Gestion de Personal</h1>
 
                 <div className={styles.content}>
                     <div className={styles.filterContainer}>
