@@ -1,0 +1,9 @@
+declare module '@mui/icons-material/Work';
+declare module '@mui/icons-material/Person';
+declare module '@mui/icons-material/Home';
+declare module '@mui/icons-material/ShoppingCart';
+declare module '@mui/icons-material/LocalOffer';
+declare module '@mui/icons-material/Inventory';
+declare module '@mui/icons-material/BarChart';
+declare module '@mui/icons-material/Menu';
+declare module '@mui/icons-material/Logout'; 

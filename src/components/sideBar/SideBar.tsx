@@ -21,11 +21,14 @@ import styles from "./sideBar.module.scss";
 import { useAuth } from '../Auth/AuthProvider';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
+import EmailIcon from '@mui/icons-material/Email';
+import SettingsIcon from '@mui/icons-material/Settings';
 import { useUserStore } from '@/contexts/userStore';
 
 const userDataIcons = [
   <PersonIcon />,
-  <WorkIcon />
+  <WorkIcon />,
+  <EmailIcon />
 ]
 
 const icons = [
@@ -50,15 +53,16 @@ const user = useUserStore(state => state.user)
 const userData = {
   name: user?.first_name + " " + user?.last_name,
   role: user?.roles[0] || 'Sin rol asignado',
+  email: user?.email || 'Sin email'
 }
 
   const DrawerList = (
     <Box className={styles.drawerContainer} role="presentation" onClick={toggleDrawer(false)}>
 <p className={styles.userData}>Datos de usuario</p>
       <List>
-        {[userData.name, userData.role].map((text, index) => (
+        {[userData.name, userData.role, userData.email].map((text, index) => (
           <ListItem key={text} disablePadding>
-            <ListItemButton className={styles.listItemButton}>
+            <ListItemButton className={`${styles.listItemButton} ${styles.userDataItem}`}>
               <ListItemIcon className={styles.icon}>
                 {userDataIcons[index]}
               </ListItemIcon>
@@ -66,6 +70,16 @@ const userData = {
             </ListItemButton>
           </ListItem>
         ))}
+        <ListItem disablePadding>
+          <NavigationLink href="/configuracion" className={styles.link}>
+            <ListItemButton className={styles.listItemButton}>
+              <ListItemIcon className={styles.icon}>
+                <SettingsIcon />
+              </ListItemIcon>
+              <ListItemText primary="Configuración" />
+            </ListItemButton>
+          </NavigationLink>
+        </ListItem>
       </List>
 
       <Divider />
