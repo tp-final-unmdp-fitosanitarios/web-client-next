@@ -159,26 +159,26 @@ export default function AgregarProductos() {
       name: "unidad",
       label: "Unidad",
       type: "select",
-      options: Object.values(Unidad),
+      options: Array.from(new Set(Object.values(Unidad))).sort(),
     },
     { name: "marca", label: "Marca", type: "text" },
     {
       name: "agroquimico",
       label: "Agroquímico",
       type: "select",
-      options: agroquimicos.map((a) => a.active_principle),
+      options: Array.from(new Set(agroquimicos.map((a) => a.active_principle))).sort(),
     },
     {
       name: "categoria",
       label: "Categoría",
       type: "select",
-      options: ["HERBICIDE", "INSECTICIDE", "FUNGICIDE"],
+      options: Array.from(new Set(["HERBICIDE", "INSECTICIDE", "FUNGICIDE"])).sort(),
     },
     {
       name: "proveedor",
       label: "Proveedor",
       type: "select",
-      options: proveedores.map((p) => p.name),
+      options: Array.from(new Set(proveedores.map((p) => p.name))).sort(),
     },
   ];
 

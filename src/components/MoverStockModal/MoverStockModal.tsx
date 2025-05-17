@@ -53,14 +53,14 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
       name: "origen",
       label: "Locación Origen",
       type: "select",
-      options: locations.map((loc) => loc.name),
+      options: Array.from(new Set(locations.map((loc) => loc.name))).sort(),
       onFocus: fetchLocations,
     },
     {
       name: "destino",
       label: "Locación Destino",
       type: "select",
-      options: locations.map((loc) => loc.name),
+      options: Array.from(new Set(locations.map((loc) => loc.name))).sort(),
       onFocus: fetchLocations,
     },
   ];

@@ -183,7 +183,7 @@ export default function StockView() {
 
     const options = Array.from(
         new Set(locations?.map((l) => l.name))
-    ).map(name => ({ label: name }));
+    ).sort().map(name => ({ label: name }));
 
     return (
         <div className="page-container">

@@ -82,6 +82,23 @@ const ModalAgregarProducto = ({ open, setModalClose, products, handleAddProducto
 
     const options = products.map((p) => ({ label: p.name }));
 
+    const fields = [
+        {
+            name: "producto",
+            label: "Producto",
+            type: "select",
+            options: Array.from(new Set(products.map((p) => p.name))).sort(),
+            onFocus: handleSelectedProduct,
+        },
+        {
+            name: "proveedor",
+            label: "Proveedor",
+            type: "select",
+            options: Array.from(new Set(products.map((p) => p.provider))).sort(),
+            onFocus: handleSelectedProduct,
+        },
+    ];
+
     return (
         <div>
             <Modal open={open} onClose={setModalClose}>

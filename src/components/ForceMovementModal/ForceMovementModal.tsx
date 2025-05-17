@@ -1,20 +1,17 @@
 import { Stock } from "@/domain/models/Stock";
-import { transformToItems } from "@/utilities/transform";
 import { Modal, Box } from "@mui/material";
-import ItemList from "../itemList/ItemList";
 import styles from "./ForceMovementModal.module.scss";
+
 interface Props {
     open: boolean;
     setModalClose: () => void;
     stockToMove: (Stock & {flag: string, cantidad: number})[];
     actualStock: Stock[];
-    origen: string | null;
-    destino: string | null;
     handleForceFinish: () => void;
     withdraw: boolean;
 }
 
-const ForceMovementModal: React.FC<Props> = ({open, setModalClose, stockToMove, actualStock, origen, destino, withdraw, handleForceFinish}) => {
+const ForceMovementModal: React.FC<Props> = ({open, setModalClose, stockToMove, actualStock, withdraw, handleForceFinish}) => {
     
     const stockNegativo = stockToMove.map((item) => {
         const stockARestar = actualStock.find((stock) => stock.product.id === item.product.id);
@@ -51,14 +48,13 @@ const ForceMovementModal: React.FC<Props> = ({open, setModalClose, stockToMove, 
     });
     console.log("stockNegativo", stockNegativo);
 
-    const items = transformToItems(stockNegativo.filter(item => item !== undefined), "id", ["producto", "stockActual","unit","cantidad"]).map((item) => {
-          return {
+    const items = stockNegativo.filter(item => item !== undefined).map((item) => {
+        const exceso = Number(item.cantidad) - Number(item.stockActual);
+        return {
             ...item,
-            display: `${item.producto}\nEn stock: ${item.stockActual}${item.unit} - ${withdraw? "Retiro": "Movimiento"}: ${item.cantidad}${item.unit}`
+            exceso: exceso > 0 ? `${exceso}${item.unit}` : null
         };
     });
-  
-  const campos = ["display"];
 
     return (
         <div>
@@ -79,32 +75,29 @@ const ForceMovementModal: React.FC<Props> = ({open, setModalClose, stockToMove, 
                 <h3 className={styles.title}>Advertencia al {withdraw ? "retirar" : "mover"} stock</h3>
                 <div className={styles.outputContainer}>
                     <div className={styles.dataPresentation}>
-                        <h4>Esta {withdraw ? "retirando todo el stock disponible" : "moviendo mas stock del que existe en el origen"}</h4>
-                    </div>
-                    <div className={styles.dataPresentation}>
-                        <h4>En los siguientes productos:</h4>
+                        <h4>Está {withdraw ? "retirando" : "moviendo"} más stock del disponible en los siguientes productos:</h4>
                     </div>
                 </div>
-                {items.length > 0 ? (
-                        <ItemList
-                            items={items}
-                            displayKeys={campos}
-                            selectItems={false}
-                            deleteItems={false}
-                            selectSingleItem={false}
-                        />
-                        ) : (
-                            <p>Ocurrio un error al mover el stock :(</p>
-                        )}
-                
+                <div>
+                    {items.map((item) => (
+                        <div key={item.id} className={styles.productContainer}>
+                            <span className={styles.productName}>{item.producto}</span>
+                            {item.exceso && (
+                                <span className={styles.excesoLabel}>
+                                    Exceso: <b>{item.exceso}</b>
+                                </span>
+                            )}
+                        </div>
+                    ))}
+                </div>
                 <div className={`${styles.buttonContainer}`}>
-                        <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} onClick={setModalClose}> 
-                            Cancelar
-                        </button>
-                        <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleForceFinish}>
-                            Forzar
-                        </button>
-                    </div>
+                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} onClick={setModalClose}> 
+                        Cancelar
+                    </button>
+                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} onClick={handleForceFinish}>
+                        Forzar
+                    </button>
+                </div>
                 </Box>
             </Modal>
         </div>

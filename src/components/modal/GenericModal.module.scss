@@ -18,7 +18,7 @@
   border: 3px solid $dark-color;
   border-radius: $border-radius;
   padding: 2rem;
-  min-width: 80%;
+  min-width: 40%;
   max-width: 500px;
   min-height: 30%;
   display: flex;
@@ -42,7 +42,7 @@
   color: $dark-color;
 
   .message {
-    font-size: 1rem;
+    font-size: 1.2rem;
     font-weight: 500;
     margin-bottom: 1rem;
   }

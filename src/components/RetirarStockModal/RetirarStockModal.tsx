@@ -7,6 +7,7 @@ import GenericForm from '@/components/formulario/formulario';
 import styles from "./RetirarStockModal.module.scss";
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { useRouter } from "next/navigation";
+import { sortAlphabeticallyUnique } from '@/utilities/sort';
 
 interface Props {
   onClose: () => void;
@@ -22,7 +23,8 @@ const RetirarStockModal: React.FC<Props> = ({ onClose }) => {
     if (loaded || !isReady) return;
     try {
       const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE&type=FIELD");
-      setLocations(response.data);
+      const sortedLocations = sortAlphabeticallyUnique(response.data, 'name', 'id');
+      setLocations(sortedLocations);
       setLoaded(true);
     } catch (error: any) {
       console.error("Error al cargar locaciones:", error.message);
@@ -49,7 +51,7 @@ const RetirarStockModal: React.FC<Props> = ({ onClose }) => {
       name: "origen",
       label: "Locación Origen",
       type: "select",
-      options: locations.map((loc) => loc.name),
+      options: Array.from(new Set(locations.map((loc) => loc.name))).sort(),
       onFocus: fetchLocations,
     },
   ];
