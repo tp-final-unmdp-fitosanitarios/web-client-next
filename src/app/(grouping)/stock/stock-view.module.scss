@@ -17,39 +17,44 @@
 .container_blurred {
     filter: blur(5px);
     transition: filter 0.3s ease-in-out;
-  }
+}
 
-  .buttonContainer{
+.buttonContainer {
     display: flex;
     flex-direction: row;
-    justify-content: space-around;
+    justify-content: center;
     width: 80%;
     margin: 40px auto;
     margin-top: 100px;
-  }
-  .title{
-   display: flex;
-   justify-content: center;
-  }
+    gap: 1.5rem;
+    flex-wrap: wrap;
+    padding: 0 1rem;
+}
 
-  .buttonDelete {
+.title {
+    display: flex;
+    justify-content: center;
+}
+
+.buttonDelete {
     margin-top: 20px;
-  }
+}
 
-  @media (max-width: 1000px) {
-    .buttonContainer{
-      margin-top: 0px;
-      flex-direction: column;
-      align-items: center;
+@media (max-width: 1000px) {
+    .buttonContainer {
+        margin-top: 0px;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
     }
-  
-    .buttonHome{
-      margin: 15px auto;
-    }
-  }
 
-  .dropdownLocation {
+    .buttonHome {
+        margin: 15px auto;
+    }
+}
+
+.dropdownLocation {
     min-width: 60px;
     max-width: 300px;
     margin: 10px auto;
-  }
+}

@@ -1,0 +1,131 @@
+@use '../../styles/variables' as *;
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 2rem 0;
+  text-align: center;
+  width: 100%;
+}
+
+.content {
+  padding: 2rem;
+  max-width: 1200px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex: 1;
+}
+
+.filterContainer {
+  margin: 2rem 0;
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+}
+
+.roleFilter {
+  min-width: 300px;
+  padding: 0.8rem 1rem;
+  border: 2px solid #404e5c;
+  border-radius: 10px;
+  font-size: 1rem;
+  background-color: #e6ebea;
+  color: #404e5c;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+  transition: all 0.2s ease-in-out;
+
+  &:focus {
+    border-color: #404e5c;
+    box-shadow: 0 0 0 2px rgba(64, 78, 92, 0.2);
+  }
+
+  option {
+    background-color: #e6ebea;
+    color: #404e5c;
+    font-weight: 600;
+  }
+}
+
+.buttonContainer {
+  display: flex;
+  flex-direction: row;
+  justify-content: center;
+  width: 100%;
+  max-width: 800px;
+  margin: 40px auto;
+  margin-top: 100px;
+  gap: 1.5rem;
+  flex-wrap: wrap;
+  padding: 0 1rem;
+}
+
+.buttonHome {
+  min-width: 200px;
+  padding: 0.8rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 16px;
+  background-color: #b5c88d;
+  color: #404e5c;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #a5b879;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@media (max-width: 1000px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .content {
+    padding: 1rem;
+  }
+
+  .filterContainer {
+    width: 90%;
+  }
+
+  .roleFilter {
+    min-width: 100%;
+  }
+
+  .buttonContainer {
+    margin-top: 0px;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+    width: 90%;
+  }
+
+  .buttonHome {
+    margin: 15px auto;
+    width: 100%;
+  }
+} 
