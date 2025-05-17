@@ -26,13 +26,16 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
     const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
 
     useEffect(() => {
+        if (!isReady) return;
+        
+        let isMounted = true;
         const fetchProviders = async () => {
             try {
                 const response = await withLoading(
                     apiService.get<ResponseItems<Proveedor>>("/providers"),
                     "Cargando proveedores..."
                 );
-                if (response.success) {
+                if (response.success && isMounted) {
                     setProviders(response.data.content);
                     setSelectedProviderProducts(response.data.content[0].products || []);
                     setFormData({
@@ -42,13 +45,16 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
                     setSelectedId(response.data.content[0].id);
                 }
             } catch (error) {
-                console.error('Error fetching providers:', error);
+                if (isMounted) {
+                    console.error('Error fetching providers:', error);
+                }
             }
         };
         
-        if (isReady)
-            fetchProviders();
-        
+        fetchProviders();
+        return () => {
+            isMounted = false;
+        };
     }, [isReady]);
     
     const handleSelectSingleItem = (id: string) => {

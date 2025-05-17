@@ -63,63 +63,81 @@ export default function StockView() {
         },
     };
 
-    const fetchLocations = async () => {
-        try {
-            console.log('Fetching locations...');
-            const response = await withLoading(
-                apiService.get<Locacion[]>('/locations?type=WAREHOUSE&type=FIELD'),
-                "Cargando ubicaciones..."
-            );
-            console.log('Locations response:', response);
-            if (response.success) {
-                const locations = response.data as Locacion[];
-                const sortedLocations = sortAlphabeticallyUnique(locations, 'name', 'id');
-                console.log('Locations loaded:', sortedLocations);
-                setLocations(sortedLocations);
-                if (sortedLocations.length > 0) {
-                    setActualLocation(sortedLocations[0].id);
-                }
-            } else {
-                console.error('Error loading locations:', response.error);
-                setError(response.error || "Error al obtener las ubicaciones");
-            }
-        } catch (err) {
-            console.error('Error in fetchLocations:', err);
-            setError("Error al conectar con el servidor: " + err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
-    const fetchStock = async (locationId: string) => {
-        try {
-            setLoading(true);
-            const response = await withLoading(
-                apiService.get<ResponseItems<Stock>>(`stock?location=${locationId}`),
-                "Cargando stock..."
-            );
-            if (response.success) {
-                const stock = response.data.content;
-                setStockFromServer(stock);
-            } else {
-                setError(response.error || "Error al obtener el stock");
-            }
-        } catch (err) {
-            setError("Error al conectar con el servidor: " + err);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
         console.log('isReady changed:', isReady);
         if (!isReady) return;
-        fetchLocations();
+        
+        let isMounted = true;
+        const fetchData = async () => {
+            try {
+                console.log('Fetching locations...');
+                const response = await withLoading(
+                    apiService.get<Locacion[]>('/locations?type=WAREHOUSE&type=FIELD'),
+                    "Cargando ubicaciones..."
+                );
+                console.log('Locations response:', response);
+                if (response.success && isMounted) {
+                    const locations = response.data as Locacion[];
+                    const sortedLocations = sortAlphabeticallyUnique(locations, 'name', 'id');
+                    console.log('Locations loaded:', sortedLocations);
+                    setLocations(sortedLocations);
+                    if (sortedLocations.length > 0) {
+                        setActualLocation(sortedLocations[0].id);
+                    }
+                } else if (isMounted) {
+                    console.error('Error loading locations:', response.error);
+                    setError(response.error || "Error al obtener las ubicaciones");
+                }
+            } catch (err) {
+                if (isMounted) {
+                    console.error('Error in fetchLocations:', err);
+                    setError("Error al conectar con el servidor: " + err);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchData();
+        return () => {
+            isMounted = false;
+        };
     }, [isReady]);
 
     useEffect(() => {
         if (!isReady || !actualLocation) return;
-        fetchStock(actualLocation);
+        
+        let isMounted = true;
+        const fetchData = async () => {
+            try {
+                setLoading(true);
+                const response = await withLoading(
+                    apiService.get<ResponseItems<Stock>>(`stock?location=${actualLocation}`),
+                    "Cargando stock..."
+                );
+                if (response.success && isMounted) {
+                    const stock = response.data.content;
+                    setStockFromServer(stock);
+                } else if (isMounted) {
+                    setError(response.error || "Error al obtener el stock");
+                }
+            } catch (err) {
+                if (isMounted) {
+                    setError("Error al conectar con el servidor: " + err);
+                }
+            } finally {
+                if (isMounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        fetchData();
+        return () => {
+            isMounted = false;
+        };
     }, [actualLocation, isReady]);
 
     const {

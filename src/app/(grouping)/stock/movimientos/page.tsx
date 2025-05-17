@@ -31,24 +31,32 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
     const apiService = getApiService();
     let latestDate: Date | null = null;
 
-    const fetchMovements = async () => {
-        try {
-            const response = await withLoading(
-                apiService.get<ResponseItems<Movement>>('/stock/movement'),
-                "Cargando movimientos..."
-            );
-            if (response.success) {
-                const movements = response.data.content;
-                movements.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
-                setMovements(movements);
-            }
-        } catch (error) {
-            console.error('Error fetching movements:', error);
-        }
-    };
     useEffect(() => {
-        if(isReady)
-            fetchMovements();
+        if (!isReady) return;
+        
+        let isMounted = true;
+        const fetchMovements = async () => {
+            try {
+                const response = await withLoading(
+                    apiService.get<ResponseItems<Movement>>('/stock/movement'),
+                    "Cargando movimientos..."
+                );
+                if (response.success && isMounted) {
+                    const movements = response.data.content;
+                    movements.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+                    setMovements(movements);
+                }
+            } catch (error) {
+                if (isMounted) {
+                    console.error('Error fetching movements:', error);
+                }
+            }
+        };
+        
+        fetchMovements();
+        return () => {
+            isMounted = false;
+        };
     }, [isReady]);
 
     const handleClickMovement = (movement: Movement) => {

@@ -25,25 +25,33 @@ export default function ProductosView() {
      const apiService = getApiService();
 
     useEffect(() => {
+        let isMounted = true;
         const fetchProductos = async () => {
             try {
                 const response = await withLoading(
                     apiService.get<ResponseItems<Producto>>('/products'),
                     "Cargando productos..."
                 );
-                if (response.success) {
+                if (response.success && isMounted) {
                     setProductosFromServer(response.data.content);
-                } else {
+                } else if (isMounted) {
                     setError(response.error || "Error al obtener los productos");
                 }
             } catch (error) {
-                console.error('Error fetching products:', error);
-                setError("Error al conectar con el servidor");
+                if (isMounted) {
+                    console.error('Error fetching products:', error);
+                    setError("Error al conectar con el servidor");
+                }
             } finally {
-                setLoading(false);
+                if (isMounted) {
+                    setLoading(false);
+                }
             }
         };
         fetchProductos();
+        return () => {
+            isMounted = false;
+        };
     }, []);
 
 

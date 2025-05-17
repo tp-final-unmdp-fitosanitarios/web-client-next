@@ -19,28 +19,35 @@ export default function Home() {
   const userId = getUserId();
 
   const buttons = [
-    { label: "Productos", path: "/productos" },
+    { label: "Productos", path: "/productos" }, 
     { label: "Stock", path: "/stock" },
   ];
 
   useEffect(() => {
     if (isReady && userId) {
+      let isMounted = true;
+      const fetchUser = async () => {
+        try {
+          const user = await withLoading(
+            apiService.get<User>(`/users/${userId}`).then(res => res.data),
+            "Cargando datos del usuario..."
+          );
+          if (isMounted) {
+            setUser(user);
+            setUserGlobally(user);
+          }
+        } catch (error) {
+          if (isMounted) {
+            console.error('Error fetching user:', error);
+          }
+        }
+      };
       fetchUser();
+      return () => {
+        isMounted = false;
+      };
     }
   }, [isReady, userId]);
-
-  async function fetchUser() {
-    try {
-      const user = await withLoading(
-        apiService.get<User>(`/users/${userId}`).then(res => res.data),
-        "Cargando datos del usuario..."
-      );
-      setUser(user);
-      setUserGlobally(user);
-    } catch (error) {
-      console.error('Error fetching user:', error);
-    }
-  }
 
   if (!user) {
     return null; // El loader se mostrará a través del withLoading
