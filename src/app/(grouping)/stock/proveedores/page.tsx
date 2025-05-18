@@ -15,7 +15,7 @@ import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import ModalConfirmacionEliminacion from "@/components/ModalConfimacionEliminacion/ModalConfirmacionEliminacion";
 
-const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de proveedores.
+const ProvidersPage = () => {
     const { getApiService, isReady } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
@@ -109,7 +109,8 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
 
     const handleConfirmDeleteProduct= () => {
         setShowDeleteModal(false);
-        //Request para eliminar
+        //Request para eliminar producto de un provider
+        apiService.delete(`/providers/remove-product?providerId=${selectedId}&productId=${entityToDelete.id}`,"");
         setSelectedProviderProducts(selectedProviderProducts.filter(p => p.id!== entityToDelete.id));
     }
 
@@ -121,6 +122,7 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
 
     const handleConfirmDeleteProvider = () => {
         setShowDeleteModal(false);
+        //Request para eliminar un provider
         apiService.delete("/providers",entityToDelete.id);
         setProviders(providers.filter(p => p.id!== entityToDelete.id));
     }
