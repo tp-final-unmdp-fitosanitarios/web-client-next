@@ -13,6 +13,7 @@ import AddProviderModal from "@/components/AddProviderModal/AddProviderModal";
 import { Producto } from "@/domain/models/Producto";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
+import ModalConfirmacionEliminacion from "@/components/ModalConfimacionEliminacion/ModalConfirmacionEliminacion";
 
 const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de proveedores.
     const { getApiService, isReady } = useAuth();
@@ -24,6 +25,9 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
     const [selectedId, setSelectedId] = useState<string>("");
     const [selectedProviderProducts, setSelectedProviderProducts] = useState<Producto[]>([]);
     const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [isDeletingProvider, setIsDeletingProvider] = useState(false);
+    const [entityToDelete, setEntityToDelete] = useState<any>({});
 
     useEffect(() => {
         if (!isReady) return;
@@ -98,11 +102,27 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
     }
 
     const handleDeleteProduct = (id: string) => {
-        setSelectedProviderProducts(selectedProviderProducts.filter(p => p.id!==id))
+        setIsDeletingProvider(false);
+        setEntityToDelete(selectedProviderProducts.find(p => p.id===id));
+        setShowDeleteModal(true);
+    }
+
+    const handleConfirmDeleteProduct= () => {
+        setShowDeleteModal(false);
+        //Request para eliminar
+        setSelectedProviderProducts(selectedProviderProducts.filter(p => p.id!== entityToDelete.id));
     }
 
     const handleDeleteProvider = (id: string) => {
-        console.log("Deleting provider: "+id);
+        setIsDeletingProvider(true);
+        setEntityToDelete(providers.find(p => p.id===id))
+        setShowDeleteModal(true);
+    }
+
+    const handleConfirmDeleteProvider = () => {
+        setShowDeleteModal(false);
+        apiService.delete("/providers",entityToDelete.id);
+        setProviders(providers.filter(p => p.id!== entityToDelete.id));
     }
 
     const handleModifyProvider = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -203,6 +223,22 @@ const ProvidersPage = () => { //TODO: Modificar los productos. Agregar baja de p
             </div>
             {showAddProvider && (
                 <AddProviderModal open={showAddProvider} setModalClose={() => setShowAddProvider(false)} saveProvider={handleAddProvider}/>
+            )}
+            {showDeleteModal && (
+                <ModalConfirmacionEliminacion
+                    isOpen={showDeleteModal}
+                    onClose={() => setShowDeleteModal(false)}
+                    onConfirm={
+                        isDeletingProvider
+                        ? handleConfirmDeleteProvider
+                        : handleConfirmDeleteProduct
+                    }
+                    text={
+                        isDeletingProvider
+                        ? `el proveedor ${entityToDelete.name}`
+                        : `el producto ${entityToDelete.name} del proveedor`
+                    }
+                />
             )}
             <GenericModal
                 isOpen={confirmationModalOpen}
