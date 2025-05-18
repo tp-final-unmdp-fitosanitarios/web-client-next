@@ -42,25 +42,39 @@ export default function AgregarUsuarioPage() { // to do parece que estoy mandand
   const handleFormSubmit = async (inputData: Record<string, string | string[]>) => {
     const payload = {
       user: {
+        id: '',
         first_name: String(inputData.first_name),
         last_name: String(inputData.last_name),
         email: String(inputData.email),
         roles: Array.isArray(inputData.roles) ? inputData.roles : [String(inputData.roles)],
+        company_id: ''
       },
       password: String(inputData.password),
     };
 
     try {
       const response = await apiService.create<CreateUserResponse>('/users', payload);
-      if (response.success) {
-        setNewUser(response.data.user);
+      
+      if (response.success && response.status === 200) {
+        setNewUser({
+          id: '',
+          first_name: String(inputData.first_name),
+          last_name: String(inputData.last_name),
+          email: String(inputData.email),
+          roles: Array.isArray(inputData.roles) ? inputData.roles : [String(inputData.roles)],
+          company_id: ''
+        });
         handleOpenModal();
-        router.push('/personal');
+        setTimeout(() => {
+          router.push('/personal');
+        }, 5000);
       } else {
-        console.error('Error al crear el usuario:', response.error);
+        const errorMessage = response.error || 'Error desconocido al crear el usuario';
+        alert(`Error al crear el usuario: ${errorMessage}`);
       }
-    } catch (error) {
-      console.error('Error en la solicitud:', error);
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Error desconocido';
+      alert(`Error al crear el usuario: ${errorMessage}`);
     }
   };
 
@@ -124,10 +138,11 @@ export default function AgregarUsuarioPage() { // to do parece que estoy mandand
       <GenericModal
         isOpen={modalOpen}
         onClose={handleCloseModal}
-        title="Usuario añadido"
-        modalText={`Se añadió el usuario: ${newUser.first_name} ${newUser.last_name}`}
-        buttonTitle="Cerrar"
+        title="Registro exitoso"
+        modalText={newUser ? `El usuario ${newUser.first_name} ${newUser.last_name} ha sido registrado correctamente` : 'El usuario ha sido registrado correctamente'}
+        buttonTitle="Aceptar"
         showSecondButton={false}
+        autoCloseTime={5000}
       />
     </div>
   );
