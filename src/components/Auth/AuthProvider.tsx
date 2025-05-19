@@ -65,6 +65,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const setUserId = (id: string) => {
     set_UserId(id);
   };
+  
   const getApiService = () => new ApiService(token, logout);
 
   return (

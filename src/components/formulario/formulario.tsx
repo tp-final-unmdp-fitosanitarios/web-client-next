@@ -1,9 +1,27 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import styles from "./formulario.module.scss";
 import { Field } from "@/domain/models/Field";
 import { sortStrings } from "@/utilities/sort";
+import OutlinedInput from '@mui/material/OutlinedInput';
+import InputLabel from '@mui/material/InputLabel';
+import MenuItem from '@mui/material/MenuItem';
+import FormControl from '@mui/material/FormControl';
+import ListItemText from '@mui/material/ListItemText';
+import Select, { SelectChangeEvent } from '@mui/material/Select';
+import Checkbox from '@mui/material/Checkbox';
+
+  const ITEM_HEIGHT = 48;
+  const ITEM_PADDING_TOP = 8;
+  const MenuProps = {
+    PaperProps: {
+      style: {
+        maxHeight: ITEM_HEIGHT * 4.5 + ITEM_PADDING_TOP,
+        width: 250,
+      },
+    },
+  };
 
 interface FormularioProps {
   fields: Field[];
@@ -15,14 +33,30 @@ interface FormularioProps {
   isSubmitDisabled?: (formData: Record<string, string>) => boolean;
 }
 
-export default function Formulario({ fields, onSubmit, onCancel,buttonName,children, equalButtonWidth, isSubmitDisabled }: FormularioProps) {
-  const initialState: Record<string, string > = fields.reduce((acc, field) => ({ ...acc, [field.name]: "" }), {} as Record<string, string>);
-  const [formData, setFormData] = useState(initialState);
+export default function Formulario({ fields, onSubmit, onCancel, buttonName, children, equalButtonWidth, isSubmitDisabled }: FormularioProps) {
+  const [formData, setFormData] = useState<Record<string, string>>({});
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  useEffect(() => {
+    const initialState: Record<string, string> = fields.reduce((acc, field) => {
+      const defaultValue = field.defaultValue !== undefined ? String(field.defaultValue) : "";
+      return { ...acc, [field.name]: defaultValue };
+    }, {});
+    setFormData(initialState);
+  }, [fields]);
+
+  
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
+    setErrors((prev) => ({ ...prev, [name]: "" })); // Limpia errores al modificar
+  };
+
+  const handleMultipleChange = (name: string) => (e: SelectChangeEvent<string[]>) => {
+    const { value } = e.target;
+    const parsedValue = typeof value === 'string' ? value.split(',') : value;
+  
+    setFormData((prev) => ({ ...prev, [name]: parsedValue.join(',') }));
     setErrors((prev) => ({ ...prev, [name]: "" })); // Limpia errores al modificar
   };
 
@@ -45,16 +79,15 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName,child
     e.preventDefault();
     if (validateForm()) {
       onSubmit(formData);
-      setFormData(initialState);
     }
   };
 
   const handleCancel = () => {
     if (onCancel)
       onCancel();
-    setFormData(initialState); 
     setErrors({});
   };
+  
 
   return (
     <>
@@ -62,18 +95,52 @@ export default function Formulario({ fields, onSubmit, onCancel,buttonName,child
         {fields.map((field) => (
           <div key={field.name} className={`${styles["input-group"]}`} >
             <label className={styles.label}>{field.label}</label>
-            {field.type === "select" ? (
-              <select name={field.name} value={formData[field.name]} onChange={handleChange}  onFocus={field.onFocus} className={styles.select}>
+            {field.type === 'select' ? (
+            field.multiple ? (
+              <FormControl className={styles.select}>
+                <InputLabel id={`${field.name}-label`}></InputLabel>
+                <Select
+                  labelId={`${field.name}-label`}
+                  id={field.name}
+                  multiple
+                  value={formData[field.name] ? formData[field.name].split(",") : []}
+                  onChange={handleMultipleChange(field.name)}
+                  input={<OutlinedInput label={field.label} />}
+                  renderValue={(selected: string[]) => selected.join(', ')}
+                  MenuProps={MenuProps}
+                >
+                  {field.options && sortStrings(field.options).map((option) => (
+                    <MenuItem key={option} value={option}>
+                      <Checkbox checked={formData[field.name].includes(option)} />
+                      <ListItemText primary={option} />
+                    </MenuItem>
+                  ))}
+                </Select>
+              </FormControl>
+            ) : (
+              <select
+                name={field.name}
+                value={formData[field.name]}
+                onChange={handleChange}
+                onFocus={field.onFocus}
+                className={styles.select}
+              >
                 <option value="">Seleccione una opción</option>
                 {field.options && sortStrings(field.options).map((option) => (
-                  <option key={option} value={option}>
-                    {option}
-                  </option>
+                  <option key={option} value={option}>{option}</option>
                 ))}
               </select>
-            ) : (
-              <input type={field.type} name={field.name} value={formData[field.name]} onChange={handleChange} className={`${styles.input} ${field.name}`}  {...(field.type === "number" ? { min: "1", step: "any" } : {})} />
-            )}
+            )
+          ) : (
+            <input
+              type={field.type}
+              name={field.name}
+              value={formData[field.name]}
+              onChange={handleChange}
+              className={`${styles.input} ${field.name}`}
+              {...(field.type === "number" ? { min: "1", step: "any" } : {})}
+            />
+          )}
             {errors[field.name] && <p className={styles.error}>{errors[field.name]}</p>}
           </div>
         ))}

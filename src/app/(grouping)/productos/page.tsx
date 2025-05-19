@@ -13,7 +13,7 @@ import { ResponseItems } from "@/domain/models/ResponseItems";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
-
+import { useRouter } from "next/navigation";
 const buttons = [{ label: "Agregar", path: "/productos/agregar" }];
 
 export default function ProductosView() {
@@ -23,6 +23,7 @@ export default function ProductosView() {
      const { getApiService } = useAuth();
      const { withLoading } = useLoading();
      const apiService = getApiService();
+     const router = useRouter();
 
     useEffect(() => {
         let isMounted = true;
@@ -91,7 +92,13 @@ export default function ProductosView() {
             alert("Error al conectar con el servidor");
         }
     };
-    ;
+    
+    const handleModificarItems = async () => {
+        console.log("Se modificara el item: "+selectedIds[0]);
+        //const prodToModify = apiService.get("products",selectedIds[0]);
+        //Aca deberia tirar alert si selectedIds.length > 1
+        router.push(`productos/edit?Id=${selectedIds[0]}`);
+    };
     
     const modalText =
         deletedItems.length > 0
@@ -135,12 +142,20 @@ export default function ProductosView() {
 
             <div className={styles.buttonContainer}>
                 {selectedIds.length > 0 && (
+                    <>
                     <button
                         className={`button button-secondary ${styles.buttonHome}`}
                         onClick={handleQuitarItems}
                     >
                         Quitar
                     </button>
+                    <button
+                        className={`button button-primary ${styles.buttonHome}`}
+                        onClick={handleModificarItems}
+                        >
+                        Modificar
+                    </button>
+                </>
                 )}
                 {buttons.map((button, index) => (
                     <Link key={index} href={button.path}>

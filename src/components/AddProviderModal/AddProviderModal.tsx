@@ -17,45 +17,6 @@ const AddProviderModal: React.FC<Props> = ({open, setModalClose,saveProvider}) =
         setModalClose();
     }
     
-    /*return (
-        <div>
-            <Modal open={open} onClose={setModalClose}>
-                <Box
-                    sx={{
-                        position: 'absolute',
-                        top: '50%',
-                        left: '50%',
-                        transform: 'translate(-50%, -50%)',
-                        width: 400,
-                        bgcolor: "background.paper",
-                        boxShadow: 24,
-                        p: 4,
-                        borderRadius: 2,
-                    }}
-                >
-                <h3 className={styles.title}>Agregar Proveedor</h3>
-                <form onSubmit={handleFinish}>
-                    <div className={styles.formRow}>
-                        <label htmlFor="providerName" className={styles.label}>Nombre del proveedor</label>
-                        <input type="text" id="providerName" name="providerName"className={styles.input} required/>
-                    </div>
-                    <div className={styles.formRow}>
-                        <label htmlFor="providerDescription" className={styles.label}>Descripcion</label>
-                        <input type="text" id="providerDescription" name="providerDescription" className={styles.input} required/>
-                    </div>
-                <div className={`${styles.buttonContainer}`}>
-                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`} onClick={setModalClose}> 
-                        Cancelar
-                    </button>
-                    <button className={`button button-primary ${styles.buttonHome} ${styles.buttonFinish}`} type="submit">
-                        Guardar
-                    </button>
-                </div>
-                </form>
-                </Box>
-            </Modal>
-        </div>
-    );*/
     const fields: Field[] = [
         {
           name: "providerName",

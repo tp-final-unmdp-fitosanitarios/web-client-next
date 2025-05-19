@@ -4,5 +4,7 @@ export interface Field {
     type: "text" | "select" | "number" | "file" | "password";
     options?: string[]; // Para dropdowns
     onFocus?: () => void; 
-  }
+    defaultValue?: string | number;
+    multiple?: boolean;
+}
   
