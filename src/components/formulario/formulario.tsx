@@ -38,12 +38,14 @@ export default function Formulario({ fields, onSubmit, onCancel, buttonName, chi
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   useEffect(() => {
-    const initialState: Record<string, string> = fields.reduce((acc, field) => {
-      const defaultValue = field.defaultValue !== undefined ? String(field.defaultValue) : "";
-      return { ...acc, [field.name]: defaultValue };
-    }, {});
-    setFormData(initialState);
-  }, [fields]);
+    if (Object.keys(formData).length === 0) {
+      const initialState: Record<string, string> = fields.reduce((acc, field) => {
+        const defaultValue = field.defaultValue !== undefined ? String(field.defaultValue) : "";
+        return { ...acc, [field.name]: defaultValue };
+      }, {});
+      setFormData(initialState);
+    }
+  }, [fields, formData]);
 
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {

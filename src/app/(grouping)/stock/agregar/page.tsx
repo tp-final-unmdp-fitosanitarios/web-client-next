@@ -6,7 +6,7 @@ import MenuBar from '@/components/menuBar/MenuBar';
 import { Unidad } from '@/domain/enum/Unidad';
 import { Field } from '@/domain/models/Field';
 import { Remito } from '@/domain/models/Remito';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import styles from "./agregarStock.module.scss"
 import { Box, Modal, Step, StepLabel, Stepper } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -151,7 +151,7 @@ const AgregarStockPage: React.FC = () => {
 
     const fetchLocations = async (): Promise<Locacion[]> => {
         try {
-            const response = await apiService.get<Locacion[]>("/locations?type=ZONE");
+            const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE,FIELD");
             const locaciones = response.data;
             console.log("locaciones", locaciones);
 
@@ -237,11 +237,11 @@ const AgregarStockPage: React.FC = () => {
         setActiveStep(0);
     }
 
-    const fields: Field[] = [
+    const fields = useMemo<Field[]>(() => [
         { name: "nroRemito", label: "Numero de Remito", type: "text" },
         { name: "campo", label: "Campo", type: "select", options: locations ? locations.map((l) => l.name) : [] },
         { name: "cantProductos", label: "Cantidad de Productos", type: "number" },
-    ];
+    ], [locations]);
 
     const items = transformToItems(productosAAgregar, "id", ["name", "size", "unit", "amount_of_units", "total_amount"]).map((item) => {
         if (item.amount_of_units !== "null") {

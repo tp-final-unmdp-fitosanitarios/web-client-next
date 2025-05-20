@@ -12,20 +12,27 @@ interface NavigationLinkProps {
 }
 
 export default function NavigationLink({ href, children, className, onClick }: NavigationLinkProps) {
-    const { showLoader } = useLoading();
+    const { withLoading } = useLoading();
     const router = useRouter();
 
-    const handleClick = (e: React.MouseEvent) => {
+    const handleClick = async (e: React.MouseEvent) => {
         e.preventDefault();
-        showLoader("Cargando...");
         
         // Ejecutar el onClick personalizado si existe
         if (onClick) {
             onClick();
         }
 
-        // Navegar a la nueva ruta
-        router.push(href);
+        // Navegar a la nueva ruta con loading
+        await withLoading(
+            new Promise((resolve) => {
+                setTimeout(() => {
+                    router.push(href);
+                    resolve(undefined);
+                }, 300);
+            }),
+            "Cargando..."
+        );
     };
 
     return (
