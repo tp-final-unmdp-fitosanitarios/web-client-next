@@ -82,6 +82,7 @@ export default function AgregarProductos() {
   const handleOpenModal = useCallback(() => setModalOpen(true), []);
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
+    router.push("/productos");
   }, []);
 
   const handleFormSubmit = (inputData: Record<string, string | number>) => {
@@ -135,7 +136,6 @@ export default function AgregarProductos() {
         setnewProducto(response.data);
         console.log("new producto",newProducto);
         handleOpenModal();
-        router.push("/productos");
       } else {
         console.error("Error al crear el producto:", response.error);
       }
