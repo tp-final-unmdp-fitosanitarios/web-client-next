@@ -150,7 +150,7 @@ export default function ProductosView() {
                         Quitar
                     </button>
                     <button
-                        className={`button button-primary ${styles.buttonHome}`}
+                        className={`button button-secondary `}
                         onClick={handleModificarItems}
                         >
                         Modificar

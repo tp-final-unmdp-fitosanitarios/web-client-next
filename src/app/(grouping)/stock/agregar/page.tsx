@@ -239,7 +239,7 @@ const AgregarStockPage: React.FC = () => {
 
     const fields = useMemo<Field[]>(() => [
         { name: "nroRemito", label: "Numero de Remito", type: "text" },
-        { name: "campo", label: "Campo", type: "select", options: locations ? locations.map((l) => l.name) : [] },
+        { name: "campo", label: "Campo", type: "select", options: locations ? Array.from(new Set(locations.map((l) => l.name))).sort() : [] },
         { name: "cantProductos", label: "Cantidad de Productos", type: "number" },
     ], [locations]);
 
@@ -390,7 +390,7 @@ const AgregarStockPage: React.FC = () => {
 
         <div className={styles.buttonContainer}>
           <button
-            className={`button button-primary ${styles.buttonHome} ${styles.buttonCancel}`}
+            className={`button button-secondary`}
             onClick={() => setActiveStep(0)}
           >
             Volver

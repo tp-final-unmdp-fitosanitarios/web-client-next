@@ -149,14 +149,16 @@ export default function StockView() {
 
     let displayStock: any[] = [];
     if (stock.length > 0) {
-        displayStock = stock.map((item) => {
-            return {
-                id: item.id,
-                producto: item.product?.name || '',
-                amount: item.amount,
-                unit: item.unit || ''
-            };
-        });
+        displayStock = stock
+            .filter(item => item.amount > 0)
+            .map((item) => {
+                return {
+                    id: item.id,
+                    producto: item.product?.name || '',
+                    amount: item.amount,
+                    unit: item.unit || ''
+                };
+            });
     }
 
     const items = transformToItems(displayStock, "id", ["producto", "amount", "unit"]).map((item) => {

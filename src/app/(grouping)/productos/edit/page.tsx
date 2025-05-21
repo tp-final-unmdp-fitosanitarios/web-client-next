@@ -87,6 +87,7 @@ const EditarProducto = () => {
   const handleOpenModal = useCallback(() => setModalOpen(true), []);
   const handleCloseModal = useCallback(() => {
     setModalOpen(false);
+    router.push("/productos");
   }, []);
 
   const handleFormSubmit = (inputData: Record<string, string | number>) => {
@@ -131,7 +132,7 @@ const EditarProducto = () => {
         console.log("Producto actualizado:", response.data);
         setProduct(response.data);
         handleOpenModal();
-        router.push("/productos");
+      
       } else {
         console.error("Error al actualizar el producto:", response.error);
       }

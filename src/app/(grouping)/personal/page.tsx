@@ -10,6 +10,8 @@ import styles from './personal.module.scss';
 import ItemList from '@/components/itemList/ItemList';
 import { transformToItems } from '@/utilities/transform';
 import Link from 'next/link';
+import { useItemsManager } from '@/hooks/useItemsManager';
+import GenericModal from '@/components/modal/GenericModal';
 
 interface UsersResponse {
     users: User[];
@@ -21,7 +23,7 @@ const roles = [
     { value: 'APPLICATOR', label: 'Aplicador' },
 ];
 
-export default function PersonalPage() {// to do falta el delete 
+export default function PersonalPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
     const [selectedRole, setSelectedRole] = useState<string>('');
@@ -30,6 +32,16 @@ export default function PersonalPage() {// to do falta el delete
     const { getApiService } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
+
+    const {
+        items: usuarios,
+        selectedIds,
+        deletedItems,
+        isModalOpen,
+        toggleSelectItem,
+        quitarItems,
+        closeModal,
+    } = useItemsManager<User>(filteredUsers);
 
     useEffect(() => {
         let isMounted = true;
@@ -71,8 +83,29 @@ export default function PersonalPage() {// to do falta el delete
         }
     }, [selectedRole, users]);
 
-    const items = filteredUsers && filteredUsers.length > 0
-        ? transformToItems(filteredUsers, "id", ["first_name", "last_name", "email", "roles"]).map((item) => {
+    const handleQuitarItems = async () => {
+        try {
+            const deleteResults = await Promise.all(
+                selectedIds.map(async (id) => {
+                    const response = await apiService.delete("users", id);
+                    return response.success;
+                })
+            );
+    
+            const allDeleted = deleteResults.every((success) => success);
+    
+            if (allDeleted) {
+                quitarItems(); // Esto actualiza los usuarios visibles y muestra la modal
+            } else {
+                alert("Algunos usuarios no pudieron ser eliminados.");
+            }
+        } catch (err) {
+            alert("Error al conectar con el servidor");
+        }
+    };
+
+    const items = usuarios && usuarios.length > 0
+        ? transformToItems(usuarios, "id", ["first_name", "last_name", "email", "roles"]).map((item) => {
             return {
                 ...item,
                 display: `${item.first_name} ${item.last_name} - ${item.email} (${item.roles[0] || 'Sin rol'})`,
@@ -81,6 +114,11 @@ export default function PersonalPage() {// to do falta el delete
         : [];
 
     const campos = ["display"];
+
+    const modalText =
+        deletedItems.length > 0
+            ? `Se han eliminado los siguientes usuarios:\n${deletedItems.map((u) => `${u.first_name} ${u.last_name}`).join("\n")}`
+            : "";
 
     if (loading) {
         return (
@@ -102,7 +140,6 @@ export default function PersonalPage() {// to do falta el delete
 
     return (
         <div className="page-container">
-
             <div className="content-wrap">
                 <MenuBar showMenu={true} path="" />
                 <h1 className={styles.title}>Gestion de Personal</h1>
@@ -127,8 +164,10 @@ export default function PersonalPage() {// to do falta el delete
                         <ItemList
                             items={items}
                             displayKeys={campos}
-                            selectItems={false}
-                            deleteItems={false}
+                            onSelect={toggleSelectItem}
+                            selectedIds={selectedIds}
+                            selectItems={true}
+                            deleteItems={true}
                             selectSingleItem={false}
                         />
                     ) : (
@@ -136,15 +175,31 @@ export default function PersonalPage() {// to do falta el delete
                     )}
 
                     <div className={styles.buttonContainer}>
+                        {selectedIds.length > 0 && (
+                            <button
+                                className={`button button-secondary`}
+                                onClick={handleQuitarItems}
+                            >
+                                Quitar
+                            </button>
+                        )}
                         <Link href="/personal/agregar">
-                            <button className={`button button-primary ${styles.buttonHome}`}>
-                                Agregar Usuario
+                            <button className={`button button-primary `}>
+                                Agregar
                             </button>
                         </Link>
                     </div>
                 </div>
             </div>
             <Footer />
+            <GenericModal
+                isOpen={isModalOpen}
+                onClose={closeModal}
+                title="Usuarios Eliminados"
+                modalText={modalText}
+                buttonTitle="Cerrar"
+                showSecondButton={false}
+            />
         </div>
     );
 } 

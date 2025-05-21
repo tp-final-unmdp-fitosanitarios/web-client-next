@@ -33,7 +33,7 @@ const AddProviderModal: React.FC<Props> = ({open, setModalClose,saveProvider}) =
     return (
     <div className={styles.modalOverlay}>
       <div className={styles.modalContent}>
-        <h2 className={styles.title}>Mover Stock</h2>
+        <h2 className={styles.title}>Agregar Proveedor</h2>
         <GenericForm fields={fields} onSubmit={handleFinish} onCancel={setModalClose} buttonName="Guardar" />
       </div>
     </div>

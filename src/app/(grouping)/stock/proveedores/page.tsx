@@ -162,94 +162,107 @@ const ProvidersPage = () => {
     return (
         <div className="page-container">
             <div className="content-wrap">
-            <MenuBar showMenu={false} showArrow={true} path="/stock" />
-            <div className={styles.formAndItemListContainer}>
-                <div className={styles.itemListContainer}>
-                    <h2 className={styles.subtitle}>Proveedores</h2>
-                    <ItemList
-                    items={items}
-                    displayKeys={campos}
-                    selectItems={false}
-                    deleteItems={true}
-                    onDelete={handleDeleteProvider}
-                    selectSingleItem={true}
-                    onSelectSingleItem={handleSelectSingleItem}
+                <MenuBar showMenu={false} showArrow={true} path="/stock" />
+                <h1 className={styles.title}>Proveedores</h1>
+                <div className={styles.formAndItemListContainer}>
+                    <div className={styles.itemListContainer}>
+                        <h2 className={styles.subtitle}>Lista de Proveedores</h2>
+                        <ItemList
+                            items={items}
+                            displayKeys={campos}
+                            selectItems={false}
+                            deleteItems={true}
+                            onDelete={handleDeleteProvider}
+                            selectSingleItem={true}
+                            onSelectSingleItem={handleSelectSingleItem}
+                        />
+                    </div>
+                    <div className={styles.formContainer}>
+                        <h2 className={styles.subtitle}>Detalle del Proveedor</h2>
+                        <form className={styles.form} onSubmit={handleModifyProvider}>
+                            <div className={styles.formRow}>
+                                <label htmlFor="providerName" className={styles.label}>Nombre del proveedor</label>
+                                <input 
+                                    type="text" 
+                                    id="providerName" 
+                                    name="providerName" 
+                                    value={formData.name} 
+                                    className={styles.input}
+                                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                    placeholder="Ingrese el nombre del proveedor"
+                                />
+                            </div>
+                            <div className={styles.formRow}>
+                                <label htmlFor="providerDescription" className={styles.label}>Descripción</label>
+                                <input 
+                                    type="text" 
+                                    id="providerDescription" 
+                                    name="providerDescription" 
+                                    value={formData.description} 
+                                    className={styles.input}
+                                    onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                    placeholder="Ingrese la descripción del proveedor"
+                                />
+                            </div>
+                            <div className={styles.formButtons}>
+                                <button className={`button button-secondary `} type="submit">
+                                    Modificar 
+                                </button>
+                                <div className={styles.productList}>
+                                    <h3 className={styles.productListTitle}>Productos Asociados</h3>
+                                    {productItems.length > 0 ? (
+                                        <ItemList
+                                            items={productItems}
+                                            displayKeys={productCampos}
+                                            selectItems={false}
+                                            deleteItems={true}
+                                            onDelete={handleDeleteProduct}
+                                            selectSingleItem={false}
+                                        />
+                                    ) : (
+                                        <p className={styles.noProducts}>El proveedor no tiene productos asociados</p>
+                                    )}
+                                </div>
+                            </div>
+                        </form>           
+                    </div>
+                </div>
+                <div className={styles.buttonContainer}>
+                    <button className={`button button-primary`} onClick={handleShowAddProvider}>
+                        Agregar 
+                    </button>
+                </div>
+                {showAddProvider && (
+                    <AddProviderModal 
+                        open={showAddProvider} 
+                        setModalClose={() => setShowAddProvider(false)} 
+                        saveProvider={handleAddProvider}
                     />
-                </div>
-                <div className={styles.formContainer}>
-                    <h2 className={styles.subtitle}>Detalle</h2>
-                    <form className={styles.form} onSubmit={handleModifyProvider}>
-                        <div className={styles.formRow}>
-                            <label htmlFor="providerName" className={styles.label}>Nombre del proveedor</label>
-                            <input 
-                            type="text" 
-                            id="providerName" 
-                            name="providerName" 
-                            value={formData.name} 
-                            className={styles.input}
-                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}/>
-                        </div>
-                        <div className={styles.formRow}>
-                            <label htmlFor="providerDescription" className={styles.label}>Descripcion</label>
-                            <input 
-                            type="text" 
-                            id="providerDescription" 
-                            name="providerDescription" 
-                            value={formData.description} 
-                            className={styles.input}
-                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}/>
-                        </div>
-                        <div className={styles.formButtons}>
-                        <button className={`button button-primary ${styles.buttonHome} ${styles.buttonSubmit}`} type="submit">
-                            Modificar
-                        </button>
-                        <h4 className={styles.subtitle}>Productos</h4>
-                        {productItems.length > 0 ? 
-                        (<ItemList
-                        items={productItems}
-                        displayKeys={productCampos}
-                        selectItems={false}
-                        deleteItems={true}
-                        onDelete={handleDeleteProduct}
-                        selectSingleItem={false} />
-                        ) : (<p>El proveedor no tiene productos asociados</p>)
+                )}
+                {showDeleteModal && (
+                    <ModalConfirmacionEliminacion
+                        isOpen={showDeleteModal}
+                        onClose={() => setShowDeleteModal(false)}
+                        onConfirm={
+                            isDeletingProvider
+                            ? handleConfirmDeleteProvider
+                            : handleConfirmDeleteProduct
                         }
-                        </div>
-                    </form>           
-                </div>
-            </div>
-            <div className={styles.buttonContainer}>
-                <button className={`button button-primary ${styles.buttonHome}`} onClick={handleShowAddProvider}>
-                    Agregar
-                </button>
-            </div>
-            {showAddProvider && (
-                <AddProviderModal open={showAddProvider} setModalClose={() => setShowAddProvider(false)} saveProvider={handleAddProvider}/>
-            )}
-            {showDeleteModal && (
-                <ModalConfirmacionEliminacion
-                    isOpen={showDeleteModal}
-                    onClose={() => setShowDeleteModal(false)}
-                    onConfirm={
-                        isDeletingProvider
-                        ? handleConfirmDeleteProvider
-                        : handleConfirmDeleteProduct
-                    }
-                    text={
-                        isDeletingProvider
-                        ? `el proveedor ${entityToDelete.name}`
-                        : `el producto ${entityToDelete.name} del proveedor`
-                    }
+                        text={
+                            isDeletingProvider
+                            ? `el proveedor ${entityToDelete.name}`
+                            : `el producto ${entityToDelete.name} del proveedor`
+                        }
+                    />
+                )}
+                <GenericModal
+                    isOpen={confirmationModalOpen}
+                    onClose={handleCloseConfirmationModal}
+                    title="Proveedor Modificado"
+                    modalText="Se modificó el proveedor correctamente"
+                    buttonTitle="Cerrar"
+                    showSecondButton={false}
                 />
-            )}
-            <GenericModal
-                isOpen={confirmationModalOpen}
-                onClose={handleCloseConfirmationModal}
-                title="Provedor Añadido"
-                modalText={`Se agrego el proveedor correctamente`}
-                buttonTitle="Cerrar"
-                showSecondButton={false}
-            />
             </div>
             <Footer />
         </div>
