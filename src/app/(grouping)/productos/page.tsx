@@ -30,7 +30,7 @@ export default function ProductosView() {
         const fetchProductos = async () => {
             try {
                 const response = await withLoading(
-                    apiService.get<ResponseItems<Producto>>('/products'),
+                    apiService.get<ResponseItems<Producto>>('/products?size=100'),
                     "Cargando productos..."
                 );
                 if (response.success && isMounted) {

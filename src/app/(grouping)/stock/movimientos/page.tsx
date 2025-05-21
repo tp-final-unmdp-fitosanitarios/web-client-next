@@ -38,7 +38,7 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
         const fetchMovements = async () => {
             try {
                 const response = await withLoading(
-                    apiService.get<ResponseItems<Movement>>('/stock/movement'),
+                    apiService.get<ResponseItems<Movement>>('/stock/movement?size=100'),
                     "Cargando movimientos..."
                 );
                 if (response.success && isMounted) {
