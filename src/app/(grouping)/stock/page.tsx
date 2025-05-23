@@ -18,6 +18,7 @@ import RetirarStockModal from "@/components/RetirarStockModal/RetirarStockModal"
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { sortAlphabeticallyUnique } from "@/utilities/sort";
+import StockDetailsModal from "@/components/StockDetailsModal/StockDetailsModal";
 
 const buttons = [
     { label: "Agregar", path: "/stock/agregar" },
@@ -36,6 +37,8 @@ export default function StockView() {
     const { getApiService, isReady } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
+    const [selectedStockItem, setSelectedStockItem] = useState<Stock | null>(null);
+    const [showDetailsModal, setShowDetailsModal] = useState(false);
 
     const customInputSx = {
         '& .MuiInputBase-root': {
@@ -176,6 +179,14 @@ export default function StockView() {
         ? `Se han eliminado los siguientes productos del stock:\n${deletedItems.map((s) => s.product.name).join("\n")}`
         : "";
 
+    const handleItemClick = (id: string) => {
+        const stockItem = stockFromServer.find(item => item.id === id);
+        if (stockItem) {
+            setSelectedStockItem(stockItem);
+            setShowDetailsModal(true);
+        }
+    };
+
     if (error) {
         return (
             <div className="page-container">
@@ -229,7 +240,8 @@ export default function StockView() {
                     displayKeys={campos}
                     selectItems={false}
                     deleteItems={false}
-                    selectSingleItem={false}
+                    selectSingleItem={true}
+                    onSelectSingleItem={handleItemClick}
                 />
             ) : (
                 <h3 className={styles.title}>No hay elementos en el stock para esta ubicación</h3>
@@ -273,6 +285,11 @@ export default function StockView() {
             {showRetirarModal && (
                 <RetirarStockModal onClose={() => setShowRetirarModal(false)} />
             )}
+            <StockDetailsModal
+                isOpen={showDetailsModal}
+                onClose={() => setShowDetailsModal(false)}
+                stockItem={selectedStockItem}
+            />
         </div>
     );
 }
