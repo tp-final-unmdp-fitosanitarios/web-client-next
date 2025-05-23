@@ -32,7 +32,7 @@ const MoverStock = () => {
   const [showMoverProductModal, setShowMoverProductModal] = useState<boolean>(false);
   const [showResultModal, setShowResultModal] = useState<boolean>(false);
   const [showForceModal, setShowForceModal] = useState<boolean>(false);
-  const [confirmationModalOpen,setConfirmationModalOpen] = useState(false);
+  const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
   const { getApiService, isReady } = useAuth();
   const apiService = getApiService();
   const router = useRouter();
@@ -160,26 +160,35 @@ const campos = ["display"];
   async function handleFinish(): Promise<void> {
     const stockToMove = productsToMove.map((item) => {
       console.log(item);
-      if(item.flag === "unitAmount")
-        return{
-        product_id: item.product.id,
-        amount_of_units: item.cantidad,
-        total_amount: null,
-        unit: item.product.unit,
-        lot_number: item.lot_number,
-        expiration_date: item.expiration_date}
 
-      if(item.flag === "totalAmount")
-        return{
+      if (item.flag === "unitAmount") {
+        return {
+          product_id: item.product.id,
+          amount_of_units: item.cantidad,
+          total_amount: null,
+          unit: item.product.unit,
+          lot_number: item.lot_number,
+          expiration_date: item.expiration_date
+        };
+    }
+
+      if (item.flag === "totalAmount") {
+        return {
           product_id: item.product.id,
           amount_of_units: null,
           total_amount: item.cantidad,
           unit: item.product.unit,
           lot_number: item.lot_number,
-          expiration_date: item.expiration_date}
+          expiration_date: item.expiration_date
+        };
+      }
+
+      return {
+        product_id: item.product.id,
+        amount_of_units: null,
+        total_amount: item.cantidad,
+      };
     });
-
-
 
     const moveStockRequest = {
       origin_id: origen,
@@ -191,17 +200,18 @@ const campos = ["display"];
 
     const response = await apiService.create<ResponseItems<Stock>>("stock/movement", moveStockRequest);
 
-    if(response.success){
+    if (response.success) {
       setShowResultModal(false);
       setProductsToMove([]);
       setConfirmationModalOpen(true);
-    }
-    else{
+    } else{
       console.log("Error al mover stock");
       console.log(response);
-      if(response.status === 400)
+      
+      if (response.status === 400) {
+        setShowResultModal(false);
         setShowForceModal(true);
-      else{
+      } else {
         setError(response.error || "Error al mover stock");
       }
     }

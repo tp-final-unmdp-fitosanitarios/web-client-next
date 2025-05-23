@@ -73,7 +73,7 @@ const ResumenOperacion = ({open, setModalClose, handleFinish, products, locacion
 
                 <div className={styles.outputContainer}>
                     <div className={styles.dataPresentation}>
-                        <h5>Locación:</h5>
+                        <h5>Ubicación:</h5>
                         <h5>{locacion}</h5>
                     </div>
                     <div className={styles.dataPresentation}>

@@ -20,15 +20,14 @@
 }
 
 .buttonContainer {
-    display: flex;
-    flex-direction: row;
-    justify-content: center;
-    width: 80%;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 10px;
+    width: 40%;
+    max-width: 1200px;
     margin: 40px auto;
-    margin-top: 100px;
-    gap: 1.5rem;
-    flex-wrap: wrap;
-    padding: 0 1rem;
+    padding: 0 10px;
+    justify-items: center;
 }
 
 .title {

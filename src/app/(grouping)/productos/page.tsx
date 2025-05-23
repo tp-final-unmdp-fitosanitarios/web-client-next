@@ -141,22 +141,22 @@ export default function ProductosView() {
             )}
 
             <div className={styles.buttonContainer}>
-                {selectedIds.length > 0 && (
-                    <>
+                <>
                     <button
                         className={`button button-secondary ${styles.buttonHome}`}
                         onClick={handleQuitarItems}
+                        disabled={selectedIds.length !== 1}
                     >
                         Quitar
                     </button>
                     <button
                         className={`button button-secondary `}
                         onClick={handleModificarItems}
-                        >
+                        disabled={selectedIds.length !== 1}
+                    >
                         Modificar
                     </button>
                 </>
-                )}
                 {buttons.map((button, index) => (
                     <Link key={index} href={button.path}>
                         <button className={`button button-primary ${styles.buttonHome}`}>

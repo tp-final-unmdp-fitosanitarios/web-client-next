@@ -199,7 +199,7 @@ const AgregarStockPage: React.FC = () => {
 
     const handleFinish = () => {
         const loc = locations?.find((l) => l.name === remito.campo)?.id;
-        if (!loc) throw new Error("No se encontro la locacion");
+        if (!loc) throw new Error("No se encontro la ubicación");
 
         const addStockRequest = {
             company_id: 1,
@@ -239,7 +239,7 @@ const AgregarStockPage: React.FC = () => {
 
     const fields = useMemo<Field[]>(() => [
         { name: "nroRemito", label: "Numero de Remito", type: "text" },
-        { name: "campo", label: "Campo", type: "select", options: locations ? Array.from(new Set(locations.map((l) => l.name))).sort() : [] },
+        { name: "campo", label: "Ubicación", type: "select", options: locations ? Array.from(new Set(locations.map((l) => l.name))).sort() : [] },
         { name: "cantProductos", label: "Cantidad de Productos", type: "number" },
     ], [locations]);
 
