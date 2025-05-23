@@ -5,7 +5,8 @@
   flex-direction: column;
   gap: $spacing-small;
   padding: $spacing-medium;
-  max-width: 600px;
+  max-width: 40rem;  /* 600px / 16 = 37.5rem */
+  min-width: 20rem; /* 300px / 16 = 18.75rem */
   margin: 0 auto;
   background-color: $background-color; // gris claro
   border: 4px solid $dark-color;
