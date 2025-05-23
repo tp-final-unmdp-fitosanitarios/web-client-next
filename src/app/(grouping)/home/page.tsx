@@ -19,8 +19,7 @@ export default function Home() {
   const userId = getUserId();
 
   const buttons = [
-    { label: "Productos", path: "/productos" }, 
-    { label: "Stock", path: "/stock" },
+
   ];
 
   useEffect(() => {
@@ -58,6 +57,13 @@ export default function Home() {
       { label: "Personal", path: "/personal" },
       { label: "Maquinas", path: "/maquinas" },
       { label: "Estadísticas", path: "/estadisticas" },
+      { label: "Productos", path: "/productos" }, 
+      { label: "Stock", path: "/stock" },
+    );
+  }else if (user && Array.isArray(user.roles) && user.roles.length > 0 && user.roles[0] === Roles.Aplicador) {
+    buttons.push(
+      { label: "Aplicaciones", path: "/aplicaciones" },
+      { label: "Stock", path: "/stock" },
     );
   }
 
@@ -66,7 +72,7 @@ export default function Home() {
       <div className="content-wrap">
         {user.roles[0] === Roles.Admin || user.roles[0] === Roles.Encargado ? 
           <HomepageJerarquico user={user} buttons={buttons} /> : 
-          <HomepageAplicador user={user} />
+          <HomepageAplicador user={user} buttons={buttons} />
         }
       </div>
       <Footer />

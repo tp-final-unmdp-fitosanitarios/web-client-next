@@ -17,7 +17,7 @@ const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProd
     const [cantidad, setCantidad] = useState('');
     const product = stock.product;
 
-    const handleSubmit = (e: any) => {
+    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         
         setModalClose();
@@ -39,6 +39,10 @@ const MoverProductModal: React.FC<Props> = ({open, setModalClose, stock, addProd
                         left: '50%',
                         transform: 'translate(-50%, -50%)',
                         width: 400,
+                        maxWidth: {
+                            xs: '250px',
+                            sm: '400px'
+                        },
                         bgcolor: "background.paper",
                         boxShadow: 24,
                         p: 4,

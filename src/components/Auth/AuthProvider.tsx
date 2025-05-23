@@ -2,6 +2,7 @@
 import ApiService from "@/services/api-service";
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { User } from "@/domain/models/User";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -12,6 +13,7 @@ interface AuthContextType {
   isReady: boolean; // Agregado para indicar si el contexto está listo
   getUserId: () => string | null;
   setUserId: (id: string) => void;
+  user: User | null;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -24,8 +26,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [token, setToken] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userId, set_UserId] = useState<string | null>(null);
-  const router = useRouter(); // Hook para redirigir después del login
-  let apiService: ApiService;
+  const [user, setUser] = useState<User | null>(null);
+  const router = useRouter();
   const [isReady, setIsReady] = useState(false);
 
   const logout = () => {
@@ -33,7 +35,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     localStorage.removeItem("token");
     setToken(null);
     setIsAuthenticated(false);
-    apiService = new ApiService(null, logout);
+    setUser(null);
     router.push("/login");
   };
 
@@ -53,6 +55,24 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsReady(true);
   }, []);
 
+  useEffect(() => {
+    if (!isReady || !userId) return;
+
+    const fetchUser = async () => {
+      try {
+        const apiService = getApiService();
+        const response = await apiService.get<User>(`/users/${userId}`);
+        if (response.success) {
+          setUser(response.data);
+        }
+      } catch (err) {
+        console.error('Error fetching user:', err);
+      }
+    };
+
+    fetchUser();
+  }, [isReady, userId]);
+
   const login = (updatedToken: string, userId: string) => {
     localStorage.setItem("token", updatedToken);
     localStorage.setItem("userId", userId);
@@ -69,7 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const getApiService = () => new ApiService(token, logout);
 
   return (
-    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, getApiService, isReady, getUserId, setUserId }}>
+    <AuthContext.Provider value={{ isAuthenticated, token, login, logout, getApiService, isReady, getUserId, setUserId, user }}>
       {children}
     </AuthContext.Provider>
   );

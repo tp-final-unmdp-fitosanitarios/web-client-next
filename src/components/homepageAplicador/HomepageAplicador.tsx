@@ -1,36 +1,39 @@
 import styles from "./homepageAplicador.module.scss"
-import MenuBarPestañas from "../menuBarPestañas/MenuBarPestañas"
 import { User } from "@/domain/models/User"
-import Link from "next/link"
-import { useState } from "react"
-import ContenedorDeAplicaciones from "../contenedorDeAplicaciones/ContenedorDeAplicaciones"
+import NavigationLink from "../NavigationLink/NavigationLink"
+import MenuBar from "../menuBar/MenuBar";
 
-interface homepageProps {
-    user: User
-}
+interface ButtonConfig {
+    label: string;
+    path: string;
+  }
+  
+  interface homePageProps {
+    user: User;
+    buttons: ButtonConfig[];
+  }
+  
 
-export default function HomepageAplicador({user}:homepageProps) {
-    const [pestañaActual,setPestañaActual] = useState<string>("pendientes")
+export default function HomepageAplicador({user,buttons}:homePageProps) {
 
-    function setPestañaPendientes() {
-        setPestañaActual("pendientes")
-    }
-    function setPestañaEnCurso() {
-        setPestañaActual("enCurso")
-    }
-    
+    const userName = user.first_name+" "+user.last_name;
+
     return (
         <>
         <div className={styles.homeContainer}>
-            <MenuBarPestañas pestañaActual={pestañaActual} setPestañaPendientes={setPestañaPendientes} setPestañaEnCurso={setPestañaEnCurso}/>
+            <MenuBar showMenu={true}/>
             <h1>Bienvenido/a</h1>
-            <h1>{user.nombre}</h1>
-            <ContenedorDeAplicaciones pestañaActual={pestañaActual}/>
+            <h1>{userName}</h1>
+            {/* <ContenedorDeAplicaciones pestañaActual={pestañaActual}/> */}
             <div className={styles.buttonContainer}>
-                <Link href="/productos">
-                    <button className={`button button-primary ${styles.buttonHome}`}>Iniciar Aplicacion</button>
-                </Link>
-            </div>
+          {buttons.map((button, index) => (
+            <NavigationLink key={index} href={button.path}>
+              <button className={`button button-primary ${styles.buttonHome}`}>
+                {button.label}
+              </button>
+            </NavigationLink>
+          ))}
+        </div>
         </div>
         </>
     )

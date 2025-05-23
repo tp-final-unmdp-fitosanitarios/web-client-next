@@ -28,6 +28,9 @@
         display: flex;
         justify-content: center;
     }
+    .buttonContainer {
+        margin-bottom: $spacing-medium;
+    }
 }
 
 .button {

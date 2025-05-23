@@ -8,7 +8,7 @@
 
 .button {
     min-width: 30%;
-    max-width: 80%;
+    max-width: 70%;
     padding: $spacing-small $spacing-medium;
     border: none;
     border-radius: $border-radius;
@@ -45,5 +45,23 @@ margin-top: $spacing-large;
   display: flex;
   justify-content: center;
   align-items: center;
+}
+
+@media (max-width: 1000px) {
+ 
+  .buttonContainer{
+    display: flex;
+    gap: 5px;
+    flex-direction: column;
+    align-items: center;
+    padding: 0;
+  }
+  .buttonFinish{
+    margin-left: 0;
+  }
+  .buttonCancel{
+    margin-right: 0;
+  }
+
 }
 

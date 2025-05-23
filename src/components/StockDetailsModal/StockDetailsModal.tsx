@@ -31,10 +31,15 @@ const StockDetailsModal: React.FC<StockDetailsModalProps> = ({
                 left: '50%',
                 transform: 'translate(-50%, -50%)',
                 width: 400,
+                maxWidth: {
+                    xs: '250px',
+                    sm: '400px'
+                },
                 bgcolor: 'background.paper',
                 borderRadius: 2,
                 boxShadow: 24,
                 p: 4,
+                
             }}>
                 <Typography id="stock-details-modal" variant="h6" component="h2" sx={{ mb: 2 }}>
                     Detalles del Stock

@@ -19,12 +19,7 @@ import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { sortAlphabeticallyUnique } from "@/utilities/sort";
 import StockDetailsModal from "@/components/StockDetailsModal/StockDetailsModal";
-
-const buttons = [
-    { label: "Agregar", path: "/stock/agregar" },
-    { label: "Ver Movimientos", path: "/stock/movimientos" },
-    { label: "Proveedores", path: "/stock/proveedores" },
-];
+import { Roles } from "@/domain/enum/Roles";
 
 export default function StockView() {
     const [stockFromServer, setStockFromServer] = useState<Stock[]>([]);
@@ -34,11 +29,26 @@ export default function StockView() {
     const [actualLocation, setActualLocation] = useState<string>("");
     const [showMoverModal, setShowMoverModal] = useState(false);
     const [showRetirarModal, setShowRetirarModal] = useState(false);
-    const { getApiService, isReady } = useAuth();
+    const { getApiService, isReady, user } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
     const [selectedStockItem, setSelectedStockItem] = useState<Stock | null>(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
+
+    const isAdmin = user?.roles.includes(Roles.Admin);
+    const isAplicador = user?.roles.includes(Roles.Aplicador);
+
+    const adminButtons = [
+        { label: "Agregar", path: "/stock/agregar" },
+        { label: "Ver Movimientos", path: "/stock/movimientos" },
+        { label: "Proveedores", path: "/stock/proveedores" },
+    ];
+
+    const aplicadorButtons = [
+        { label: "Mover", action: () => setShowMoverModal(true) },
+        { label: "Retirar", action: () => setShowRetirarModal(true) },
+        { label: "Agregar", path: "/stock/agregar" },
+    ];
 
     const customInputSx = {
         '& .MuiInputBase-root': {
@@ -248,25 +258,37 @@ export default function StockView() {
             )}
 
             <div className={styles.buttonContainer}>
-                <button
-                    className={`button button-primary ${styles.buttonHome}`}
-                    onClick={() => setShowMoverModal(true)}
-                >
-                    Mover
-                </button>
-                <button
-                    className={`button button-primary ${styles.buttonHome}`}
-                    onClick={() => setShowRetirarModal(true)}
-                >
-                    Retirar
-                </button>
-                {buttons.map((button, index) => (
-                    <NavigationLink key={index} href={button.path}>
-                        <button className={`button button-primary ${styles.buttonHome}`}>
-                            {button.label}
-                        </button>
-                    </NavigationLink>
-                ))}
+                {isAdmin ? (
+                    <>
+                        {adminButtons.map((button, index) => (
+                            <NavigationLink key={index} href={button.path}>
+                                <button className={`button button-primary ${styles.buttonHome}`}>
+                                    {button.label}
+                                </button>
+                            </NavigationLink>
+                        ))}
+                    </>
+                ) : isAplicador ? (
+                    <>
+                        {aplicadorButtons.map((button, index) => (
+                            button.action ? (
+                                <button
+                                    key={index}
+                                    className={`button button-primary ${styles.buttonHome}`}
+                                    onClick={button.action}
+                                >
+                                    {button.label}
+                                </button>
+                            ) : (
+                                <NavigationLink key={index} href={button.path}>
+                                    <button className={`button button-primary ${styles.buttonHome}`}>
+                                        {button.label}
+                                    </button>
+                                </NavigationLink>
+                            )
+                        ))}
+                    </>
+                ) : null}
             </div>
             </div>
             <Footer />

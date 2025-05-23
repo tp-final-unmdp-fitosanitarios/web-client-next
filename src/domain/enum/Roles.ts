@@ -1,5 +1,5 @@
 export enum Roles {
     Admin = "ADMIN",
     Encargado = "ENGINEER",
-    Aplicador = "APLICATOR"
+    Aplicador = "APPLICATOR"
   }

@@ -2,10 +2,10 @@ import { Roles } from "../enum/Roles"
 
 export interface User {
     id: string,
-    firstName: string,
-    lastName: string,
+    first_name: string,
+    last_name: string,
     roles: Roles[] | string[],
-    companyId: string,
+    company_id: string,
     email: string
 }
 
