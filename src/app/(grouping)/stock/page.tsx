@@ -156,15 +156,17 @@ export default function StockView() {
                     id: item.id,
                     producto: item.product?.name || '',
                     amount: item.amount,
-                    unit: item.unit || ''
+                    unit: item.unit || '',
+                    lot_number: item.lot_number || '',
+                    expiration_date: item.expiration_date || ''
                 };
             });
     }
 
-    const items = transformToItems(displayStock, "id", ["producto", "amount", "unit"]).map((item) => {
+    const items = transformToItems(displayStock, "id", ["producto", "amount", "unit", "lot_number", "expiration_date"]).map((item) => {
         return {
             ...item,
-            display: `${item.producto} : ${item.amount}${item.unit}`,
+            display: `${item.producto}: ${item.amount}${item.unit} - Lote: ${item.lot_number} - Vencimiento: ${item.expiration_date}`,
         };
     });
 
