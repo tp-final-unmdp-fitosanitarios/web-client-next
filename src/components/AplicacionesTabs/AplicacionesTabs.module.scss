@@ -21,12 +21,12 @@
     padding: 12px 16px;
 
     &:hover {
-        color: #404e5c;
+        color: $primary-color;
         opacity: 0.8;
     }
 
     &.Mui-selected {
-        color: #404e5c;
+        color: $primary-color;
         font-weight: 700;
     }
 }
@@ -47,19 +47,26 @@
 
 @media (max-width: 768px) {
     .container {
-        margin: 0 16px;
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
     }
 
     .tab {
-        font-size: 0.9rem;
-        padding: 8px 12px;
+        font-size: 0.875rem;
+        padding: 8px;
+        min-height: 40px;
     }
 
     .tabPanel {
-        padding: 16px;
+        padding: 12px;
     }
 
     .tabContent {
-        padding: 12px;
+        padding: 8px;
+    }
+
+    .tabText {
+        font-size: 0.875rem;
     }
 } 

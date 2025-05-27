@@ -6,6 +6,10 @@ import Tab from '@mui/material/Tab';
 import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import styles from './AplicacionesTabs.module.scss';
+import ItemList from '../itemList/ItemList';
+import { Aplicacion } from '@/domain/models/Aplicacion';
+import { useItemsManager } from '@/hooks/useItemsManager';
+import { transformToItems } from "@/utilities/transform";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -72,12 +76,44 @@ const StyledAppBar = styled(AppBar)({
   borderBottom: '2px solid #404e5c',
 });
 
-export default function AplicacionesTabs() {
+interface AplicacionesTabsProps {
+  aplicaciones: Aplicacion[];
+}
+
+export default function AplicacionesTabs({ aplicaciones }: AplicacionesTabsProps) {
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
   };
+
+  const {
+    items: aplicacionesToDisplay,
+    selectedIds,
+  } = useItemsManager<Aplicacion>(aplicaciones);
+
+  const parsedAplicaciones = aplicacionesToDisplay
+    .filter((item) =>
+      (value === 0 && item.status === "PENDING") ||
+      (value === 1 && item.status === "IN_PROGRESS")
+    )
+    .map((item) => ({
+      id: item.id.toString(),
+      status: item.status,
+      campo: item.campo.name,
+    producto: item.producto.name,
+    cantidad: item.cantidad.toString(),
+    unidad: item.unidad,
+  }));
+
+  const items = transformToItems(aplicacionesToDisplay, "id", ["campo", "producto", "cantidad", "unidad"]).map((item) => {
+    return {
+        ...item,
+        display: `Campo: ${item.lot_number} - ${item.producto}: ${item.cantidad}${item.unit}`, //Se deberia agregar fecha
+    };
+});
+
+const campos = ["display"];
 
   return (
     <Box className={styles.container}>
@@ -88,20 +124,43 @@ export default function AplicacionesTabs() {
           aria-label="aplicaciones tabs"
           variant="fullWidth"
           className={styles.tabs}
+          TabIndicatorProps={{
+            style: {
+              backgroundColor: '#aebc86',  /*Terminar el manejo del color*/
+            },
+          }}
         >
-          <LinkTab label="Aplicaciones Activas" href="/aplicaciones/activas" {...a11yProps(0)} />
-          <LinkTab label="Historial" href="/aplicaciones/historial" {...a11yProps(1)} />
-          <LinkTab label="Estadísticas" href="/aplicaciones/estadisticas" {...a11yProps(2)} />
+          <LinkTab label="Pendientes" href="/aplicaciones/pendientes" {...a11yProps(0)} />
+          <LinkTab label="En curso" href="/aplicaciones/encurso" {...a11yProps(1)} />
         </StyledTabs>
       </StyledAppBar>
-      <TabPanel value={value} index={0}>
-        Contenido de Aplicaciones Activas
-      </TabPanel>
       <TabPanel value={value} index={1}>
-        Contenido del Historial
+        {items.length > 0 ? (
+          <ItemList
+            items={items}
+            displayKeys={campos}
+            selectedIds={selectedIds}
+            selectItems={false}
+            deleteItems={false}
+            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
+          />
+        ) : (
+          <p style={{textAlign: "center"}}>No hay aplicaciones en curso</p>
+        )}
       </TabPanel>
-      <TabPanel value={value} index={2}>
-        Contenido de Estadísticas
+      <TabPanel value={value} index={0}>
+      {items.length > 0 ? (
+          <ItemList
+            items={items}
+            displayKeys={campos}
+            selectedIds={selectedIds}
+            selectItems={false}
+            deleteItems={false}
+            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
+          />
+        ) : (
+          <p style={{textAlign: "center"}}>No hay aplicaciones pendientes</p>
+        )}
       </TabPanel>
     </Box>
   );
