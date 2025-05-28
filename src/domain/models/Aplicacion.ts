@@ -4,12 +4,14 @@ import { Producto } from "./Producto";
 import { Unidad } from "../enum/Unidad";
 
 export interface Aplicacion {
-    id: string,
-    campo: Locacion,
-    producto: Producto,
-    unidad: Unidad | string,
-    cantidad: number,
-    estado: EstadoAplicacion,
-    fecha: Date,
-    status: string
+    id: number;
+    estado: EstadoAplicacion;
+    cultivo: Locacion;
+    fecha: Date;
+    producto: Producto;
+    unidad: Unidad;
+    cantidad: number;
+    superficie: number;
+    aplicadorId: string;
+    ingenieroId: string;
 }
