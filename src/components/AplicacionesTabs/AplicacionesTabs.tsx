@@ -32,7 +32,7 @@ function TabPanel(props: TabPanelProps) {
     >
       {value === index && (
         <Box className={styles.tabContent}>
-          <Typography className={styles.tabText}>{children}</Typography>
+          {children}
         </Box>
       )}
     </div>
@@ -146,7 +146,7 @@ const campos = ["display"];
             selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
           />
         ) : (
-          <p style={{textAlign: "center"}}>No hay aplicaciones en curso</p>
+          <div style={{textAlign: "center"}}>No hay aplicaciones en curso</div>
         )}
       </TabPanel>
       <TabPanel value={value} index={0}>
@@ -160,7 +160,7 @@ const campos = ["display"];
             selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
           />
         ) : (
-          <p style={{textAlign: "center"}}>No hay aplicaciones pendientes</p>
+          <div style={{textAlign: "center"}}>No hay aplicaciones pendientes</div>
         )}
       </TabPanel>
     </Box>

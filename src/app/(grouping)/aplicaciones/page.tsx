@@ -25,9 +25,10 @@ export default function AplicacionesPage() {
         const fetchAplicaciones = async () => {
             try {
                 const response = await withLoading(
-                  apiService.get<ResponseItems<Aplicacion>>('applications'),
+                  apiService.get<ResponseItems<Aplicacion>>('/applications'),
                   "Cargando aplicaciones..."
                 );
+                console.log(response);
                 if (response.success) {
                     setAplicaciones(response.data.content);
                 } else {
