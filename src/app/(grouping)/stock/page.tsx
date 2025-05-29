@@ -171,7 +171,7 @@ export default function StockView() {
                     amount: item.amount,
                     unit: item.unit || '',
                     lot_number: item.lot_number || '',
-                    expiration_date: item.expiration_date || ''
+                    expiration_date: item.expiration_date ? new Date(item.expiration_date).toLocaleDateString() : ''
                 };
             });
     }

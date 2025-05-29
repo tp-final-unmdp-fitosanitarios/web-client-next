@@ -4,7 +4,7 @@ import { Producto } from "./Producto";
 import { Unidad } from "../enum/Unidad";
 
 export interface Aplicacion {
-    id: number;
+    id: string;
     estado: EstadoAplicacion;
     cultivo: Locacion;
     fecha: Date;

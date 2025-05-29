@@ -318,7 +318,7 @@ const campos = ["display"];
         <ResultModal open={showResultModal} setModalClose={handleResultModalClose} stock={productsToMove} origen={originName} destino={destinationName} handleFinish={handleFinish} withdraw={false}/>
       )}
       {showForceModal && (
-        <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToMove} actualStock={stockFromServer} origen={originName} destino={destinationName} handleForceFinish={handleForceFinish} withdraw={false}/>
+        <ForceMovementModal open={showForceModal} setModalClose={handleForceModalClose} stockToMove={productsToMove} actualStock={stockFromServer}  handleForceFinish={handleForceFinish} withdraw={false}/>
       )}
       <GenericModal
           isOpen={confirmationModalOpen}

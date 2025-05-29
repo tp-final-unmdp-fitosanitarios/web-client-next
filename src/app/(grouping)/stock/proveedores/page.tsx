@@ -208,21 +208,6 @@ const ProvidersPage = () => {
                                 <button className={`button button-secondary `} type="submit">
                                     Modificar 
                                 </button>
-                                <div className={styles.productList}>
-                                    <h3 className={styles.productListTitle}>Productos Asociados</h3>
-                                    {productItems.length > 0 ? (
-                                        <ItemList
-                                            items={productItems}
-                                            displayKeys={productCampos}
-                                            selectItems={false}
-                                            deleteItems={true}
-                                            onDelete={handleDeleteProduct}
-                                            selectSingleItem={false}
-                                        />
-                                    ) : (
-                                        <p className={styles.noProducts}>El proveedor no tiene productos asociados</p>
-                                    )}
-                                </div>
                             </div>
                         </form>           
                     </div>

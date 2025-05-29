@@ -10,6 +10,7 @@ import ItemList from '../itemList/ItemList';
 import { Aplicacion } from '@/domain/models/Aplicacion';
 import { useItemsManager } from '@/hooks/useItemsManager';
 import { transformToItems } from "@/utilities/transform";
+import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -94,22 +95,22 @@ export default function AplicacionesTabs({ aplicaciones }: AplicacionesTabsProps
 
   const parsedAplicaciones = aplicacionesToDisplay
     .filter((item) =>
-      (value === 0 && item.status === "PENDING") ||
-      (value === 1 && item.status === "IN_PROGRESS")
+      (value === 0 && item.estado === EstadoAplicacion.Pendiente) ||
+      (value === 1 && item.estado === EstadoAplicacion.EnCurso)
     )
     .map((item) => ({
       id: item.id.toString(),
-      status: item.status,
-      campo: item.campo.name,
-    producto: item.producto.name,
-    cantidad: item.cantidad.toString(),
-    unidad: item.unidad,
+      estado: item.estado,
+      cultivo: item.cultivo.name,
+      producto: item.producto.name,
+      cantidad: item.cantidad.toString(),
+      unidad: item.unidad,
   }));
 
-  const items = transformToItems(aplicacionesToDisplay, "id", ["campo", "producto", "cantidad", "unidad"]).map((item) => {
+  const items = transformToItems(aplicacionesToDisplay, "id", ["cultivo", "producto", "cantidad", "unidad"]).map((item) => {
     return {
         ...item,
-        display: `Campo: ${item.lot_number} - ${item.producto}: ${item.cantidad}${item.unit}`, //Se deberia agregar fecha
+        display: `Cultivo: ${item.lot_number} - ${item.producto}: ${item.cantidad}${item.unit}`, //Se deberia agregar fecha
     };
 });
 
