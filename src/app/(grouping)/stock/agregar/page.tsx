@@ -50,8 +50,9 @@ const AgregarStockPage: React.FC = () => {
     const [finishModalOpen, setFinishModalOpen] = useState(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
-    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [fileBase64, setFileBase64] = useState<string | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
     const { getApiService, isReady } = useAuth();
@@ -97,12 +98,32 @@ const AgregarStockPage: React.FC = () => {
     };
 
     const handleFileSelect = (file: File | null) => {
+        if (file) {
+            // Check file size (10MB = 10 * 1024 * 1024 bytes)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert("El archivo es demasiado grande. El tamaño máximo permitido es 10MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+                const base64WithoutPrefix = base64String.split(',')[1];
+                setFileBase64(base64WithoutPrefix);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setFileBase64(null);
+        }
         setSelectedFile(file);
     };
 
     const handleClearFile = () => {
         setSelectedFile(null);
         setPreviewUrl(null);
+        setFileBase64(null);
     };
 
     const handleAddProducto = (producto: string, lotNumber: string, expirationDate: any, amount_of_units: number | null, total_amount: number | null) => {
@@ -241,9 +262,12 @@ const AgregarStockPage: React.FC = () => {
                     return { ...prodReq, total_amount: p.total_amount, amount_of_units: null };
 
             }),
-            attachment: remito.archivo,
-            location_id: loc,
-            provider_id: prov
+            attachment: fileBase64,
+            attached_file: {
+                attachment: fileBase64,
+                mime_type: selectedFile?.type,
+            },
+            location_id: loc
         }
         console.log(loc);
         console.log(addStockRequest);
