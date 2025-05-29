@@ -41,7 +41,7 @@ export default function StockView() {
     const adminButtons = [
         { label: "Agregar", path: "/stock/agregar" },
         { label: "Ver Movimientos", path: "/stock/movimientos" },
-        { label: "Proveedores", path: "/stock/proveedores" },
+        { label: "Proveedores", path: "/stock/proveedores" }
     ];
 
     const aplicadorButtons = [
