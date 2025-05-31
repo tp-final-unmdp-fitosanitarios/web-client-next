@@ -11,6 +11,8 @@ import { Aplicacion } from '@/domain/models/Aplicacion';
 import { useItemsManager } from '@/hooks/useItemsManager';
 import { transformToItems } from "@/utilities/transform";
 import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
+import { Producto } from '@/domain/models/Producto';
+import { Locacion } from '@/domain/models/Locacion';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -79,10 +81,15 @@ const StyledAppBar = styled(AppBar)({
 
 interface AplicacionesTabsProps {
   aplicaciones: Aplicacion[];
+  productos: Producto[];
+  locaciones: Locacion[];
 }
 
-export default function AplicacionesTabs({ aplicaciones }: AplicacionesTabsProps) {
+export default function AplicacionesTabs({ aplicaciones, productos, locaciones }: AplicacionesTabsProps) {
   const [value, setValue] = React.useState(0);
+  console.log("ps: ",productos);
+  console.log("ls: ",locaciones);
+  console.log("aps: ", aplicaciones);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -95,22 +102,20 @@ export default function AplicacionesTabs({ aplicaciones }: AplicacionesTabsProps
 
   const parsedAplicaciones = aplicacionesToDisplay
     .filter((item) =>
-      (value === 0 && item.estado === EstadoAplicacion.Pendiente) ||
-      (value === 1 && item.estado === EstadoAplicacion.EnCurso)
+      (value === 0 && item.status === EstadoAplicacion.Pendiente) ||
+      (value === 1 && item.status === EstadoAplicacion.EnCurso)
     )
     .map((item) => ({
       id: item.id.toString(),
-      estado: item.estado,
-      cultivo: item.cultivo.name,
-      producto: item.producto.name,
-      cantidad: item.cantidad.toString(),
-      unidad: item.unidad,
-  }));
+      estado: item.status,
+      cultivo: locaciones?.find((l) => l.id === item.location_id)?.name || 'Sin cultivo',
+      fecha: new Date(item.created_at).toLocaleDateString()
+    }));
 
-  const items = transformToItems(aplicacionesToDisplay, "id", ["cultivo", "producto", "cantidad", "unidad"]).map((item) => {
+  const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
     return {
         ...item,
-        display: `Cultivo: ${item.lot_number} - ${item.producto}: ${item.cantidad}${item.unit}`, //Se deberia agregar fecha
+        display: `Cultivo: ${item.cultivo} - Fecha: ${item.fecha}`, //Se deberia agregar fecha
     };
 });
 
@@ -133,6 +138,7 @@ const campos = ["display"];
         >
           <LinkTab label="Pendientes" href="/aplicaciones/pendientes" {...a11yProps(0)} />
           <LinkTab label="En curso" href="/aplicaciones/encurso" {...a11yProps(1)} />
+          <LinkTab label="A confirmar" href="/aplicaciones/confirmar" {...a11yProps(2)} />
         </StyledTabs>
       </StyledAppBar>
       <TabPanel value={value} index={1}>
@@ -161,6 +167,20 @@ const campos = ["display"];
           />
         ) : (
           <div style={{textAlign: "center"}}>No hay aplicaciones pendientes</div>
+        )}
+      </TabPanel>
+      <TabPanel value={value} index={2}>
+      {items.length > 0 ? (
+          <ItemList
+            items={items}
+            displayKeys={campos}
+            selectedIds={selectedIds}
+            selectItems={false}
+            deleteItems={false}
+            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
+          />
+        ) : (
+          <div style={{textAlign: "center"}}>No hay aplicaciones a confirmar</div>
         )}
       </TabPanel>
     </Box>

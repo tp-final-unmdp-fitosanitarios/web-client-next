@@ -40,6 +40,7 @@ const ProvidersPage = () => {
                     "Cargando proveedores..."
                 );
                 if (response.success && isMounted) {
+                    console.log(response.data.content);
                     setProviders(response.data.content);
                     setSelectedProviderProducts(response.data.content[0].products || []);
                     setFormData({

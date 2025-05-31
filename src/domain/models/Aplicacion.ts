@@ -6,9 +6,9 @@ import { Unidad } from "../enum/Unidad";
 export interface Aplicacion {
     id: string;
     estado: EstadoAplicacion;
-    cultivo: Locacion;
+    locacionId: string;
     fecha: Date;
-    producto: Producto;
+    productId: string;
     unidad: Unidad;
     cantidad: number;
     superficie: number;
