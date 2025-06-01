@@ -5,4 +5,5 @@ export interface RecipeItem {
     amount: number;
     unit: Unidad;
     doseType: string;
+    lotNumber: string;
 } 

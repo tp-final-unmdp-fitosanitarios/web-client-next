@@ -39,8 +39,9 @@ class ApiService {
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
+        console.log("Error response:", error.response);
         if (error.response?.status === 401) {
-          console.log("Fallo de autorrizacion")
+          console.log("Fallo de autorizacion")
           this.logout();
         }
         return Promise.reject(error);
@@ -74,18 +75,19 @@ class ApiService {
       headers: { ...this.axiosInstance.defaults.headers.common, ...headers },
       baseURL: baseUrl,
     };
-
+    
     try {
-      console.log(config.url);
-      console.log(config.headers);
+      console.log("Request URL:", `${baseUrl}${url}`);
+      console.log("Request headers:", config.headers);
       const response = await this.axiosInstance(config);
       return { data: response.data, status: response.status, success: true };
     } catch (error: any) {
+      console.error("API Error:", error.response || error);
       return {
         data: null as any,
-        status: error.status || 500,
+        status: error.response?.status || 500,
         success: false,
-        error: error.error || "Error en la petición",
+        error: error.response?.data?.message || error.message || "Error en la petición",
       };
     }
   }

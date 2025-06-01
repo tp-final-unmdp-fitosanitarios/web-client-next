@@ -87,9 +87,6 @@ interface AplicacionesTabsProps {
 
 export default function AplicacionesTabs({ aplicaciones, productos, locaciones }: AplicacionesTabsProps) {
   const [value, setValue] = React.useState(0);
-  console.log("ps: ",productos);
-  console.log("ls: ",locaciones);
-  console.log("aps: ", aplicaciones);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -115,7 +112,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
   const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
     return {
         ...item,
-        display: `Cultivo: ${item.cultivo} - Fecha: ${item.fecha}`, //Se deberia agregar fecha
+        display: `Cultivo: ${item.cultivo} - Fecha: ${item.fecha}`, 
     };
 });
 

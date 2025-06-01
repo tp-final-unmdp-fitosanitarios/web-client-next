@@ -11,6 +11,7 @@ import { ResponseItems } from "@/domain/models/ResponseItems";
 import { useLoading } from "@/hooks/useLoading";
 import { Locacion } from '@/domain/models/Locacion';
 import { Producto } from '@/domain/models/Producto';
+import NavigationLink from '@/components/NavigationLink/NavigationLink';
 
 export default function AplicacionesPage() {
     const { getApiService, isReady } = useAuth();
@@ -91,6 +92,11 @@ export default function AplicacionesPage() {
       fetchData();
   }, [isReady]);
 
+  const buttons = [
+    { label: "Crear", path: "/aplicaciones/crear" },
+    { label: "Ver Todas", path: "/aplicaciones/vertodas" },
+  ];
+
 
   return (
       <div className="page-container">
@@ -99,6 +105,15 @@ export default function AplicacionesPage() {
               <h1 className={styles.title}>Aplicaciones</h1>
               <div className={styles.content}>
                   <AplicacionesTabs aplicaciones={aplicaciones} productos={productos} locaciones={locaciones}/>
+              </div>
+              <div className={styles.buttonContainer}>
+                {buttons.map((button, index) => (
+                    <NavigationLink key={index} href={button.path}>
+                        <button className={`button button-primary ${styles.buttonHome}`}>
+                            {button.label}
+                        </button>
+                    </NavigationLink>
+                ))}
               </div>
           </div>
           <Footer />

@@ -1,0 +1,501 @@
+"use client"
+import Formulario from '@/components/formulario/formulario';
+import MenuBar from '@/components/menuBar/MenuBar';
+import { Field } from '@/domain/models/Field';
+import React, { useEffect, useState, useMemo } from 'react';
+import styles from "./crearAplicacion.module.scss"
+import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
+import { useAuth } from '@/components/Auth/AuthProvider';
+import { Locacion } from '@/domain/models/Locacion';
+import Footer from '@/components/Footer/Footer';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DemoContainer } from '@mui/x-date-pickers/internals/demo';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import { Dayjs } from 'dayjs';
+import ItemList from '@/components/itemList/ItemList';
+import { Producto } from '@/domain/models/Producto';
+import { ResponseItems } from '@/domain/models/ResponseItems';
+import { RecipeItem } from '@/domain/models/RecipeItem';
+import { Unidad } from '@/domain/enum/Unidad';
+import AddRecipeItemModal from '@/components/AddRecipeItemModal/AddRecipeItemModalt';
+import { transformToItems } from '@/utilities/transform';
+import { useItemsManager } from '@/hooks/useItemsManager';
+import { Stock } from '@/domain/models/Stock';
+import ResumenOpCrearAplicacion from '@/components/resumenOpCrearAplicacion/ResumenOpCrearAplicacion';
+import GenericModal from '@/components/modal/GenericModal';
+import { useRouter } from 'next/navigation';
+import { useLoading } from '@/hooks/useLoading';
+
+type RecipeItemAAgregar = RecipeItem & {
+    id: string;
+    prodName: string;
+};
+
+type ProductoExistente = Producto & {
+    lot_number: string;
+}
+
+const CrearAplicacionPage: React.FC = () => {
+    const [activeStep, setActiveStep] = useState(0);
+    const [locations, setLocations] = useState<Locacion[]>([]);
+    const [hectareas, setHectareas] = useState<number>(0);
+    const [campo, setCampo] = useState<string>("");
+    const [expirationDate, setExpirationDate] = useState<Dayjs | null>(null);
+    const [productosAAgregar, setProductosAAgregar] = useState<RecipeItemAAgregar[]>([]);
+    const [productosExistentes, setProductosExistentes] = useState<ProductoExistente[]>([]);
+    const [addRecipeItemModal, setAddRecipeModalOpen] = useState<boolean>(false);
+    const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+    const router = useRouter();
+    const { getApiService, isReady } = useAuth();
+    const apiService = getApiService();
+    const { withLoading } = useLoading();
+    const title = 'Crear Aplicación'
+
+    const customInputSx = {
+        '& .MuiInputBase-root': {
+            borderRadius: '10px',
+            backgroundColor: '#e6ebea',
+            paddingX: 1,
+            fontWeight: 'bold',
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+            borderWidth: '2px',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '& .MuiInputLabel-root': {
+            fontWeight: 'bold',
+            color: '#404e5c',
+        },
+        '&.Mui-focused .MuiInputLabel-root': {
+            color: '#404e5c',
+        },
+    };
+
+    const fetchLocations = async (): Promise<Locacion[]> => {
+        try {
+            const response = await apiService.get<Locacion[]>("locations?type=FIELD");
+            const locaciones = response.data;
+            return locaciones;
+        }
+        catch (e: any) {
+            console.log(e.message);
+            return [];
+        }
+    }
+
+    const fetchProductos = async (locId: string) => {
+        try {
+            const stockRes = await apiService.get<ResponseItems<Stock>>(`stock?location=${locId}`);
+            const stock = stockRes.data.content;
+            const prods = stock.map((s) => ({
+                ...s.product,
+                lot_number: s.lot_number
+            }));
+            setProductosExistentes(prods);
+        }
+        catch (e: any) {
+            console.log(e.message);
+            return [];
+        }
+
+    }
+
+    useEffect(() => {
+        if (!isReady) return;
+        const fetchData = async () => {
+            const locs = await fetchLocations();
+            setLocations(locs);
+        };
+        fetchData();
+    }, [isReady])
+
+    const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+        if(hectareas > 0 && campo !== "" && expirationDate !== null){
+            setActiveStep(1);
+            const locId = locations.find(c => c.name === campo)?.id;
+            if(locId)
+                fetchProductos(locId);
+            else
+                alert("Error al encontrar la locacion");
+        }
+        else{
+            alert("Complete bien los campos");
+        }
+    };
+
+    const handleAddProducto = (producto: ProductoExistente, amount: number, doseType: string) => {
+        if (!amount ) return;
+        if(!producto) return;
+        if(!doseType) return;
+
+
+       // const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
+
+        const existingProductIndex = productosAAgregar.findIndex((p) => p.productId === producto.id);
+
+        if (existingProductIndex !== -1) {
+            console.warn("Ya se agrego el producto", producto.name);
+            return;
+        } else {
+            setProductosAAgregar(
+                [...productosAAgregar,
+                {
+                    productId: producto.id,
+                    id: producto.id, //Esto se hace para poder usar el useItemManager
+                    prodName: producto.name,
+                    amount: amount,
+                    unit: producto.unit,
+                    doseType: doseType,
+                    lotNumber: producto.lot_number
+                }]);
+        }
+    };
+
+    const {
+        selectedIds,
+        deletedItems,
+        isModalOpen,
+        toggleSelectItem,
+        quitarItems,
+        closeModal,
+    } = useItemsManager(productosAAgregar);
+
+    const quitarItem = (id: string) => {
+        setProductosAAgregar((prev) => prev.filter((item) => item.productId !== id));
+    };
+
+    const items = transformToItems(productosAAgregar, "id", ["prodName", "amount", "unit", "doseType"]).map((item) => {
+        if(item.doseType==="SURFACE")
+            return {
+                ...item,
+                display: `${item.prodName}: ${item.amount} ${item.unit} POR HECTAREA`
+            };
+        else
+        return {
+            ...item,
+            display: `${item.prodName}: ${item.amount} ${item.unit} EN TOTAL`
+        };
+    });
+
+    const campos = ["display"];
+
+    const isDataValid = () => {
+        return campo !== "" &&
+               expirationDate !== null &&
+               hectareas !== 0 
+    };
+
+    const handleFinish = async () => {
+        console.log("Finishing application creation");
+        const recipeItems = productosAAgregar.map((p) => ({
+            product_id: p.productId,
+            amount: p.amount,
+            unit: p.unit,
+            dose_type: p.doseType,
+            lot_number: p.lotNumber
+        }));
+        const recipeReq = {
+            type: "ENGINEER_RECIPE",
+            recipe_items: recipeItems
+        }
+        const locId = locations.find(c => c.name === campo)?.id;
+        if(!locId)
+            alert("Error al encontrar la locacion");
+
+        const createAplicationReq = {
+            location_id: locId,
+            surface: hectareas,
+            recipe: recipeReq
+        }
+
+        console.log(createAplicationReq);
+        try {
+            const response = await withLoading(
+                apiService.create("applications", createAplicationReq),
+                "Creando aplicación..."
+            );
+            if (response.success) {
+                setConfirmationModalOpen(true);
+                setAddRecipeModalOpen(false);
+                setProductosAAgregar([]);
+                setCampo("");
+                setExpirationDate(null);
+                setHectareas(0);
+            } else {
+                console.error("Error al crear la aplicacion:", response.error);
+            }
+        } catch (error) {
+            console.error("Error al crear la aplicacion:", error);
+        }
+        setActiveStep(0);
+    };
+
+    const handleCloseConfirmationModal = () => {
+        setConfirmationModalOpen(false);
+        router.push("/stock");
+    }
+
+    return (
+        <div className="page-container">
+            <div className="content-wrap">
+                <MenuBar showMenu={false} showArrow={true} path='/aplicaciones' />
+                <h1 className={styles.title}>{title}</h1>
+
+                {/* STEPPER */}
+                <Box sx={{ width: '100%', mb: 4 }}>
+                    <Stepper activeStep={activeStep} alternativeLabel>
+                        {['Ubicación', 'Productos', 'Confirmación'].map((label) => (
+                            <Step key={label}>
+                                <StepLabel>{label}</StepLabel>
+                            </Step>
+                        ))}
+                    </Stepper>
+                </Box>
+
+                {/* PASO 1: Formulario */}
+                {activeStep === 0 && (
+                    <Box sx={{ maxWidth: '600px', mx: 'auto', p: 3 }}>
+                        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+                            <form onSubmit={handleFormSubmit} className={styles.form}>
+                                <TextField
+                                    fullWidth
+                                    type="number"
+                                    name="hectareas"
+                                    onChange={(e) => setHectareas(Number(e.target.value))}
+                                    placeholder="Hectáreas"
+                                    label="Hectáreas"
+                                    variant="outlined"
+                                    sx={{
+                                        mb: 2,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: '#e6ebea',
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: '#404e5c',
+                                        },
+                                    }}
+                                />
+                                <TextField
+                                    fullWidth
+                                    select
+                                    name="campo"
+                                    value={campo}
+                                    onChange={(e) => setCampo(e.target.value)}
+                                    label="Selecciona un campo"
+                                    variant="outlined"
+                                    sx={{
+                                        mb: 2,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: '#e6ebea',
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: '#404e5c',
+                                        },
+                                    }}
+                                >
+                                    {locations?.map((l) => (
+                                        <MenuItem key={l.id ?? l.name} value={l.name}>
+                                            {l.name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <DemoContainer components={['DesktopDatePicker']}
+                                        sx={{ mb: 2, overflow: 'hidden' }} >
+                                        <DatePicker
+                                            label="Fecha de Aplicacion"
+                                            value={expirationDate}
+                                            onChange={(newDate) => setExpirationDate(newDate)}
+                                            slotProps={{
+                                                textField: {
+                                                    fullWidth: true,
+                                                    sx: {
+                                                        '& .MuiOutlinedInput-root': {
+                                                            borderRadius: '10px',
+                                                            backgroundColor: '#e6ebea',
+                                                        },
+                                                        '& .MuiInputLabel-root': {
+                                                            color: '#404e5c',
+                                                        },
+                                                    }
+                                                }
+                                            }}
+                                        />
+                                    </DemoContainer>
+                                </LocalizationProvider>
+                                <Button 
+                                    type="submit" 
+                                    variant="contained" 
+                                    fullWidth
+                                    sx={{
+                                        mt: 2,
+                                        py: 1.5,
+                                        backgroundColor: '#4CAF50',
+                                        '&:hover': {
+                                            backgroundColor: '#45a049',
+                                        },
+                                        borderRadius: '10px',
+                                        textTransform: 'none',
+                                        fontSize: '1rem',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Continuar
+                                </Button>
+                            </form>
+                        </Paper>
+                    </Box>
+                )}
+
+                {/* PASO 2: Agregar productos */}
+                {activeStep === 1 && (
+                    <Box sx={{ maxWidth: '800px', mx: 'auto', p: 3 }}>
+                        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+                            <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
+                                Ingresó {productosAAgregar.length} productos
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
+                                Fecha de Aplicación: {expirationDate?.format('DD/MM/YYYY')}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
+                                Lugar de aplicación: {campo}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 3, color: '#666' }}>
+                                Hectáreas: {hectareas}
+                            </Typography>
+
+                            {productosAAgregar.length > 0 ? (
+                                <ItemList
+                                    items={items}
+                                    displayKeys={campos}
+                                    onSelect={toggleSelectItem}
+                                    selectedIds={selectedIds}
+                                    selectItems={false}
+                                    deleteItems={true}
+                                    onDelete={quitarItem}
+                                    selectSingleItem={false}
+                                />
+                            ) : (
+                                <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
+                                    Ingrese productos para agregar
+                                </Typography>
+                            )}
+
+                            <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => setAddRecipeModalOpen(true)}
+                                    disabled={!isDataValid()}
+                                    sx={{
+                                        flex: 1,
+                                        py: 1.5,
+                                        borderColor: '#404e5c',
+                                        color: '#404e5c',
+                                        '&:hover': {
+                                            borderColor: '#404e5c',
+                                            backgroundColor: 'rgba(64, 78, 92, 0.04)',
+                                        },
+                                        borderRadius: '10px',
+                                        textTransform: 'none',
+                                        fontSize: '1rem',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Agregar Producto
+                                </Button>
+                            </Box>
+
+                            <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => setActiveStep(0)}
+                                    sx={{
+                                        flex: 1,
+                                        py: 1.5,
+                                        borderColor: '#404e5c',
+                                        color: '#404e5c',
+                                        '&:hover': {
+                                            borderColor: '#404e5c',
+                                            backgroundColor: 'rgba(64, 78, 92, 0.04)',
+                                        },
+                                        borderRadius: '10px',
+                                        textTransform: 'none',
+                                        fontSize: '1rem',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Volver
+                                </Button>
+                                <Button
+                                    variant="contained"
+                                    onClick={() => setActiveStep(2)}
+                                    disabled={productosAAgregar.length === 0}
+                                    type="button"
+                                    sx={{
+                                        flex: 1,
+                                        py: 1.5,
+                                        backgroundColor: '#4CAF50',
+                                        '&:hover': {
+                                            backgroundColor: '#45a049',
+                                        },
+                                        borderRadius: '10px',
+                                        textTransform: 'none',
+                                        fontSize: '1rem',
+                                        fontWeight: 'bold'
+                                    }}
+                                >
+                                    Confirmar
+                                </Button>
+                            </Box>
+                        </Paper>
+                    </Box>
+                )}
+                
+                {/* Paso 3 Confirmacion */}
+                {activeStep === 2 && (
+                    <ResumenOpCrearAplicacion
+                        handleFinish={handleFinish}
+                        products={productosAAgregar}
+                        open={true}
+                        setModalClose={() => setActiveStep(1)}
+                        locacion={campo}
+                        hectareas={hectareas}
+                        fechaVencimiento={expirationDate?.format('DD/MM/YYYY') || ''}
+                    />
+                )}
+
+
+            {addRecipeItemModal && (
+                <AddRecipeItemModal
+                    handleAddProducto={handleAddProducto}
+                    products={productosExistentes}
+                    open={addRecipeItemModal}
+                    setModalClose={() => setAddRecipeModalOpen(false)}
+                />
+            )}
+
+            <GenericModal
+                isOpen={confirmationModalOpen}
+                onClose={handleCloseConfirmationModal}
+                title="Aplicacion creada"
+                modalText="Se creo la aplicacion correctamente"
+                buttonTitle="Cerrar"
+                showSecondButton={false}
+             />
+            </div>
+            <Footer />
+        </div>
+    );
+};
+
+export default CrearAplicacionPage;

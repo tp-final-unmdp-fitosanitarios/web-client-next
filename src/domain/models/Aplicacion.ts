@@ -5,13 +5,14 @@ import { Unidad } from "../enum/Unidad";
 
 export interface Aplicacion {
     id: string;
-    estado: EstadoAplicacion;
-    locacionId: string;
-    fecha: Date;
-    productId: string;
+    status: EstadoAplicacion;
+    location_id: string;
+    created_at: Date;
     unidad: Unidad;
     cantidad: number;
-    superficie: number;
+    surface: number;
     aplicadorId: string;
-    ingenieroId: string;
+    engineer_id: string;
+    recipe: any;
+    actual_application: any;
 }

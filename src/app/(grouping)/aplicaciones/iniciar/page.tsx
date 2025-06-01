@@ -26,17 +26,17 @@ const mockAplicacion: AplicacionResponse = {
     recipe: {
         type: "ENGINEER_RECIPE",
         recipeItems: [
-            { productId: "prod1", amount: 20, unit: Unidad.Litros, doseType: "SURFACE" },
-            { productId: "prod2", amount: 20, unit:Unidad.Litros, doseType: "SURFACE" },
-            { productId: "prod3", amount: 20, unit:Unidad.Kilogramos, doseType: "SURFACE" }
+            { productId: "prod1", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L1A" },
+            { productId: "prod2", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L2B" },
+            { productId: "prod3", amount: 20, unit: Unidad.Kilogramos, doseType: "SURFACE", lotNumber: "L3C" }
         ]
     },
     actualApplication: {
         type: "ENGINEER_RECIPE",
         recipeItems: [
-            { productId: "prod1", amount: 20, unit:Unidad.Litros, doseType: "SURFACE" },
-            { productId: "prod2", amount: 20, unit:Unidad.Litros, doseType: "SURFACE" },
-            { productId: "prod3", amount: 20, unit:Unidad.Kilogramos, doseType: "SURFACE" }
+            { productId: "prod1", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L1A" },
+            { productId: "prod2", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L2B" },
+            { productId: "prod3", amount: 20, unit: Unidad.Kilogramos, doseType: "SURFACE", lotNumber: "L3C" }
         ]
     }
 };
