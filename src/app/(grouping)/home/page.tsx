@@ -59,6 +59,7 @@ export default function Home() {
       { label: "Estadísticas", path: "/estadisticas" },
       { label: "Productos", path: "/productos" }, 
       { label: "Stock", path: "/stock" },
+      { label: "Ubicaciones", path: "/locaciones" },
     );
   }else if (user && Array.isArray(user.roles) && user.roles.length > 0 && user.roles[0] === Roles.Aplicador) {
     buttons.push(
