@@ -34,13 +34,16 @@ type RecipeItemAAgregar = RecipeItem & {
 
 type ProductoExistente = Producto & {
     lot_number: string;
+    cantidadEnStock: number;
 }
 
 const CrearAplicacionPage: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [hectareas, setHectareas] = useState<number>(0);
+    const [zona, setZona] = useState<string>("");
     const [campo, setCampo] = useState<string>("");
+    const [cultivo, setCultivo] = useState<string>("");
     const [expirationDate, setExpirationDate] = useState<Dayjs | null>(null);
     const [productosAAgregar, setProductosAAgregar] = useState<RecipeItemAAgregar[]>([]);
     const [productosExistentes, setProductosExistentes] = useState<ProductoExistente[]>([]);
@@ -80,7 +83,7 @@ const CrearAplicacionPage: React.FC = () => {
 
     const fetchLocations = async (): Promise<Locacion[]> => {
         try {
-            const response = await apiService.get<Locacion[]>("locations?type=FIELD");
+            const response = await apiService.get<Locacion[]>("locations?type=ZONE&type=FIELD&type=CROP");
             const locaciones = response.data;
             return locaciones;
         }
@@ -96,7 +99,8 @@ const CrearAplicacionPage: React.FC = () => {
             const stock = stockRes.data.content;
             const prods = stock.map((s) => ({
                 ...s.product,
-                lot_number: s.lot_number
+                lot_number: s.lot_number,
+                cantidadEnStock: s.amount
             }));
             setProductosExistentes(prods);
         }
@@ -206,7 +210,7 @@ const CrearAplicacionPage: React.FC = () => {
             type: "ENGINEER_RECIPE",
             recipe_items: recipeItems
         }
-        const locId = locations.find(c => c.name === campo)?.id;
+        const locId = locations.find(c => c.name === cultivo)?.id;
         if(!locId)
             alert("Error al encontrar la locacion");
 
@@ -241,6 +245,24 @@ const CrearAplicacionPage: React.FC = () => {
     const handleCloseConfirmationModal = () => {
         setConfirmationModalOpen(false);
         router.push("/stock");
+    }
+
+    const filterField = (l: Locacion) => {
+        if (l.type !== 'FIELD') return false;
+
+        const parentLoc = locations.find((loc) => loc.name === zona);
+        if (!parentLoc) return false;
+
+        return l.parent_location.id === parentLoc.id
+    }
+
+    const filterCrop = (l: Locacion) => {
+        if (l.type !== 'CROP') return false;
+
+        const parentLoc = locations.find((loc) => loc.name === campo);
+        if (!parentLoc) return false;
+
+        return l.parent_location.id === parentLoc.id
     }
 
     return (
@@ -287,10 +309,10 @@ const CrearAplicacionPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     select
-                                    name="campo"
-                                    value={campo}
-                                    onChange={(e) => setCampo(e.target.value)}
-                                    label="Selecciona un campo"
+                                    name="zona"
+                                    value={zona}
+                                    onChange={(e) => setZona(e.target.value)}
+                                    label="Selecciona una zona"
                                     variant="outlined"
                                     sx={{
                                         mb: 2,
@@ -303,7 +325,59 @@ const CrearAplicacionPage: React.FC = () => {
                                         },
                                     }}
                                 >
-                                    {locations?.map((l) => (
+                                    {locations?.filter((l) => l.type === "ZONE").map((l) => (
+                                        <MenuItem key={l.id ?? l.name} value={l.name}>
+                                            {l.name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    name="campo"
+                                    value={campo}
+                                    onChange={(e) => setCampo(e.target.value)}
+                                    label="Selecciona un campo"
+                                    variant="outlined"
+                                    disabled = {zona===""}
+                                    sx={{
+                                        mb: 2,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: '#e6ebea',
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: '#404e5c',
+                                        },
+                                    }}
+                                >
+                                    {locations?.filter((l) => filterField(l)).map((l) => (
+                                        <MenuItem key={l.id ?? l.name} value={l.name}>
+                                            {l.name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    name="cultivo"
+                                    value={cultivo}
+                                    onChange={(e) => setCultivo(e.target.value)}
+                                    label="Selecciona un cultivo"
+                                    variant="outlined"
+                                    disabled = {campo===""}
+                                    sx={{
+                                        mb: 2,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: '#e6ebea',
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: '#404e5c',
+                                        },
+                                    }}
+                                >
+                                    {locations?.filter((l) => filterCrop(l)).map((l) => (
                                         <MenuItem key={l.id ?? l.name} value={l.name}>
                                             {l.name}
                                         </MenuItem>

@@ -4,7 +4,8 @@ import styles from "./AddRecipeItemModal.module.scss"
 import { Producto } from '@/domain/models/Producto';
 
 type ProductoExistente = Producto & {
-    lot_number: string;
+    lot_number: string,
+    cantidadEnStock: number
 }
 
 interface Props {
@@ -108,6 +109,11 @@ const AddRecipeItemModal: React.FC<Props> = ({ open, setModalClose, products, ha
                             </MenuItem>
                         ))}
                     </TextField>
+                    {selectedProduct ?
+                        <p className={styles.text}>Hay {products.find(p => p.name === selectedProduct)?.cantidadEnStock} {products.find(p => p.name === selectedProduct)?.unit} en stock</p>
+                        :
+                        <></>
+                    }
                     <TextField
                         fullWidth
                         type="number"

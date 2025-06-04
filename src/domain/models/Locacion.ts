@@ -3,9 +3,9 @@ export interface Locacion {
     name: string;
     address: string;
     area: string;
-    parent_location: string;
+    parent_location: Locacion;
     parent_location_id: string;
-    type: "ZONE";
+    type: string;
     created_at: Date; 
   }
   
