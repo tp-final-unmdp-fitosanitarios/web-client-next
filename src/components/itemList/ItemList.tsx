@@ -13,6 +13,7 @@ interface GenericListProps {
   onDelete?: (id: string) => void;
   selectSingleItem: boolean;
   onSelectSingleItem?: (id: string) => void;
+  actions?: (item: Record<string, string>) => React.ReactNode;
 }
 
 const ItemList: React.FC<GenericListProps> = ({
@@ -25,6 +26,7 @@ const ItemList: React.FC<GenericListProps> = ({
   displayKeys,
   selectSingleItem,
   onSelectSingleItem,
+  actions,
 }) => {
   const isSelected = (id: string) => selectedIds.includes(id);
 
@@ -53,8 +55,9 @@ const ItemList: React.FC<GenericListProps> = ({
               ))}
             </div>
 
-            {deleteItems && onDelete && (
-              <div className={styles.cardActions}>
+            <div className={styles.cardActions}>
+              {actions && actions(item)}
+              {deleteItems && onDelete && (
                 <IconButton
                   onClick={(e) => {
                     e.stopPropagation();
@@ -65,8 +68,8 @@ const ItemList: React.FC<GenericListProps> = ({
                 >
                   <DeleteIcon />
                 </IconButton>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         );
       })}

@@ -20,17 +20,34 @@ export default function ProductosView() {
      const [productosFromServer, setProductosFromServer] = useState<Producto[]>([]);
      const [loading, setLoading] = useState<boolean>(true);
      const [error, setError] = useState<string>("");
+     const [searchName, setSearchName] = useState<string>("");
+     const [debouncedSearchName, setDebouncedSearchName] = useState<string>("");
      const { getApiService } = useAuth();
      const { withLoading } = useLoading();
      const apiService = getApiService();
      const router = useRouter();
 
+    // Debounce search input
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            setDebouncedSearchName(searchName);
+        }, 500); // 500ms delay
+
+        return () => clearTimeout(timer);
+    }, [searchName]);
+
     useEffect(() => {
         let isMounted = true;
         const fetchProductos = async () => {
             try {
+                const queryParams = new URLSearchParams();
+                queryParams.append('size', '100');
+                if (debouncedSearchName) {
+                    queryParams.append('name', debouncedSearchName);
+                }
+                
                 const response = await withLoading(
-                    apiService.get<ResponseItems<Producto>>('/products?size=100'),
+                    apiService.get<ResponseItems<Producto>>(`/products?${queryParams.toString()}`),
                     "Cargando productos..."
                 );
                 if (response.success && isMounted) {
@@ -53,7 +70,7 @@ export default function ProductosView() {
         return () => {
             isMounted = false;
         };
-    }, []);
+    }, [debouncedSearchName]);
 
 
 
@@ -129,6 +146,16 @@ export default function ProductosView() {
             <div className="content-wrap">
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Productos</h1>
+
+            <div className={styles.filterContainer}>
+                <input
+                    type="text"
+                    placeholder="Buscar por nombre..."
+                    value={searchName}
+                    onChange={(e) => setSearchName(e.target.value)}
+                    className={styles.searchInput}
+                />
+            </div>
 
             {items.length > 0 ? (
                 <ItemList
