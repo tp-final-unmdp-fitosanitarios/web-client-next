@@ -2,6 +2,7 @@ import { EstadoAplicacion } from "../enum/EstadoAplicacion";
 import { Locacion } from "./Locacion";
 import { Producto } from "./Producto";
 import { Unidad } from "../enum/Unidad";
+import { Recipe } from "./Recipe";
 
 export interface Aplicacion {
     id: string;
@@ -13,6 +14,6 @@ export interface Aplicacion {
     surface: number;
     aplicadorId: string;
     engineer_id: string;
-    recipe: any;
-    actual_application: any;
+    recipe: Recipe;
+    actual_application: Aplicacion;
 }
