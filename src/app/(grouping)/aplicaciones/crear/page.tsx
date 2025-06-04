@@ -26,6 +26,7 @@ import ResumenOpCrearAplicacion from '@/components/resumenOpCrearAplicacion/Resu
 import GenericModal from '@/components/modal/GenericModal';
 import { useRouter } from 'next/navigation';
 import { useLoading } from '@/hooks/useLoading';
+import dayjs from 'dayjs';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -44,7 +45,7 @@ const CrearAplicacionPage: React.FC = () => {
     const [zona, setZona] = useState<string>("");
     const [campo, setCampo] = useState<string>("");
     const [cultivo, setCultivo] = useState<string>("");
-    const [expirationDate, setExpirationDate] = useState<Dayjs | null>(null);
+    const [expirationDate, setExpirationDate] = useState<Dayjs | null>(dayjs());
     const [productosAAgregar, setProductosAAgregar] = useState<RecipeItemAAgregar[]>([]);
     const [productosExistentes, setProductosExistentes] = useState<ProductoExistente[]>([]);
     const [addRecipeItemModal, setAddRecipeModalOpen] = useState<boolean>(false);
@@ -223,7 +224,7 @@ const CrearAplicacionPage: React.FC = () => {
         console.log(createAplicationReq);
         try {
             const response = await withLoading(
-                apiService.create("applications", createAplicationReq),
+                apiService.create("applications/instant", createAplicationReq),
                 "Creando aplicación..."
             );
             if (response.success) {
@@ -390,6 +391,8 @@ const CrearAplicacionPage: React.FC = () => {
                                             label="Fecha de Aplicacion"
                                             value={expirationDate}
                                             onChange={(newDate) => setExpirationDate(newDate)}
+                                            format="DD/MM/YYYY"
+                                            minDate={dayjs()}
                                             slotProps={{
                                                 textField: {
                                                     fullWidth: true,
