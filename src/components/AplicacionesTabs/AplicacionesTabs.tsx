@@ -13,6 +13,7 @@ import { transformToItems } from "@/utilities/transform";
 import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
+import { useRouter } from 'next/navigation';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -86,6 +87,7 @@ interface AplicacionesTabsProps {
 }
 
 export default function AplicacionesTabs({ aplicaciones, productos, locaciones }: AplicacionesTabsProps) {
+  const router = useRouter();
   const [value, setValue] = React.useState(0);
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
@@ -99,7 +101,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
 
   const parsedAplicaciones = aplicacionesToDisplay
     .filter((item) =>
-      (value === 0 && item.status === EstadoAplicacion.Pendiente) ||
+      (value === 0 && item.status === EstadoAplicacion.Pendiente) || //Agregar a confirmar
       (value === 1 && item.status === EstadoAplicacion.EnCurso)
     )
     .map((item) => ({
@@ -115,6 +117,10 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
         display: `Cultivo: ${item.cultivo} - Fecha: ${item.fecha}`, 
     };
 });
+
+const startApplication = (id: string) => {
+  router.push(`aplicaciones/iniciar?id=${id}`);
+}
 
 const campos = ["display"];
 
@@ -138,20 +144,6 @@ const campos = ["display"];
           <LinkTab label="A confirmar" href="/aplicaciones/confirmar" {...a11yProps(2)} />
         </StyledTabs>
       </StyledAppBar>
-      <TabPanel value={value} index={1}>
-        {items.length > 0 ? (
-          <ItemList
-            items={items}
-            displayKeys={campos}
-            selectedIds={selectedIds}
-            selectItems={false}
-            deleteItems={false}
-            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
-          />
-        ) : (
-          <div style={{textAlign: "center"}}>No hay aplicaciones en curso</div>
-        )}
-      </TabPanel>
       <TabPanel value={value} index={0}>
       {items.length > 0 ? (
           <ItemList
@@ -160,10 +152,25 @@ const campos = ["display"];
             selectedIds={selectedIds}
             selectItems={false}
             deleteItems={false}
-            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
+            selectSingleItem={true}
+            onSelectSingleItem={startApplication}
           />
         ) : (
           <div style={{textAlign: "center"}}>No hay aplicaciones pendientes</div>
+        )}
+      </TabPanel>
+      <TabPanel value={value} index={1}>
+        {items.length > 0 ? (
+          <ItemList
+            items={items}
+            displayKeys={campos}
+            selectedIds={selectedIds}
+            selectItems={false}
+            deleteItems={false}
+            selectSingleItem={false}
+          />
+        ) : (
+          <div style={{textAlign: "center"}}>No hay aplicaciones en curso</div>
         )}
       </TabPanel>
       <TabPanel value={value} index={2}>
