@@ -20,6 +20,7 @@ import { useLoading } from "@/hooks/useLoading";
 import { sortAlphabeticallyUnique } from "@/utilities/sort";
 import StockDetailsModal from "@/components/StockDetailsModal/StockDetailsModal";
 import { Roles } from "@/domain/enum/Roles";
+import { Producto } from "@/domain/models/Producto";
 
 export default function StockView() {
     const [stockFromServer, setStockFromServer] = useState<Stock[]>([]);
@@ -34,6 +35,14 @@ export default function StockView() {
     const apiService = getApiService();
     const [selectedStockItem, setSelectedStockItem] = useState<Stock | null>(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
+    const [searchParams, setSearchParams] = useState({
+        productId: "",
+        lotNumber: "",
+        expirationBefore: "",
+        expirationAfter: ""
+    });
+    const [products, setProducts] = useState<Producto[]>([]);
+    const [activeSearchParams, setActiveSearchParams] = useState(searchParams);
 
     const isAdmin = user?.roles.includes(Roles.Admin);
     const isAplicador = user?.roles.includes(Roles.Aplicador);
@@ -77,7 +86,6 @@ export default function StockView() {
     };
 
     useEffect(() => {
-        console.log('isReady changed:', isReady);
         if (!isReady) return;
         
         let isMounted = true;
@@ -120,14 +128,58 @@ export default function StockView() {
     }, [isReady]);
 
     useEffect(() => {
+        if (!isReady) return;
+        
+        let isMounted = true;
+        const fetchProducts = async () => {
+            try {
+                const response = await withLoading(
+                    apiService.get<ResponseItems<Producto>>('/products'),
+                    "Cargando productos..."
+                );
+                if (response.success && isMounted) {
+                    setProducts(response.data.content);
+                }
+            } catch (err) {
+                if (isMounted) {
+                    console.error('Error fetching products:', err);
+                }
+            }
+        };
+
+        fetchProducts();
+        return () => {
+            isMounted = false;
+        };
+    }, [isReady]);
+
+    useEffect(() => {
         if (!isReady || !actualLocation) return;
         
         let isMounted = true;
         const fetchData = async () => {
             try {
                 setLoading(true);
+                const queryParams = new URLSearchParams();
+                queryParams.append('location', actualLocation);
+                
+                if (activeSearchParams.productId) {
+                    queryParams.append('product', activeSearchParams.productId);
+                }
+                if (activeSearchParams.lotNumber) {
+                    queryParams.append('lot_number', activeSearchParams.lotNumber);
+                }
+                if (activeSearchParams.expirationBefore) {
+                    const date = new Date(activeSearchParams.expirationBefore);
+                    queryParams.append('expiration_before', date.toISOString());
+                }
+                if (activeSearchParams.expirationAfter) {
+                    const date = new Date(activeSearchParams.expirationAfter);
+                    queryParams.append('expiration_after', date.toISOString());
+                }
+
                 const response = await withLoading(
-                    apiService.get<ResponseItems<Stock>>(`stock?location=${actualLocation}`),
+                    apiService.get<ResponseItems<Stock>>(`stock?${queryParams.toString()}`),
                     "Cargando stock..."
                 );
                 if (response.success && isMounted) {
@@ -151,7 +203,7 @@ export default function StockView() {
         return () => {
             isMounted = false;
         };
-    }, [actualLocation, isReady]);
+    }, [actualLocation, isReady, activeSearchParams]);
 
     const {
         items: stock,
@@ -197,6 +249,10 @@ export default function StockView() {
         }
     };
 
+    const handleSearch = () => {
+        setActiveSearchParams(searchParams);
+    };
+
     if (error) {
         return (
             <div className="page-container">
@@ -216,31 +272,89 @@ export default function StockView() {
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Gestión de Stock</h1>
 
-            {options.length > 0 && (
-                <Autocomplete
-                    disablePortal
-                    options={options}
-                    defaultValue={options[0]}
-                    renderInput={(params) => (
-                        <TextField
-                          {...params}
-                          label="Locación"
-                          required
-                          sx={{...customInputSx}}
-                        />
-                      )}
-                    onChange={(e, newValue) => {
-                      if (newValue) {
-                        const selectedLocation = locations.find(l => l.name === newValue.label);
-                        if (selectedLocation) {
-                            setActualLocation(selectedLocation.id);
-                        }
-                      }
-                    }}
-                    sx={{ width: 300, margin: '0 auto', marginBottom: '10px' }}
-                    className=""
-                />
-            )}
+            <div className={styles.searchForm}>
+                <div className={styles.searchRow}>
+                    <Autocomplete
+                        disablePortal
+                        options={options}
+                        defaultValue={options[0]}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Locación"
+                                required
+                                sx={{...customInputSx}}
+                            />
+                        )}
+                        onChange={(e, newValue) => {
+                            if (newValue) {
+                                const selectedLocation = locations.find(l => l.name === newValue.label);
+                                if (selectedLocation) {
+                                    setActualLocation(selectedLocation.id);
+                                }
+                            }
+                        }}
+                        sx={{ width: '100%' }}
+                    />
+                    <Autocomplete
+                        disablePortal
+                        options={products.map(p => ({ label: p.name, id: p.id }))}
+                        renderInput={(params) => (
+                            <TextField
+                                {...params}
+                                label="Producto"
+                                sx={{...customInputSx}}
+                            />
+                        )}
+                        onChange={(e, newValue) => {
+                            setSearchParams(prev => ({
+                                ...prev,
+                                productId: newValue?.id || ""
+                            }));
+                        }}
+                        sx={{ width: '100%' }}
+                    />
+                    <TextField
+                        label="Número de Lote"
+                        value={searchParams.lotNumber}
+                        onChange={(e) => setSearchParams(prev => ({
+                            ...prev,
+                            lotNumber: e.target.value
+                        }))}
+                        sx={{...customInputSx, width: '100%'}}
+                    />
+                </div>
+                <div className={styles.searchRow}>
+                    <TextField
+                        label="Vencimiento Desde"
+                        type="date"
+                        value={searchParams.expirationAfter}
+                        onChange={(e) => setSearchParams(prev => ({
+                            ...prev,
+                            expirationAfter: e.target.value
+                        }))}
+                        InputLabelProps={{ shrink: true }}
+                        sx={{...customInputSx, width: '100%'}}
+                    />
+                    <TextField
+                        label="Vencimiento Hasta"
+                        type="date"
+                        value={searchParams.expirationBefore}
+                        onChange={(e) => setSearchParams(prev => ({
+                            ...prev,
+                            expirationBefore: e.target.value
+                        }))}
+                        InputLabelProps={{ shrink: true }}
+                        sx={{...customInputSx, width: '100%'}}
+                    />
+                    <button 
+                        className={`button button-primary ${styles.searchButton}`}
+                        onClick={handleSearch}
+                    >
+                        Buscar
+                    </button>
+                </div>
+            </div>
 
             {loading ? (
                 <div>Cargando stock...</div>
