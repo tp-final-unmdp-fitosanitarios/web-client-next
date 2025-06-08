@@ -122,6 +122,10 @@ const startApplication = (id: string) => {
   router.push(`aplicaciones/iniciar?id=${id}`);
 }
 
+const finishApplication = (id: string) => {
+  router.push(`aplicaciones/finalizar?id=${id}`);
+}
+
 const campos = ["display"];
 
   return (
@@ -167,7 +171,8 @@ const campos = ["display"];
             selectedIds={selectedIds}
             selectItems={false}
             deleteItems={false}
-            selectSingleItem={false}
+            selectSingleItem={true}
+            onSelectSingleItem={finishApplication}
           />
         ) : (
           <div style={{textAlign: "center"}}>No hay aplicaciones en curso</div>

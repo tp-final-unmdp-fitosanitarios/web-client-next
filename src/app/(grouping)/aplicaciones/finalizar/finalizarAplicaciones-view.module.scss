@@ -1,0 +1,43 @@
+.finalizarAplicacionContainer {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 16px;
+    background-color: #f5f7f6;
+}
+
+.finalizarHeader {
+    font-size: 24px;
+    font-weight: bold;
+    color: #404e5c;
+    margin-bottom: 24px;
+    text-align: center;
+}
+
+.container {
+    background-color: white;
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 24px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.finalizarInfo {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 16px;
+    color: #404e5c;
+    font-weight: 500;
+}
+
+.productTitle {
+    color: #404e5c;
+    font-size: 18px;
+    margin-bottom: 16px;
+    font-weight: bold;
+    text-align: center;
+}
+
+.button {
+    margin: 10px auto;
+}

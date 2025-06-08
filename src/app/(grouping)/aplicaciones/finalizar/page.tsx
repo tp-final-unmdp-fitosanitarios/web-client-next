@@ -3,24 +3,21 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import MenuBar from "@/components/menuBar/MenuBar";
 import ItemList from "@/components/itemList/ItemList";
-import { AplicacionResponse } from "@/domain/models/AplicacionResponse";
 import { EstadoAplicacion } from "@/domain/enum/EstadoAplicacion";
 import { Unidad } from "@/domain/enum/Unidad";
-import styles from "./iniciarAplicaciones-view.module.scss";
+import styles from "./finalizarAplicaciones-view.module.scss";
 import Footer from "@/components/Footer/Footer";
 import { Aplicacion } from "@/domain/models/Aplicacion";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import { Maquina } from "@/domain/models/Maquina";
-import ModalElegirMaquina from "@/components/ModalElegirMaquina/ModalElegirMaquina";
 import GenericModal from "@/components/modal/GenericModal";
 import { useRouter } from 'next/navigation';
-// import LoaderGlobal from "@/components/Loader/LoaderGlobal";
 
 // MOCK DE DATOS
 const mockAplicacion: Aplicacion = {
     id: "1",
-    status: EstadoAplicacion.Pendiente,
+    status: EstadoAplicacion.EnCurso,
     location_id: "Campo Norte",
     created_at: new Date(),
     unidad: Unidad.Litros,
@@ -38,7 +35,7 @@ const mockAplicacion: Aplicacion = {
     },
     actual_application: {
         id: "1-actual",
-        status: EstadoAplicacion.Pendiente,
+        status: EstadoAplicacion.EnCurso,
         location_id: "Campo Norte",
         created_at: new Date(),
         unidad: Unidad.Litros,
@@ -54,32 +51,19 @@ const mockAplicacion: Aplicacion = {
                 { productId: "prod3", amount: 20, unit: Unidad.Kilogramos, doseType: "SURFACE", lotNumber: "L3C" }
             ]
         },
-        actual_application: undefined as any // o null si el tipo lo permite
+        actual_application: undefined as any
     }
 };
 
-export default function IniciarAplicacion() {
+export default function FinalizarAplicacion() {
     const searchParams = useSearchParams();
     const applicationId = searchParams.get("id");
     const [aplicacion, setAplicacion] = useState<Aplicacion | null>(null);
     const [loading, setLoading] = useState(true);
-    const [openModalMaquina, setOpenModalMaquina] = useState(false);
+    const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
-    const [maquinas, setMaquinas] = useState<Maquina[] | undefined>(undefined);
-    const [selectedMaquina, setSelectedMaquina] = useState<Maquina>();
-    const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const router = useRouter();
-
-    const fetchMaquinas = async () => {
-        try {
-            const response = await apiService.get<ResponseItems<Maquina>>("machines");
-            setMaquinas(response.data.content);
-        } catch (e: any) {
-            console.error("Error al obtener las máquinas:", e.message);
-            setMaquinas([]);
-        }
-    };
 
     const fetchApplication = async () => {
         try {
@@ -92,41 +76,30 @@ export default function IniciarAplicacion() {
         }
     }
 
-    const handleSelectMaquina = (maquina: Maquina) => {
-        if(maquina){
-            setSelectedMaquina(maquina);
-            const req = {
-                "status":"IN_PROGRESS"
+    const handleFinalizarAplicacion = async () => {
+        if (aplicacion) {
+            try {
+                const req = {
+                    "status": "COMPLETED"
+                }
+                await apiService.create(`applications/${aplicacion.id}/status`, req);
+                setConfirmationModalOpen(true);
+            } catch (e: any) {
+                console.error("Error al finalizar la aplicación:", e.message);
             }
-            const res = apiService.create(`applications/${aplicacion?.id}/status`,req);
-
-            setConfirmationModalOpen(true);
         }
-        else
-            console.log("Error al guardar la maquina");
     }
 
-   /* useEffect(() => {
-        if(!isReady) return;
-
-        fetchApplication();
-        
-    }, [applicationId,isReady]);*/
     useEffect(() => {
         // Simula un fetch con mock
-        fetchMaquinas();
-
         setTimeout(() => {
             setAplicacion(mockAplicacion);
             setLoading(false);
-        }, 500); // medio segundo de delay para simular carga
+        }, 500);
     }, [applicationId]);
 
-
-
     if (loading) 
-        // return <LoaderGlobal />; // Descomenta esta línea para usar el loader global
-        return <div>Cargando...</div>; // Elimina esta línea cuando uses el loader global
+        return <div>Cargando...</div>;
     if (!aplicacion) return <div>No se encontró la aplicación.</div>;
 
     const cultivo = aplicacion.location_id;
@@ -134,7 +107,7 @@ export default function IniciarAplicacion() {
 
     const productos = aplicacion.recipe?.recipeItems?.map((item) => ({
         id: item.productId,
-        title: `Producto ${item.productId+ 1}`,
+        title: `Producto ${item.productId + 1}`,
         description: `${item.unit.toLowerCase()} x ${item.amount}${item.unit} - ${item.doseType === "SURFACE" ? item.amount + "/Ha" : item.amount}`
     }));
 
@@ -142,7 +115,7 @@ export default function IniciarAplicacion() {
         id: p.id.toString(),
         title: p.title,
         description: p.description
-    }))
+    }));
 
     function handleCloseConfirmationModal(): void {
         setConfirmationModalOpen(false);
@@ -150,15 +123,16 @@ export default function IniciarAplicacion() {
     }
 
     return (
-        <div className={styles.iniciarAplicacionContainer}>
+        <div className={styles.finalizarAplicacionContainer}>
+            <div className="content-wrap">
             <MenuBar showMenu={false} showArrow={true} path="/aplicaciones"/>
-            <div className={styles.iniciarHeader}>Aplicacion a realizar</div>
+            <div className={styles.finalizarHeader}>Aplicación en progreso</div>
             <div className={styles.container}>
-            <div className={styles.iniciarInfo}>
-                <div>Cultivo: {cultivo}</div>
-                <div>Fecha: {fecha}</div>
-            </div>
-            <h3 className={styles.productTitle}>Productos a aplicar</h3>
+                <div className={styles.finalizarInfo}>
+                    <div>Cultivo: {cultivo}</div>
+                    <div>Fecha: {fecha}</div>
+                </div>
+                <h3 className={styles.productTitle}>Productos aplicados</h3>
                 <ItemList
                     items={items}
                     displayKeys={["title", "description"]}
@@ -167,27 +141,24 @@ export default function IniciarAplicacion() {
                     selectSingleItem={false}
                 />
             </div>
-            <button className={"button button-primary"} style={{ marginBottom: 24 }} onClick={() => {setOpenModalMaquina(true)}}>Confirmar</button>
+            <button 
+                className={`button button-primary ${styles.button}`}  
+                onClick={handleFinalizarAplicacion}
+            >
+                Finalizar
+            </button>
             
             <Footer />
 
-            {openModalMaquina && (
-                <ModalElegirMaquina
-                    open={openModalMaquina}
-                    setModalClose={() => setOpenModalMaquina(false)}
-                    maquinas={maquinas || []}
-                    handleSelectMaquina={handleSelectMaquina}
-                />
-            )}
             <GenericModal
                 isOpen={confirmationModalOpen}
                 onClose={handleCloseConfirmationModal}
-                title="Aplicació Iniciada"
-                modalText={`Se utilizara la maquina: ${selectedMaquina?.name}`}
+                title="Aplicación Finalizada"
+                modalText="La aplicación ha sido finalizada exitosamente"
                 buttonTitle="Cerrar"
                 showSecondButton={false}
             />
         </div>
+    </div>
     );
 }
-
