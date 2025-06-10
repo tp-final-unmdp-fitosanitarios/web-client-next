@@ -114,7 +114,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
   const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
     return {
         ...item,
-        display: `Cultivo: ${item.cultivo} - Fecha: ${item.fecha}`, 
+        display: `${item.cultivo} - Fecha: ${item.fecha}`, 
     };
 });
 

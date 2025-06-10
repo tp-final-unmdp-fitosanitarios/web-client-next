@@ -17,46 +17,6 @@ import GenericModal from "@/components/modal/GenericModal";
 import { useRouter } from 'next/navigation';
 // import LoaderGlobal from "@/components/Loader/LoaderGlobal";
 
-// MOCK DE DATOS
-const mockAplicacion: Aplicacion = {
-    id: "1",
-    status: EstadoAplicacion.Pendiente,
-    location_id: "Campo Norte",
-    created_at: new Date(),
-    unidad: Unidad.Litros,
-    cantidad: 100,
-    surface: 100,
-    aplicadorId: "Aplicador1",
-    engineer_id: "Ingeniero1",
-    recipe: {
-        type: "ENGINEER_RECIPE",
-        recipe_items: [
-            { product_id: "prod1", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L1A" },
-            { product_id: "prod2", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L2B" },
-            { product_id: "prod3", amount: 20, unit: Unidad.Kilogramos, dose_type: "SURFACE", lot_number: "L3C" }
-        ]
-    },
-    actual_application: {
-        id: "1-actual",
-        status: EstadoAplicacion.Pendiente,
-        location_id: "Campo Norte",
-        created_at: new Date(),
-        unidad: Unidad.Litros,
-        cantidad: 100,
-        surface: 100,
-        aplicadorId: "Aplicador1",
-        engineer_id: "Ingeniero1",
-        recipe: {
-            type: "ENGINEER_RECIPE",
-            recipe_items: [
-                { product_id: "prod1", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L1A" },
-                { product_id: "prod2", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L2B" },
-                { product_id: "prod3", amount: 20, unit: Unidad.Kilogramos, dose_type: "SURFACE", lot_number: "L3C" }
-            ]
-        },
-        actual_application: undefined as any // o null si el tipo lo permite
-    }
-};
 
 export default function IniciarAplicacion() {
     const searchParams = useSearchParams();
@@ -81,20 +41,20 @@ export default function IniciarAplicacion() {
         }
     }
 
-   /* useEffect(() => {
+   useEffect(() => {
         if(!isReady) return;
 
         fetchApplication();
         
-    }, [applicationId,isReady]);*/
-    useEffect(() => {
+    }, [applicationId,isReady]);
+    /*useEffect(() => {
         // Simula un fetch con mock
 
         setTimeout(() => {
             setAplicacion(mockAplicacion);
             setLoading(false);
         }, 500); // medio segundo de delay para simular carga
-    }, [applicationId]);
+    }, [applicationId]);*/
 
 
 
@@ -108,8 +68,8 @@ export default function IniciarAplicacion() {
 
     const productos = aplicacion.recipe?.recipe_items?.map((item) => ({
         id: item.product_id,
-        title: `Producto ${item.product_id+ 1}`,
-        description: `${item.unit.toLowerCase()} x ${item.amount}${item.unit} - ${item.dose_type === "SURFACE" ? item.amount + "/Ha" : item.amount}`
+        title: `${item.product_id+ 1}`,
+        description: `${item.amount}${item.unit}${item.dose_type === "SURFACE" ? " - "+item.amount + "/Ha" : item.amount}`
     }));
 
     const items = productos.map(p => ({

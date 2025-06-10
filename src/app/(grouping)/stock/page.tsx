@@ -277,7 +277,7 @@ export default function StockView() {
                     <Autocomplete
                         disablePortal
                         options={options}
-                        defaultValue={options[0]}
+                        value={options.find(option => option.label === locations.find(l => l.id === actualLocation)?.name) || null}
                         renderInput={(params) => (
                             <TextField
                                 {...params}
