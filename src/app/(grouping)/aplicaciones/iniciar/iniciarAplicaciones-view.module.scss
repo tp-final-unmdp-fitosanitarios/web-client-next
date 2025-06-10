@@ -76,3 +76,14 @@
 .iniciarConfirmButton:hover {
   background: color.adjust($primary-color, $lightness: -10%);
 }
+
+.button{
+  margin: 10px auto;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 20px;
+}

@@ -51,7 +51,7 @@ const CrearAplicacionPage: React.FC = () => {
     const [addRecipeItemModal, setAddRecipeModalOpen] = useState<boolean>(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const router = useRouter();
-    const { getApiService, isReady } = useAuth();
+    const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
     const { withLoading } = useLoading();
     const title = 'Crear Aplicación'
@@ -144,7 +144,7 @@ const CrearAplicacionPage: React.FC = () => {
 
        // const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
 
-        const existingProductIndex = productosAAgregar.findIndex((p) => p.productId === producto.id);
+        const existingProductIndex = productosAAgregar.findIndex((p) => p.product_id === producto.id);
 
         if (existingProductIndex !== -1) {
             console.warn("Ya se agrego el producto", producto.name);
@@ -153,13 +153,13 @@ const CrearAplicacionPage: React.FC = () => {
             setProductosAAgregar(
                 [...productosAAgregar,
                 {
-                    productId: producto.id,
+                    product_id: producto.id,
                     id: producto.id, //Esto se hace para poder usar el useItemManager
                     prodName: producto.name,
                     amount: amount,
                     unit: producto.unit,
-                    doseType: doseType,
-                    lotNumber: producto.lot_number
+                    dose_type: doseType,
+                    lot_number: producto.lot_number
                 }]);
         }
     };
@@ -174,10 +174,10 @@ const CrearAplicacionPage: React.FC = () => {
     } = useItemsManager(productosAAgregar);
 
     const quitarItem = (id: string) => {
-        setProductosAAgregar((prev) => prev.filter((item) => item.productId !== id));
+        setProductosAAgregar((prev) => prev.filter((item) => item.product_id !== id));
     };
 
-    const items = transformToItems(productosAAgregar, "id", ["prodName", "amount", "unit", "doseType"]).map((item) => {
+    const items = transformToItems(productosAAgregar, "id", ["prodName", "amount", "unit", "dose_type"]).map((item) => {
         if(item.doseType==="SURFACE")
             return {
                 ...item,
@@ -201,11 +201,11 @@ const CrearAplicacionPage: React.FC = () => {
     const handleFinish = async () => {
         console.log("Finishing application creation");
         const recipeItems = productosAAgregar.map((p) => ({
-            product_id: p.productId,
+            product_id: p.product_id,
             amount: p.amount,
             unit: p.unit,
-            dose_type: p.doseType,
-            lot_number: p.lotNumber
+            dose_type: p.dose_type,
+            lot_number: p.lot_number
         }));
         const recipeReq = {
             type: "ENGINEER_RECIPE",
@@ -223,10 +223,17 @@ const CrearAplicacionPage: React.FC = () => {
 
         console.log(createAplicationReq);
         try {
-            const response = await withLoading(
-                apiService.create("applications/instant", createAplicationReq),
-                "Creando aplicación..."
-            );
+            let response
+            if(user?.roles.find(f => f ==="APPLICATOR"))
+                response = await withLoading(
+                    apiService.create("applications/instant", createAplicationReq),
+                    "Creando aplicación..."
+                );
+            else
+                response = await withLoading(
+                    apiService.create("applications", createAplicationReq),
+                    "Creando aplicación..."
+                );
             if (response.success) {
                 setConfirmationModalOpen(true);
                 setAddRecipeModalOpen(false);

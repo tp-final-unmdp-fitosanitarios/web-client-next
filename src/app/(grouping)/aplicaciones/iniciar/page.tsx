@@ -30,10 +30,10 @@ const mockAplicacion: Aplicacion = {
     engineer_id: "Ingeniero1",
     recipe: {
         type: "ENGINEER_RECIPE",
-        recipeItems: [
-            { productId: "prod1", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L1A" },
-            { productId: "prod2", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L2B" },
-            { productId: "prod3", amount: 20, unit: Unidad.Kilogramos, doseType: "SURFACE", lotNumber: "L3C" }
+        recipe_items: [
+            { product_id: "prod1", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L1A" },
+            { product_id: "prod2", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L2B" },
+            { product_id: "prod3", amount: 20, unit: Unidad.Kilogramos, dose_type: "SURFACE", lot_number: "L3C" }
         ]
     },
     actual_application: {
@@ -48,10 +48,10 @@ const mockAplicacion: Aplicacion = {
         engineer_id: "Ingeniero1",
         recipe: {
             type: "ENGINEER_RECIPE",
-            recipeItems: [
-                { productId: "prod1", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L1A" },
-                { productId: "prod2", amount: 20, unit: Unidad.Litros, doseType: "SURFACE", lotNumber: "L2B" },
-                { productId: "prod3", amount: 20, unit: Unidad.Kilogramos, doseType: "SURFACE", lotNumber: "L3C" }
+            recipe_items: [
+                { product_id: "prod1", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L1A" },
+                { product_id: "prod2", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L2B" },
+                { product_id: "prod3", amount: 20, unit: Unidad.Kilogramos, dose_type: "SURFACE", lot_number: "L3C" }
             ]
         },
         actual_application: undefined as any // o null si el tipo lo permite
@@ -63,23 +63,12 @@ export default function IniciarAplicacion() {
     const applicationId = searchParams.get("id");
     const [aplicacion, setAplicacion] = useState<Aplicacion | null>(null);
     const [loading, setLoading] = useState(true);
-    const [openModalMaquina, setOpenModalMaquina] = useState(false);
     const { getApiService, isReady } = useAuth();
     const apiService = getApiService();
-    const [maquinas, setMaquinas] = useState<Maquina[] | undefined>(undefined);
-    const [selectedMaquina, setSelectedMaquina] = useState<Maquina>();
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const router = useRouter();
 
-    const fetchMaquinas = async () => {
-        try {
-            const response = await apiService.get<ResponseItems<Maquina>>("machines");
-            setMaquinas(response.data.content);
-        } catch (e: any) {
-            console.error("Error al obtener las máquinas:", e.message);
-            setMaquinas([]);
-        }
-    };
+    
 
     const fetchApplication = async () => {
         try {
@@ -92,20 +81,6 @@ export default function IniciarAplicacion() {
         }
     }
 
-    const handleSelectMaquina = (maquina: Maquina) => {
-        if(maquina){
-            setSelectedMaquina(maquina);
-            const req = {
-                "status":"IN_PROGRESS"
-            }
-            const res = apiService.create(`applications/${aplicacion?.id}/status`,req);
-
-            setConfirmationModalOpen(true);
-        }
-        else
-            console.log("Error al guardar la maquina");
-    }
-
    /* useEffect(() => {
         if(!isReady) return;
 
@@ -114,7 +89,6 @@ export default function IniciarAplicacion() {
     }, [applicationId,isReady]);*/
     useEffect(() => {
         // Simula un fetch con mock
-        fetchMaquinas();
 
         setTimeout(() => {
             setAplicacion(mockAplicacion);
@@ -132,10 +106,10 @@ export default function IniciarAplicacion() {
     const cultivo = aplicacion.location_id;
     const fecha = new Date(aplicacion.created_at).toLocaleDateString();
 
-    const productos = aplicacion.recipe?.recipeItems?.map((item) => ({
-        id: item.productId,
-        title: `Producto ${item.productId+ 1}`,
-        description: `${item.unit.toLowerCase()} x ${item.amount}${item.unit} - ${item.doseType === "SURFACE" ? item.amount + "/Ha" : item.amount}`
+    const productos = aplicacion.recipe?.recipe_items?.map((item) => ({
+        id: item.product_id,
+        title: `Producto ${item.product_id+ 1}`,
+        description: `${item.unit.toLowerCase()} x ${item.amount}${item.unit} - ${item.dose_type === "SURFACE" ? item.amount + "/Ha" : item.amount}`
     }));
 
     const items = productos.map(p => ({
@@ -149,8 +123,23 @@ export default function IniciarAplicacion() {
         router.push("/aplicaciones");
     }
 
+    const handleConfirm = () => {
+            const req = {
+                "status":"IN_PROGRESS"
+            }
+           apiService.create(`applications/${aplicacion?.id}/status`,req).then(
+            (res)=>{
+                if(res.status === 0)
+                    setConfirmationModalOpen(true);
+                else
+                    alert("Error al inicar la aplicación");
+            }
+            );
+    }
+
     return (
-        <div className={styles.iniciarAplicacionContainer}>
+        <div className="page-container">
+            <div className="content-wrap">
             <MenuBar showMenu={false} showArrow={true} path="/aplicaciones"/>
             <div className={styles.iniciarHeader}>Aplicacion a realizar</div>
             <div className={styles.container}>
@@ -167,26 +156,20 @@ export default function IniciarAplicacion() {
                     selectSingleItem={false}
                 />
             </div>
-            <button className={"button button-primary"} style={{ marginBottom: 24 }} onClick={() => {setOpenModalMaquina(true)}}>Confirmar</button>
+            <div className={styles.buttonContainer}>
+                <button className={`button button-primary ${styles.button}`} onClick={handleConfirm}>Confirmar</button>
+            </div>
             
-            <Footer />
-
-            {openModalMaquina && (
-                <ModalElegirMaquina
-                    open={openModalMaquina}
-                    setModalClose={() => setOpenModalMaquina(false)}
-                    maquinas={maquinas || []}
-                    handleSelectMaquina={handleSelectMaquina}
-                />
-            )}
             <GenericModal
                 isOpen={confirmationModalOpen}
                 onClose={handleCloseConfirmationModal}
                 title="Aplicació Iniciada"
-                modalText={`Se utilizara la maquina: ${selectedMaquina?.name}`}
+                modalText={`Se inició la aplicacion correctamente`}
                 buttonTitle="Cerrar"
                 showSecondButton={false}
             />
+            </div>
+            <Footer />
         </div>
     );
 }
