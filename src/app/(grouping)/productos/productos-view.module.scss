@@ -15,6 +15,20 @@
     font-size: 30px;
 }
 
+.subtitle {
+  text-align: center;
+  color: $dark-color;
+  font-size: 20px;
+  text-decoration: none;
+
+  &:hover {
+   text-decoration: underline;
+   text-decoration-color: $dark-color;
+   text-decoration-thickness: 3px;
+   text-underline-offset: 3px;
+  }
+}
+
 .container_blurred {
     filter: blur(5px);
     transition: filter 0.3s ease-in-out;

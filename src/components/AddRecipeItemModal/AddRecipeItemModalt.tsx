@@ -141,8 +141,8 @@ const AddRecipeItemModal: React.FC<Props> = ({ open, setModalClose, products, ha
                         <MenuItem key={1} value="SURFACE">
                             Superficie
                         </MenuItem>
-                        <MenuItem key={2} value="VOLUME">
-                            Volumen
+                        <MenuItem key={2} value="TOTAL">
+                            Total
                         </MenuItem>
                     </TextField>
                     <div className={styles.buttonContainer}>

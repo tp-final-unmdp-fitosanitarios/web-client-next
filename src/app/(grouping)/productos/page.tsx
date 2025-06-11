@@ -146,6 +146,11 @@ export default function ProductosView() {
             <div className="content-wrap">
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Productos</h1>
+            <Link href="/productos/agroquimicos" style={{textDecoration: "none"}}>
+              
+              <h3 className={styles.subtitle}>  Gestionar Agroquímicos </h3>     
+           
+            </Link>
 
             <div className={styles.filterContainer}>
                 <input
@@ -156,7 +161,7 @@ export default function ProductosView() {
                     className={styles.searchInput}
                 />
             </div>
-
+        
             {items.length > 0 ? (
                 <ItemList
                     items={items}
