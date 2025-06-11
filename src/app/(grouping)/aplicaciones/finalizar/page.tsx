@@ -213,7 +213,7 @@ export default function FinalizarAplicacion() {
         return <div>Cargando...</div>;
     if (!aplicacion) return <div>No se encontró la aplicación.</div>;
 
-    const cultivo = aplicacion.location_id;
+    const cultivo = aplicacion.location.name;
     const fecha = new Date(aplicacion.created_at).toLocaleDateString();
 
     const fetchProductosDetalles = async () => {
