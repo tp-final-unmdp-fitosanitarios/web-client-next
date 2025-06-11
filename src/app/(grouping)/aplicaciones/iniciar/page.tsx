@@ -15,6 +15,7 @@ import { Maquina } from "@/domain/models/Maquina";
 import ModalElegirMaquina from "@/components/ModalElegirMaquina/ModalElegirMaquina";
 import GenericModal from "@/components/modal/GenericModal";
 import { useRouter } from 'next/navigation';
+import { useLoading } from "@/hooks/useLoading";
 // import LoaderGlobal from "@/components/Loader/LoaderGlobal";
 
 
@@ -27,7 +28,7 @@ export default function IniciarAplicacion() {
     const apiService = getApiService();
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const router = useRouter();
-
+    const { withLoading } = useLoading();
     
 
     const fetchApplication = async () => {
@@ -47,15 +48,6 @@ export default function IniciarAplicacion() {
         fetchApplication();
         
     }, [applicationId,isReady]);
-    /*useEffect(() => {
-        // Simula un fetch con mock
-
-        setTimeout(() => {
-            setAplicacion(mockAplicacion);
-            setLoading(false);
-        }, 500); // medio segundo de delay para simular carga
-    }, [applicationId]);*/
-
 
 
     if (loading) 
@@ -83,18 +75,23 @@ export default function IniciarAplicacion() {
         router.push("/aplicaciones");
     }
 
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
             const req = {
                 "status":"IN_PROGRESS"
             }
-           apiService.create(`applications/${aplicacion?.id}/status`,req).then(
-            (res)=>{
-                if(res.status === 0)
+            try {
+                const response = await withLoading(
+                    apiService.create(`applications/${aplicacion?.id}/status`,req),
+                    "Iniciando aplicación..."
+                );
+                if (response.success) {
                     setConfirmationModalOpen(true);
-                else
-                    alert("Error al inicar la aplicación");
+                } else {
+                    console.error("Error al crear la aplicacion:", response.error);
+                }
+            } catch (error) {
+                console.error("Error al crear la aplicacion:", error);
             }
-            );
     }
 
     return (
@@ -123,7 +120,7 @@ export default function IniciarAplicacion() {
             <GenericModal
                 isOpen={confirmationModalOpen}
                 onClose={handleCloseConfirmationModal}
-                title="Aplicació Iniciada"
+                title="Aplicación Iniciada"
                 modalText={`Se inició la aplicacion correctamente`}
                 buttonTitle="Cerrar"
                 showSecondButton={false}

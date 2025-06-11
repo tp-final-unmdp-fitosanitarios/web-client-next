@@ -27,6 +27,7 @@ import GenericModal from '@/components/modal/GenericModal';
 import { useRouter } from 'next/navigation';
 import { useLoading } from '@/hooks/useLoading';
 import dayjs from 'dayjs';
+import { Roles } from '@/domain/enum/Roles';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -55,7 +56,7 @@ const CrearAplicacionPage: React.FC = () => {
     const apiService = getApiService();
     const { withLoading } = useLoading();
     const title = 'Crear Aplicación'
-
+    console.log(user);
     const customInputSx = {
         '& .MuiInputBase-root': {
             borderRadius: '10px',
@@ -224,7 +225,7 @@ const CrearAplicacionPage: React.FC = () => {
         console.log(createAplicationReq);
         try {
             let response
-            if(user?.roles.find(f => f ==="APPLICATOR"))
+            if(user?.roles.includes(Roles.Aplicador))
                 response = await withLoading(
                     apiService.create("applications/instant", createAplicationReq),
                     "Creando aplicación..."

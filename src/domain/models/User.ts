@@ -4,7 +4,7 @@ export interface User {
     id: string,
     first_name: string,
     last_name: string,
-    roles: Roles[] | string[],
+    roles: string[],
     company_id: string,
     email: string
 }
