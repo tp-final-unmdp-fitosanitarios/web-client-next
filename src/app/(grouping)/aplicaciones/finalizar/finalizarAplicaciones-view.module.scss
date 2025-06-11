@@ -1,3 +1,5 @@
+@use '../../../styles/variables' as *;
+
 .finalizarAplicacionContainer {
     display: flex;
     flex-direction: column;
@@ -20,11 +22,16 @@
     padding: 16px;
     margin-bottom: 24px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin-left: auto;
+    margin-right: auto;
 }
 
 .finalizarInfo {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
     margin-bottom: 16px;
     color: #404e5c;
     font-weight: 500;
@@ -39,5 +46,21 @@
 }
 
 .button {
-    margin: 10px auto;
+    margin: 10px;
+    min-width: 120px;
+}
+
+.buttonContainer {
+    display: flex;
+    justify-content: center;
+    gap: 16px;
+    margin-top: 24px;
+    width: 100%;
+}
+
+.button:disabled {
+    background-color: #cccccc;
+    color: #888888;
+    cursor: not-allowed;
+    opacity: 0.7;
 }

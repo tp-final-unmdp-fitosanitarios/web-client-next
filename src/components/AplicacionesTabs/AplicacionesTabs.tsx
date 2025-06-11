@@ -101,8 +101,9 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
 
   const parsedAplicaciones = aplicacionesToDisplay
     .filter((item) =>
-      (value === 0 && item.status === EstadoAplicacion.Pendiente) || //Agregar a confirmar
-      (value === 1 && item.status === EstadoAplicacion.EnCurso)
+      (value === 0 && item.status === EstadoAplicacion.Pendiente) || 
+      (value === 1 && item.status === EstadoAplicacion.EnCurso) ||
+      (value === 2 && item.status === EstadoAplicacion.Finalizada && item.type==="INSTANT")
     )
     .map((item) => ({
       id: item.id.toString(),
@@ -114,7 +115,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
   const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
     return {
         ...item,
-        display: `Cultivo: ${item.cultivo} - Fecha: ${item.fecha}`, 
+        display: `${item.cultivo} - Fecha: ${item.fecha}`, 
     };
 });
 

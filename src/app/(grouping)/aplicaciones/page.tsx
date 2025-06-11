@@ -43,9 +43,10 @@ export default function AplicacionesPage() {
   };
 
   const fetchLocaciones = async () => {
+    console.log('Starting fetchLocaciones');
     try {
         const response = await withLoading(
-        apiService.get<Locacion[]>('/locations?type=WAREHOUSE&type=FIELD'),
+        apiService.get<Locacion[]>('locations?type=CROP'),
         "Cargando ubicaciones..."
         );
         if (response.success) {

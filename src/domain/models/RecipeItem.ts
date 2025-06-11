@@ -1,9 +1,9 @@
 import { Unidad } from "../enum/Unidad";
 
 export interface RecipeItem {
-    productId: string;
+    product_id: string;
     amount: number;
     unit: Unidad;
-    doseType: string;
-    lotNumber: string;
+    dose_type: string;
+    lot_number: string;
 } 

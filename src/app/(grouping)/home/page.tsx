@@ -67,6 +67,13 @@ export default function Home() {
       { label: "Stock", path: "/stock" },
     );
   }
+  else{
+    buttons.push(
+      { label: "Aplicaciones", path: "/aplicaciones" },
+      { label: "Stock", path: "/stock" },
+      { label: "Estadísticas", path: "/estadisticas" }
+    );
+  }
 
   return (
     <div className="page-container">

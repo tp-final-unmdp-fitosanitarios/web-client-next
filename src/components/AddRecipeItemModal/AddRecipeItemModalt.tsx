@@ -139,7 +139,7 @@ const AddRecipeItemModal: React.FC<Props> = ({ open, setModalClose, products, ha
                         }}
                     >
                         <MenuItem key={1} value="SURFACE">
-                            Superficie
+                            Por Hectarea
                         </MenuItem>
                         <MenuItem key={2} value="TOTAL">
                             Total

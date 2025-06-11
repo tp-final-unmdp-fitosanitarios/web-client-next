@@ -16,4 +16,5 @@ export interface Aplicacion {
     engineer_id: string;
     recipe: Recipe;
     actual_application: Aplicacion;
+    type: string;
 }

@@ -27,6 +27,7 @@ import GenericModal from '@/components/modal/GenericModal';
 import { useRouter } from 'next/navigation';
 import { useLoading } from '@/hooks/useLoading';
 import dayjs from 'dayjs';
+import { Roles } from '@/domain/enum/Roles';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -51,11 +52,11 @@ const CrearAplicacionPage: React.FC = () => {
     const [addRecipeItemModal, setAddRecipeModalOpen] = useState<boolean>(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const router = useRouter();
-    const { getApiService, isReady } = useAuth();
+    const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
     const { withLoading } = useLoading();
     const title = 'Crear Aplicación'
-
+    console.log(user);
     const customInputSx = {
         '& .MuiInputBase-root': {
             borderRadius: '10px',
@@ -144,7 +145,7 @@ const CrearAplicacionPage: React.FC = () => {
 
        // const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
 
-        const existingProductIndex = productosAAgregar.findIndex((p) => p.productId === producto.id);
+        const existingProductIndex = productosAAgregar.findIndex((p) => p.product_id === producto.id);
 
         if (existingProductIndex !== -1) {
             console.warn("Ya se agrego el producto", producto.name);
@@ -153,13 +154,13 @@ const CrearAplicacionPage: React.FC = () => {
             setProductosAAgregar(
                 [...productosAAgregar,
                 {
-                    productId: producto.id,
+                    product_id: producto.id,
                     id: producto.id, //Esto se hace para poder usar el useItemManager
                     prodName: producto.name,
                     amount: amount,
                     unit: producto.unit,
-                    doseType: doseType,
-                    lotNumber: producto.lot_number
+                    dose_type: doseType,
+                    lot_number: producto.lot_number
                 }]);
         }
     };
@@ -174,11 +175,11 @@ const CrearAplicacionPage: React.FC = () => {
     } = useItemsManager(productosAAgregar);
 
     const quitarItem = (id: string) => {
-        setProductosAAgregar((prev) => prev.filter((item) => item.productId !== id));
+        setProductosAAgregar((prev) => prev.filter((item) => item.product_id !== id));
     };
 
-    const items = transformToItems(productosAAgregar, "id", ["prodName", "amount", "unit", "doseType"]).map((item) => {
-        if(item.doseType==="SURFACE")
+    const items = transformToItems(productosAAgregar, "id", ["prodName", "amount", "unit", "dose_type"]).map((item) => {
+        if(item.dose_type==="SURFACE")
             return {
                 ...item,
                 display: `${item.prodName}: ${item.amount} ${item.unit} POR HECTAREA`
@@ -201,11 +202,11 @@ const CrearAplicacionPage: React.FC = () => {
     const handleFinish = async () => {
         console.log("Finishing application creation");
         const recipeItems = productosAAgregar.map((p) => ({
-            product_id: p.productId,
+            product_id: p.product_id,
             amount: p.amount,
             unit: p.unit,
-            dose_type: p.doseType,
-            lot_number: p.lotNumber
+            dose_type: p.dose_type,
+            lot_number: p.lot_number
         }));
         const recipeReq = {
             type: "ENGINEER_RECIPE",
@@ -223,10 +224,17 @@ const CrearAplicacionPage: React.FC = () => {
 
         console.log(createAplicationReq);
         try {
-            const response = await withLoading(
-                apiService.create("applications/instant", createAplicationReq),
-                "Creando aplicación..."
-            );
+            let response
+            if(user?.roles.includes(Roles.Aplicador))
+                response = await withLoading(
+                    apiService.create("applications/instant", createAplicationReq),
+                    "Creando aplicación..."
+                );
+            else
+                response = await withLoading(
+                    apiService.create("applications", createAplicationReq),
+                    "Creando aplicación..."
+                );
             if (response.success) {
                 setConfirmationModalOpen(true);
                 setAddRecipeModalOpen(false);
@@ -407,6 +415,7 @@ const CrearAplicacionPage: React.FC = () => {
                                                     }
                                                 }
                                             }}
+                                            defaultValue={dayjs()}
                                         />
                                     </DemoContainer>
                                 </LocalizationProvider>
@@ -450,48 +459,54 @@ const CrearAplicacionPage: React.FC = () => {
                             <Typography variant="body1" sx={{ mb: 3, color: '#666' }}>
                                 Hectáreas: {hectareas}
                             </Typography>
+                            {productosExistentes.length > 0 ?
+                            <>
+                                {productosAAgregar.length > 0 ?
+                                    <ItemList
+                                        items={items}
+                                        displayKeys={campos}
+                                        onSelect={toggleSelectItem}
+                                        selectedIds={selectedIds}
+                                        selectItems={false}
+                                        deleteItems={true}
+                                        onDelete={quitarItem}
+                                        selectSingleItem={false}
+                                    />
+                                : (
+                                    <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
+                                        Ingrese productos para agregar
+                                    </Typography>
+                                )}
 
-                            {productosAAgregar.length > 0 ? (
-                                <ItemList
-                                    items={items}
-                                    displayKeys={campos}
-                                    onSelect={toggleSelectItem}
-                                    selectedIds={selectedIds}
-                                    selectItems={false}
-                                    deleteItems={true}
-                                    onDelete={quitarItem}
-                                    selectSingleItem={false}
-                                />
-                            ) : (
+                                <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
+                                    <Button
+                                        variant="outlined"
+                                        onClick={() => setAddRecipeModalOpen(true)}
+                                        disabled={!isDataValid()}
+                                        sx={{
+                                            flex: 1,
+                                            py: 1.5,
+                                            borderColor: '#404e5c',
+                                            color: '#404e5c',
+                                            '&:hover': {
+                                                borderColor: '#404e5c',
+                                                backgroundColor: 'rgba(64, 78, 92, 0.04)',
+                                            },
+                                            borderRadius: '10px',
+                                            textTransform: 'none',
+                                            fontSize: '1rem',
+                                            fontWeight: 'bold'
+                                        }}
+                                    >
+                                        Agregar Producto
+                                    </Button>
+                                </Box>
+                            </>
+                            : (
                                 <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
-                                    Ingrese productos para agregar
+                                    No hay stock disonible en el campo seleccionado
                                 </Typography>
                             )}
-
-                            <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-                                <Button
-                                    variant="outlined"
-                                    onClick={() => setAddRecipeModalOpen(true)}
-                                    disabled={!isDataValid()}
-                                    sx={{
-                                        flex: 1,
-                                        py: 1.5,
-                                        borderColor: '#404e5c',
-                                        color: '#404e5c',
-                                        '&:hover': {
-                                            borderColor: '#404e5c',
-                                            backgroundColor: 'rgba(64, 78, 92, 0.04)',
-                                        },
-                                        borderRadius: '10px',
-                                        textTransform: 'none',
-                                        fontSize: '1rem',
-                                        fontWeight: 'bold'
-                                    }}
-                                >
-                                    Agregar Producto
-                                </Button>
-                            </Box>
-
                             <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
                                 <Button
                                     variant="outlined"
