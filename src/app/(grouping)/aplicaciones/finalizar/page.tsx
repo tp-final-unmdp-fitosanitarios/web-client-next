@@ -22,47 +22,6 @@ import { Stock } from "@/domain/models/Stock";
 import { Producto } from "@/domain/models/Producto";
 import { useLoading } from "@/hooks/useLoading";
 
-// MOCK DE DATOS
-const mockAplicacion: Aplicacion = {
-    id: "1",
-    status: EstadoAplicacion.EnCurso,
-    location_id: "F005",
-    created_at: new Date(),
-    unidad: Unidad.Litros,
-    cantidad: 100,
-    surface: 100,
-    aplicadorId: "Aplicador1",
-    engineer_id: "Ingeniero1",
-    recipe: {
-        type: "ENGINEER_RECIPE",
-        recipe_items: [
-            { product_id: "prod1", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L1A" },
-            { product_id: "prod2", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L2B" },
-            { product_id: "prod3", amount: 20, unit: Unidad.Kilogramos, dose_type: "SURFACE", lot_number: "L3C" }
-        ]
-    },
-    actual_application: {
-        id: "1-actual",
-        status: EstadoAplicacion.EnCurso,
-        location_id: "Campo Norte",
-        created_at: new Date(),
-        unidad: Unidad.Litros,
-        cantidad: 100,
-        surface: 100,
-        aplicadorId: "Aplicador1",
-        engineer_id: "Ingeniero1",
-        recipe: {
-            type: "ENGINEER_RECIPE",
-            recipe_items: [
-                { product_id: "prod1", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L1A" },
-                { product_id: "prod2", amount: 20, unit: Unidad.Litros, dose_type: "SURFACE", lot_number: "L2B" },
-                { product_id: "prod3", amount: 20, unit: Unidad.Kilogramos, dose_type: "SURFACE", lot_number: "L3C" }
-            ]
-        },
-        actual_application: undefined as any
-    }
-};
-
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
     prodName: string;
@@ -102,15 +61,33 @@ export default function FinalizarAplicacion() {
         closeModal,
     } = useItemsManager(productosAAgregar);
 
+    const fetchProductos = async (locId: string) => {
+        try {
+            const stockRes = await apiService.get<ResponseItems<Stock>>(`stock?location=${locId}`);
+            const stock = stockRes.data.content;
+            const prods = stock.map((s) => ({
+                ...s.product,
+                lot_number: s.lot_number,
+                cantidadEnStock: s.amount
+            }));
+            setProductosExistentes(prods);
+        }
+        catch (e: any) {
+            console.log(e.message);
+            return [];
+        }
+    }
+
     const fetchApplication = async () => {
         try {
             const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
             console.log(response);
-            setAplicacion(response.data);
-            setLoading(false);
+            const app = response.data
+            const loc = app.location.parent_location;
+            fetchProductos(loc.id);
+            setAplicacion(app);
         } catch (e: any) {
             console.error("Error en la solicitud:", e.message);
-            return null;
         }
     }
 
@@ -189,17 +166,19 @@ export default function FinalizarAplicacion() {
         setActiveStep(0);
     }
 
-    useEffect(() => {
+    const fetchData = async () => {
         // Simula un fetch con mock
         fetchMaquinas();
-        if(aplicacion?.location_id)
-        fetchProductos(aplicacion?.location_id);
+        await fetchApplication();
+        //if(aplicacion?.location){
+        //    const loc = aplicacion?.location.parent_location;
+          //  fetchProductos(loc.id);
+        //}
+        setLoading(false);
+    }
 
-        fetchApplication();
-        /*setTimeout(() => {
-            setAplicacion(mockAplicacion);
-            setLoading(false);
-        }, 500);*/
+    useEffect(() => {
+        fetchData();
     }, [applicationId]);
 
     if (loading) 
@@ -251,24 +230,6 @@ export default function FinalizarAplicacion() {
             color: '#404e5c',
         },
     };
-
-    const fetchProductos = async (locId: string) => {
-        try {
-            const stockRes = await apiService.get<ResponseItems<Stock>>(`stock?location=${locId}`);
-            const stock = stockRes.data.content;
-            const prods = stock.map((s) => ({
-                ...s.product,
-                lot_number: s.lot_number,
-                cantidadEnStock: s.amount
-            }));
-            setProductosExistentes(prods);
-        }
-        catch (e: any) {
-            console.log(e.message);
-            return [];
-        }
-
-    }
 
     const handleAddProducto = (producto: ProductoExistente, amount: number, dose_type: string) => {
         if (!amount ) return;

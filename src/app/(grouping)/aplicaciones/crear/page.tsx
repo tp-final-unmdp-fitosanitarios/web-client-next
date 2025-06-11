@@ -56,7 +56,7 @@ const CrearAplicacionPage: React.FC = () => {
     const apiService = getApiService();
     const { withLoading } = useLoading();
     const title = 'Crear Aplicación'
-    console.log(user);
+    
     const customInputSx = {
         '& .MuiInputBase-root': {
             borderRadius: '10px',
@@ -126,7 +126,7 @@ const CrearAplicacionPage: React.FC = () => {
         e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
         if(hectareas > 0 && campo !== "" && expirationDate !== null){
             setActiveStep(1);
-            const locId = locations.find(c => c.name === campo)?.id;
+            const locId = locations.find(c => c.id === campo)?.id;
             if(locId)
                 fetchProductos(locId);
             else
@@ -212,7 +212,7 @@ const CrearAplicacionPage: React.FC = () => {
             type: "ENGINEER_RECIPE",
             recipe_items: recipeItems
         }
-        const locId = locations.find(c => c.name === cultivo)?.id;
+        const locId = locations.find(c => c.id === cultivo)?.id;
         if(!locId)
             alert("Error al encontrar la locacion");
 
@@ -259,7 +259,7 @@ const CrearAplicacionPage: React.FC = () => {
     const filterField = (l: Locacion) => {
         if (l.type !== 'FIELD') return false;
 
-        const parentLoc = locations.find((loc) => loc.name === zona);
+        const parentLoc = locations.find((loc) => loc.id === zona);
         if (!parentLoc) return false;
 
         return l.parent_location.id === parentLoc.id
@@ -268,7 +268,7 @@ const CrearAplicacionPage: React.FC = () => {
     const filterCrop = (l: Locacion) => {
         if (l.type !== 'CROP') return false;
 
-        const parentLoc = locations.find((loc) => loc.name === campo);
+        const parentLoc = locations.find((loc) => loc.id === campo);
         if (!parentLoc) return false;
 
         return l.parent_location.id === parentLoc.id
@@ -335,7 +335,7 @@ const CrearAplicacionPage: React.FC = () => {
                                     }}
                                 >
                                     {locations?.filter((l) => l.type === "ZONE").map((l) => (
-                                        <MenuItem key={l.id ?? l.name} value={l.name}>
+                                        <MenuItem key={l.id ?? l.name} value={l.id}>
                                             {l.name}
                                         </MenuItem>
                                     ))}
@@ -361,7 +361,7 @@ const CrearAplicacionPage: React.FC = () => {
                                     }}
                                 >
                                     {locations?.filter((l) => filterField(l)).map((l) => (
-                                        <MenuItem key={l.id ?? l.name} value={l.name}>
+                                        <MenuItem key={l.id ?? l.name} value={l.id}>
                                             {l.name}
                                         </MenuItem>
                                     ))}
@@ -387,7 +387,7 @@ const CrearAplicacionPage: React.FC = () => {
                                     }}
                                 >
                                     {locations?.filter((l) => filterCrop(l)).map((l) => (
-                                        <MenuItem key={l.id ?? l.name} value={l.name}>
+                                        <MenuItem key={l.id ?? l.name} value={l.id}>
                                             {l.name}
                                         </MenuItem>
                                     ))}

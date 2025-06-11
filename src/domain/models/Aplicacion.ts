@@ -17,4 +17,5 @@ export interface Aplicacion {
     recipe: Recipe;
     actual_application: Aplicacion;
     type: string;
+    location: Locacion;
 }
