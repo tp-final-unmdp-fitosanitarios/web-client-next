@@ -10,7 +10,6 @@ import { Unidad } from "@/domain/enum/Unidad";
 import { Field } from "@/domain/models/Field";
 import { Producto } from "@/domain/models/Producto";
 import { Agroquimico } from "@/domain/models/Agroquimico";
-import { Proveedor } from "@/domain/models/Proveedor";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import styles from "./editProductos.module.scss";
 import { ResponseItems } from "@/domain/models/ResponseItems";
@@ -23,7 +22,6 @@ interface EditProductPayload {
   brand: string;
   created_at: string;
   agrochemical_id: string;
-  provider_ids: string[];
 }
 
 
@@ -39,7 +37,6 @@ const EditarProducto = () => {
   const [product, setProduct] = useState<Producto | null>(null);
 
   const [agroquimicos, setAgroquimicos] = useState<Agroquimico[]>([]);
-  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
 
   useEffect(() => {
     if (!isReady) return;
@@ -47,12 +44,12 @@ const EditarProducto = () => {
     const fetchData = async () => {
       try {
         const agroResponse = await apiService.get<ResponseItems<Agroquimico>>("/agrochemicals");
-        const provResponse = await apiService.get<ResponseItems<Proveedor>>("/providers");
-        if (agroResponse.success && provResponse.success) {
+
+        if (agroResponse.success ) {
           setAgroquimicos(agroResponse.data.content);
-          setProveedores(provResponse.data.content);
+  
         } else {
-          console.error("Error al obtener agroquímicos o proveedores");
+          console.error("Error al obtener agroquímicos");
         }
       } catch (error: any) {
         console.error("Error en la solicitud:", error.message);
@@ -95,19 +92,13 @@ const EditarProducto = () => {
       (a) => a.active_principle === inputData.agroquimico
     );
 
-    const proveedoresSeleccionados = proveedores.filter(
-      (p) => (inputData.proveedor as string).split(',').includes(p.name)
-    );
 
     if (!agroquimicoSeleccionado) {
       console.error("Agroquímico no encontrado");
       return;
     }
 
-    if (proveedoresSeleccionados.length === 0) {
-      console.error("Proveedor no encontrado");
-      return;
-    }
+  
    
     const payload: EditProductPayload = {
       name: String(inputData.nombre),
@@ -116,7 +107,7 @@ const EditarProducto = () => {
       brand: String(inputData.marca),
       agrochemical_id: agroquimicoSeleccionado.id,
       created_at: product?.created_at || "",
-      provider_ids: proveedoresSeleccionados.map(p => p.id)
+
     };
 
     //console.log(payload);
@@ -146,9 +137,7 @@ const EditarProducto = () => {
            formData.cantidad && 
            formData.unidad && 
            formData.marca && 
-           formData.agroquimico && 
-           formData.categoria && 
-           formData.proveedor;
+           formData.agroquimico   
   };
 
   const handleCancel = () => {
@@ -188,23 +177,7 @@ const EditarProducto = () => {
       options: Array.from(new Set(agroquimicos.map((a) => a.active_principle))).sort(),
       defaultValue: product?.agrochemical?.active_principle || "",
       multiple: false
-    },
-    {
-      name: "categoria",
-      label: "Categoría",
-      type: "select",
-      options: Array.from(new Set(["HERBICIDE", "INSECTICIDE", "FUNGICIDE"])).sort(),
-      defaultValue: product?.agrochemical?.category || "",
-      multiple: false
-    },
-    {
-      name: "proveedor",
-      label: "Proveedores",
-      type: "select",
-      options: Array.from(new Set(proveedores.map((p) => p.name))).sort(),
-      defaultValue: product?.providers?.map(p => p.name).join(',') || "",
-      multiple: true
-    },
+    }
   ];
 
   return (

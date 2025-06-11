@@ -10,7 +10,6 @@ import { Unidad } from "@/domain/enum/Unidad";
 import { Field } from "@/domain/models/Field";
 import { Producto } from "@/domain/models/Producto";
 import { Agroquimico } from "@/domain/models/Agroquimico";
-import { Proveedor } from "@/domain/models/Proveedor";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import styles from "./agregarProductos.module.scss";
 import { ResponseItems } from "@/domain/models/ResponseItems";
@@ -23,7 +22,6 @@ interface CreateProductPayload {
   brand: string;
   created_at: string;
   agrochemical_id: string;
-  provider_ids: string[];
 }
 
 
@@ -42,7 +40,6 @@ export default function AgregarProductos() {
     brand: "",
     agrochemical_id: "",
     created_at: new Date().toISOString(),
-    providers: [],
     agrochemical: {
       id: "",
       active_principle: "",
@@ -55,7 +52,7 @@ export default function AgregarProductos() {
   });
 
   const [agroquimicos, setAgroquimicos] = useState<Agroquimico[]>([]);
-  const [proveedores, setProveedores] = useState<Proveedor[]>([]);
+
 
   useEffect(() => {
     if (!isReady) return;
@@ -63,13 +60,13 @@ export default function AgregarProductos() {
     const fetchData = async () => {
       try {
         const agroResponse = await apiService.get<ResponseItems<Agroquimico>>("/agrochemicals");
-        const provResponse = await apiService.get<ResponseItems<Proveedor>>("/providers");
-        if (agroResponse.success && provResponse.success) {
+     
+        if (agroResponse.success) {
           console.log("Agroquímico recibido ", agroResponse.data.content);
           setAgroquimicos(agroResponse.data.content);
-          setProveedores(provResponse.data.content);
+         
         } else {
-          console.error("Error al obtener agroquímicos o proveedores");
+          console.error("Error al obtener agroquímicos");
         }
       } catch (error: any) {
         console.error("Error en la solicitud:", error.message);
@@ -90,17 +87,10 @@ export default function AgregarProductos() {
       (a) => a.active_principle === inputData.agroquimico
     );
 
-    const proveedorSeleccionado = proveedores.find(
-      (p) => p.name === inputData.proveedor
-    );
+
 
     if (!agroquimicoSeleccionado) {
       console.error("Agroquímico no encontrado");
-      return;
-    }
-
-    if (!proveedorSeleccionado) {
-      console.error("Proveedor no encontrado");
       return;
     }
    
@@ -109,9 +99,8 @@ export default function AgregarProductos() {
       unit: inputData.unidad as string,
       amount: Number(inputData.cantidad),
       brand: String(inputData.marca),
-      agrochemical_id: agroquimicoSeleccionado.id,
+      agrochemical_id: agroquimicoSeleccionado!.id,
       created_at: new Date().toISOString(),
-      provider_ids: [proveedorSeleccionado.id]
     };
   
     createProduct(payload);
@@ -122,9 +111,7 @@ export default function AgregarProductos() {
            formData.cantidad && 
            formData.unidad && 
            formData.marca && 
-           formData.agroquimico && 
-           formData.categoria && 
-           formData.proveedor;
+           formData.agroquimico
   };
 
   const createProduct = async (payload:CreateProductPayload) => {
@@ -168,18 +155,6 @@ export default function AgregarProductos() {
       type: "select",
       options: Array.from(new Set(agroquimicos.map((a) => a.active_principle))).sort(),
     },
-    {
-      name: "categoria",
-      label: "Categoría",
-      type: "select",
-      options: Array.from(new Set(["HERBICIDE", "INSECTICIDE", "FUNGICIDE"])).sort(),
-    },
-    {
-      name: "proveedor",
-      label: "Proveedor",
-      type: "select",
-      options: Array.from(new Set(proveedores.map((p) => p.name))).sort(),
-    },
   ];
 
   return (
@@ -196,7 +171,9 @@ export default function AgregarProductos() {
         equalButtonWidth={true}
         isSubmitDisabled={(formData) => !isFormValid(formData)}
       />
+     
       </div>
+      
       <Footer />
       <GenericModal
         isOpen={modalOpen}
@@ -206,7 +183,8 @@ export default function AgregarProductos() {
         buttonTitle="Cerrar"
         showSecondButton={false}
       />
+
+
     </div>
   );
 }
-

@@ -50,6 +50,7 @@ export default function FinalizarAplicacion() {
     const [addRecipeItemModal, setAddRecipeModalOpen] = useState<boolean>(false);
     const [productosAAgregar, setProductosAAgregar] = useState<RecipeItemAAgregar[]>([]);
     const [productosExistentes, setProductosExistentes] = useState<ProductoExistente[]>([]);
+    const [productosDetalles, setProductosDetalles] = useState<{[key: string]: string}>({});
 
     // Custom hooks
     const {
@@ -181,16 +182,41 @@ export default function FinalizarAplicacion() {
         fetchData();
     }, [applicationId]);
 
+    useEffect(() => {
+        if (aplicacion) {
+            fetchProductosDetalles();
+        }
+    }, [aplicacion]);
+
     if (loading) 
         return <div>Cargando...</div>;
     if (!aplicacion) return <div>No se encontró la aplicación.</div>;
 
-    const cultivo = aplicacion.location_id;
+    const cultivo = aplicacion.location.name;
     const fecha = new Date(aplicacion.created_at).toLocaleDateString();
+
+    const fetchProductosDetalles = async () => {
+        try {
+            const productosIds = aplicacion?.recipe?.recipe_items?.map(item => item.product_id) || [];
+            const detalles = await Promise.all(
+                productosIds.map(async (id) => {
+                    const response = await apiService.get<Producto>(`products/${id}`);
+                    return { id, name: response.data.name };
+                })
+            );
+            const detallesMap = detalles.reduce((acc, curr) => {
+                acc[curr.id] = curr.name;
+                return acc;
+            }, {} as {[key: string]: string});
+            setProductosDetalles(detallesMap);
+        } catch (error) {
+            console.error("Error al obtener detalles de productos:", error);
+        }
+    };
 
     const productos = aplicacion.recipe?.recipe_items?.map((item) => ({
         id: item.product_id,
-        title: `Producto ${item.product_id + 1}`,
+        title: productosDetalles[item.product_id] || item.product_id,
         description: `${item.unit.toLowerCase()} x ${item.amount}${item.unit} - ${item.dose_type === "SURFACE" ? item.amount + "/Ha" : item.amount}`
     })) || [];
 
