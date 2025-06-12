@@ -60,11 +60,13 @@ export default function Home() {
       { label: "Productos", path: "/productos" }, 
       { label: "Stock", path: "/stock" },
       { label: "Ubicaciones", path: "/locaciones" },
+      { label: "Cultivos", path: "/cultivos" },
     );
   }else if (user && Array.isArray(user.roles) && user.roles.length > 0 && user.roles[0] === Roles.Aplicador) {
     buttons.push(
       { label: "Aplicaciones", path: "/aplicaciones" },
       { label: "Stock", path: "/stock" },
+      { label: "Cultivos", path: "/cultivos" },
     );
   }
 

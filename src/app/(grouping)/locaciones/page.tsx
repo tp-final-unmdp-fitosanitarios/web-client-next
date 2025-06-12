@@ -23,7 +23,8 @@ const locationTypes = {
     ZONE: "Zona",
     WAREHOUSE: "Depósito",
     FIELD: "Campo",
-    CROP: "Cultivo"
+    CROP: "Cultivo",
+    LOT: "Lote"
 };
 
 export default function LocacionesView() {
