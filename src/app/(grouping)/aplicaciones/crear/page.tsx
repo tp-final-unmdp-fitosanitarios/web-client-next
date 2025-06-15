@@ -28,6 +28,7 @@ import { useRouter } from 'next/navigation';
 import { useLoading } from '@/hooks/useLoading';
 import dayjs from 'dayjs';
 import { Roles } from '@/domain/enum/Roles';
+import { User } from '@/domain/models/User';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -42,6 +43,9 @@ type ProductoExistente = Producto & {
 const CrearAplicacionPage: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [locations, setLocations] = useState<Locacion[]>([]);
+    const [applicators, setApplicators] = useState<User[]>([]);
+    const [selectedApplicator, setSelectedApplicator] = useState<string>("");
+    const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
     const [hectareas, setHectareas] = useState<number>(0);
     const [zona, setZona] = useState<string>("");
     const [campo, setCampo] = useState<string>("");
@@ -85,12 +89,27 @@ const CrearAplicacionPage: React.FC = () => {
 
     const fetchLocations = async (): Promise<Locacion[]> => {
         try {
-            const response = await apiService.get<Locacion[]>("locations?type=ZONE&type=FIELD&type=CROP");
+            const response = await apiService.get<Locacion[]>("locations?type=ZONE&type=FIELD&type=CROP&type=WAREHOUSE");
             const locaciones = response.data;
             return locaciones;
         }
         catch (e: any) {
             console.log(e.message);
+            return [];
+        }
+    }
+
+    const fetchApplicators = async (): Promise<User[]> => {
+        try {
+            const response = await apiService.get<any>("users/applicators");
+            const aplicadores = response.data.users || [];
+            console.log(aplicadores.users);
+            setApplicators(aplicadores);
+            return aplicadores;
+        }
+        catch (e: any) {
+            console.log(e.message);
+            setApplicators([]);
             return [];
         }
     }
@@ -117,6 +136,7 @@ const CrearAplicacionPage: React.FC = () => {
         if (!isReady) return;
         const fetchData = async () => {
             const locs = await fetchLocations();
+            await fetchApplicators();
             setLocations(locs);
         };
         fetchData();
@@ -124,9 +144,9 @@ const CrearAplicacionPage: React.FC = () => {
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-        if(hectareas > 0 && campo !== "" && expirationDate !== null){
+        if(hectareas > 0 && cultivo !== "" && expirationDate !== null && selectedWarehouse !== ""){
             setActiveStep(1);
-            const locId = locations.find(c => c.id === campo)?.id;
+            const locId = locations.find(c => c.id === selectedWarehouse)?.id;
             if(locId)
                 fetchProductos(locId);
             else
@@ -219,7 +239,9 @@ const CrearAplicacionPage: React.FC = () => {
         const createAplicationReq = {
             location_id: locId,
             surface: hectareas,
-            recipe: recipeReq
+            recipe: recipeReq,
+            applicator_id: selectedApplicator ? selectedApplicator : null,
+            warehouse_id: selectedWarehouse
         }
 
         console.log(createAplicationReq);
@@ -256,8 +278,8 @@ const CrearAplicacionPage: React.FC = () => {
         router.push("/stock");
     }
 
-    const filterField = (l: Locacion) => {
-        if (l.type !== 'FIELD') return false;
+    const filterField = (l: Locacion) => { //Se usaba para buscar campos hijos de una
+        if (l.type !== 'FIELD') return false;//zona recibida por paramettro
 
         const parentLoc = locations.find((loc) => loc.id === zona);
         if (!parentLoc) return false;
@@ -318,37 +340,11 @@ const CrearAplicacionPage: React.FC = () => {
                                 <TextField
                                     fullWidth
                                     select
-                                    name="zona"
-                                    value={zona}
-                                    onChange={(e) => setZona(e.target.value)}
-                                    label="Selecciona una zona"
-                                    variant="outlined"
-                                    sx={{
-                                        mb: 2,
-                                        '& .MuiOutlinedInput-root': {
-                                            borderRadius: '10px',
-                                            backgroundColor: '#e6ebea',
-                                        },
-                                        '& .MuiInputLabel-root': {
-                                            color: '#404e5c',
-                                        },
-                                    }}
-                                >
-                                    {locations?.filter((l) => l.type === "ZONE").map((l) => (
-                                        <MenuItem key={l.id ?? l.name} value={l.id}>
-                                            {l.name}
-                                        </MenuItem>
-                                    ))}
-                                </TextField>
-                                <TextField
-                                    fullWidth
-                                    select
                                     name="campo"
                                     value={campo}
                                     onChange={(e) => setCampo(e.target.value)}
                                     label="Selecciona un campo"
                                     variant="outlined"
-                                    disabled = {zona===""}
                                     sx={{
                                         mb: 2,
                                         '& .MuiOutlinedInput-root': {
@@ -360,7 +356,7 @@ const CrearAplicacionPage: React.FC = () => {
                                         },
                                     }}
                                 >
-                                    {locations?.filter((l) => filterField(l)).map((l) => (
+                                    {locations?.filter((l) => l.type === "FIELD").map((l) => (
                                         <MenuItem key={l.id ?? l.name} value={l.id}>
                                             {l.name}
                                         </MenuItem>
@@ -389,6 +385,56 @@ const CrearAplicacionPage: React.FC = () => {
                                     {locations?.filter((l) => filterCrop(l)).map((l) => (
                                         <MenuItem key={l.id ?? l.name} value={l.id}>
                                             {l.name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    name="warehouse"
+                                    value={selectedWarehouse}
+                                    onChange={(e) => setSelectedWarehouse(e.target.value)}
+                                    label="Selecciona un depósito"
+                                    variant="outlined"
+                                    sx={{
+                                        mb: 2,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: '#e6ebea',
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: '#404e5c',
+                                        },
+                                    }}
+                                >
+                                    {locations?.filter((l) => l.type === "WAREHOUSE").map((l) => (
+                                        <MenuItem key={l.id ?? l.name} value={l.id}>
+                                            {l.name}
+                                        </MenuItem>
+                                    ))}
+                                </TextField>
+                                <TextField
+                                    fullWidth
+                                    select
+                                    name="applicator"
+                                    value={selectedApplicator}
+                                    onChange={(e) => setSelectedApplicator(e.target.value)}
+                                    label="Selecciona un aplicador"
+                                    variant="outlined"
+                                    sx={{
+                                        mb: 2,
+                                        '& .MuiOutlinedInput-root': {
+                                            borderRadius: '10px',
+                                            backgroundColor: '#e6ebea',
+                                        },
+                                        '& .MuiInputLabel-root': {
+                                            color: '#404e5c',
+                                        },
+                                    }}
+                                >
+                                    {Array.isArray(applicators) && applicators.map((applicator) => (
+                                        <MenuItem key={applicator.id} value={applicator.id}>
+                                            {applicator.first_name+" "+applicator.last_name}
                                         </MenuItem>
                                     ))}
                                 </TextField>

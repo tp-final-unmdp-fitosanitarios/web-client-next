@@ -14,6 +14,7 @@ import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
 import { useRouter } from 'next/navigation';
+import { useAuth } from '../Auth/AuthProvider';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -89,6 +90,7 @@ interface AplicacionesTabsProps {
 export default function AplicacionesTabs({ aplicaciones, productos, locaciones }: AplicacionesTabsProps) {
   const router = useRouter();
   const [value, setValue] = React.useState(0);
+  const {user} = useAuth();
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -125,6 +127,10 @@ const startApplication = (id: string) => {
 
 const finishApplication = (id: string) => {
   router.push(`aplicaciones/finalizar?id=${id}`);
+}
+
+const confirmApplication = (id: string) => {
+  router.push(`aplicaciones/confirmar?id=${id}`);
 }
 
 const campos = ["display"];
@@ -187,7 +193,8 @@ const campos = ["display"];
             selectedIds={selectedIds}
             selectItems={false}
             deleteItems={false}
-            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
+            selectSingleItem={user?.roles.includes("ENGINEER") ? true : false}
+            onSelectSingleItem={confirmApplication}
           />
         ) : (
           <div style={{textAlign: "center"}}>No hay aplicaciones a confirmar</div>
