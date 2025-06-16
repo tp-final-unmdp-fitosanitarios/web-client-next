@@ -18,6 +18,11 @@ interface homePageProps {
 export default function HomepageJerarquico({ user, buttons }: homePageProps) {
   const userName = user.first_name+" "+user.last_name;
 
+  const allButtons = [
+    ...buttons,
+    { label: "Consolidado", path: "/aplicaciones/consolidado" }
+  ];
+
   return (
     <>
       <div className={styles.homeContainer}>
@@ -25,7 +30,7 @@ export default function HomepageJerarquico({ user, buttons }: homePageProps) {
         <h1 className={styles.welcomeTitle}>Bienvenido/a</h1>
         <h1 className={styles.username}>{userName}</h1>
         <div className={styles.buttonContainer}>
-          {buttons.map((button, index) => (
+          {allButtons.map((button, index) => (
             <NavigationLink key={index} href={button.path}>
               <button className={`button button-primary ${styles.buttonHome}`}>
                 {button.label}

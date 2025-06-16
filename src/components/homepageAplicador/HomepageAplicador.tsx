@@ -18,6 +18,11 @@ export default function HomepageAplicador({user,buttons}:homePageProps) {
 
     const userName = user.first_name+" "+user.last_name;
 
+    const allButtons = [
+        ...buttons,
+        { label: "Consolidado", path: "/aplicaciones/consolidado" }
+    ];
+
     return (
         <>
         <div className={styles.homeContainer}>
@@ -26,7 +31,7 @@ export default function HomepageAplicador({user,buttons}:homePageProps) {
             <h1>{userName}</h1>
             {/* <ContenedorDeAplicaciones pestañaActual={pestañaActual}/> */}
             <div className={styles.buttonContainer}>
-          {buttons.map((button, index) => (
+          {allButtons.map((button, index) => (
             <NavigationLink key={index} href={button.path}>
               <button className={`button button-primary ${styles.buttonHome}`}>
                 {button.label}
