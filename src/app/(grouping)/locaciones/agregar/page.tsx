@@ -13,7 +13,8 @@ const locationTypes = {
     ZONE: "Zona",
     WAREHOUSE: "Depósito",
     FIELD: "Campo",
-    CROP: "Cultivo"
+    CROP: "Cultivo",
+    LOT: "Lote"
 };
 
 export default function AgregarLocacion() {
@@ -27,7 +28,10 @@ export default function AgregarLocacion() {
         address: "",
         area: "",
         type: "ZONE",
-        parent_location_id: ""
+        parent_location_id: "",
+        end_of_sowing: "",
+        variety: "",
+        crop_number: ""
     });
 
     const [parentLocations, setParentLocations] = useState<Locacion[]>([]);
@@ -40,11 +44,16 @@ export default function AgregarLocacion() {
             let parentType = "";
             switch (type) {
                 case "WAREHOUSE":
+                    parentType = "ZONE";
+                    break;
                 case "FIELD":
                     parentType = "ZONE";
                     break;
-                case "CROP":
+                case "LOT":
                     parentType = "FIELD";
+                    break;
+                case "CROP":
+                    parentType = "LOT";
                     break;
                 default:
                     setParentLocations([]);
@@ -165,7 +174,7 @@ export default function AgregarLocacion() {
                             </select>
                         </div>
 
-                        {(formData.type === "WAREHOUSE" || formData.type === "FIELD" || formData.type === "CROP") && (
+                        {(formData.type === "WAREHOUSE" || formData.type === "FIELD" || formData.type === "LOT" || formData.type === "CROP") && (
                             <div className={styles.formGroup}>
                                 <label htmlFor="parent_location_id">Ubicación Padre *</label>
                                 <select
@@ -209,6 +218,46 @@ export default function AgregarLocacion() {
                                     min="0"
                                 />
                             </div>
+                        )}
+
+                        {formData.type === "CROP" && (
+                            <>
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="end_of_sowing">Fin de siembra *</label>
+                                    <input
+                                        type="date"
+                                        id="end_of_sowing"
+                                        name="end_of_sowing"
+                                        value={formData.end_of_sowing}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="variety">Variedad *</label>
+                                    <input
+                                        type="text"
+                                        id="variety"
+                                        name="variety"
+                                        value={formData.variety}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+
+                                <div className={styles.formGroup}>
+                                    <label htmlFor="crop_number">Número de cultivo *</label>
+                                    <input
+                                        type="text"
+                                        id="crop_number"
+                                        name="crop_number"
+                                        value={formData.crop_number}
+                                        onChange={handleInputChange}
+                                        required
+                                    />
+                                </div>
+                            </>
                         )}
 
                         {error && <div className={styles.error}>{error}</div>}

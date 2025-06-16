@@ -1,0 +1,70 @@
+@use '../../styles/variables' as *;
+
+.titleContainer {
+  margin: 3rem 2rem 2rem 2rem;
+}
+
+.title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: $dark-color;
+  text-align: center;
+}
+
+.tableContainer {
+  background-color: white;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  overflow-x: auto;
+  width: 100%;
+  margin: 0 auto;
+  margin-bottom: 2rem;
+}
+
+.table {
+  width: 100%;
+  min-width: 650px;
+}
+
+.tableHead {
+  background-color: $primary-color;
+  
+  th {
+    color: white;
+    font-weight: 600;
+    white-space: nowrap;
+    padding: 0.75rem;
+  }
+}
+
+.tableRow {
+  &:hover {
+    background-color: rgba($primary-color, 0.05);
+  }
+}
+
+.tableCell {
+  padding: 0.75rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  white-space: nowrap;
+}
+
+@media (min-width: 768px) {
+  .titleContainer {
+    margin: 4rem 2rem 3rem 2rem;
+  }
+
+  .title {
+    font-size: 2rem;
+  }
+
+  .tableContainer {
+    max-width: 1200px;
+    margin: 0 auto;
+    margin-bottom: 3rem;
+  }
+
+  .tableCell {
+    padding: 1rem;
+  }
+} 
