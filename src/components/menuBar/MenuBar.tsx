@@ -7,6 +7,8 @@ import pampaGrowLogo from "../../../public/PampaGrow.png"
 import { useRouter } from 'next/navigation';
 import { IoArrowBack } from 'react-icons/io5';
 import { useLoading } from '@/hooks/useLoading';
+import { format } from 'date-fns';
+import { es } from 'date-fns/locale';
 
 interface MenuBarProps {
     showMenu: boolean;
@@ -18,7 +20,7 @@ export default function MenuBar({ showMenu, showArrow, path}: MenuBarProps) {
     const router = useRouter();
     const { showLoader } = useLoading();
     const date: Date = new Date()
-    const dateWithoutTime: string = date.toLocaleDateString();
+    const dateWithoutTime: string = format(date, 'dd/MM/yyyy', { locale: es });
 
     function handleBackClick() {
         if (!showMenu && path) {
