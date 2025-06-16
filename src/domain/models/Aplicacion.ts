@@ -8,6 +8,7 @@ export interface Aplicacion {
     id: string;
     status: EstadoAplicacion;
     location_id: string;
+    stock_location_id: string;
     created_at: Date;
     unidad: Unidad;
     cantidad: number;

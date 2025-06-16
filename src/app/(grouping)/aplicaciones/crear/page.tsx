@@ -238,10 +238,11 @@ const CrearAplicacionPage: React.FC = () => {
 
         const createAplicationReq = {
             location_id: locId,
+            stock_location_id: selectedWarehouse,
             surface: hectareas,
             recipe: recipeReq,
             applicator_id: selectedApplicator ? selectedApplicator : null,
-            warehouse_id: selectedWarehouse
+            application_date: expirationDate?.toISOString()
         }
 
         console.log(createAplicationReq);
@@ -407,7 +408,7 @@ const CrearAplicacionPage: React.FC = () => {
                                         },
                                     }}
                                 >
-                                    {locations?.filter((l) => l.type === "WAREHOUSE").map((l) => (
+                                    {locations?.filter((l) => l.type === "WAREHOUSE" || l.type === "FIELD").map((l) => (
                                         <MenuItem key={l.id ?? l.name} value={l.id}>
                                             {l.name}
                                         </MenuItem>

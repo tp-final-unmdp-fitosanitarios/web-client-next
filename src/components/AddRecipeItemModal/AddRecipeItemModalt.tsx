@@ -49,7 +49,7 @@ const AddRecipeItemModal: React.FC<Props> = ({ open, setModalClose, products, ha
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if (selectedProduct!=="" && amount > 0) {
-            const prod = products.find(p => p.name === selectedProduct)
+            const prod = products.find(p => p.id === selectedProduct)
             if(prod){
                 handleAddProducto(prod, amount, doseType);
                 setModalClose();
@@ -104,20 +104,20 @@ const AddRecipeItemModal: React.FC<Props> = ({ open, setModalClose, products, ha
                         }}
                     >
                         {products.map((p) => (
-                            <MenuItem key={p.id ?? p.name} value={p.name}>
+                            <MenuItem key={p.id ?? p.name} value={p.id}>
                                 {p.name}
                             </MenuItem>
                         ))}
                     </TextField>
                     {selectedProduct ?
-                        <p className={styles.text}>Hay {products.find(p => p.name === selectedProduct)?.cantidadEnStock} {products.find(p => p.name === selectedProduct)?.unit} en stock</p>
+                        <p className={styles.text}>Hay {products.find(p => p.id === selectedProduct)?.cantidadEnStock} {products.find(p => p.id === selectedProduct)?.unit} en stock</p>
                         :
                         <></>
                     }
                     <TextField
                         fullWidth
                         type="number"
-                        label= {selectedProduct ? "Cantidad a aplicar en "+products.find(p => p.name === selectedProduct)?.unit 
+                        label= {selectedProduct ? "Cantidad a aplicar en "+products.find(p => p.id === selectedProduct)?.unit 
                             : `Cantidad a aplicar` }
                         onChange={(e) => setAmount(Number(e.target.value))}
                         required

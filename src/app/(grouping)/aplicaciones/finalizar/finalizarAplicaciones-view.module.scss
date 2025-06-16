@@ -45,25 +45,61 @@
     text-align: center;
 }
 
-.button {
-    margin: 10px;
-    min-width: 120px;
-}
-
 .buttonContainer {
     display: flex;
+    gap: 1.5rem;
+    margin-top: 1.5rem;
     justify-content: center;
-    gap: 16px;
-    margin-top: 24px;
-    width: 100%;
 }
 
-.button:disabled {
-    background-color: #cccccc;
-    color: #888888;
-    cursor: not-allowed;
-    opacity: 0.7;
+.button {
+    min-width: 30%;
+    max-width: 80%;
+    padding: $spacing-small;
+    border: none;
+    border-radius: $border-radius;
+    font-weight: $button-font-weight;
+    cursor: pointer;
+    color: $dark-color;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }
+
+.button-outlined {
+    background-color: transparent;
+    border: 2px solid #404e5c;
+    color: #404e5c;
+    &:hover {
+        background-color: rgba(64, 78, 92, 0.04);
+    }
+}
+
+.buttonSelect {
+    border: 2px solid $dark-color;
+    background-color: $light-color;
+    width: 80px;
+    padding: $spacing-small;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+  
+  .buttonChange {  
+    border: 2px solid $dark-color;
+    background-color: $light-color;
+    width: 80px;
+    padding: $spacing-small;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
 
 .fileInputContainer {
     display: flex;
@@ -100,39 +136,3 @@
         opacity: 0.7;
     }
 }
-
-.buttonSelect {
-    border: 2px solid $dark-color;
-    background-color: $light-color;
-    width: 80px;
-    height: 10px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-  }
-  
-  .buttonChange {  
-    border: 2px solid $dark-color;
-    background-color: $light-color;
-    width: 80px;
-    height: 10px;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-  }
-
-  .button {
-    min-width: 30%;
-    max-width: 80%;
-    padding: $spacing-small ;
-    border: none;
-    border-radius: $border-radius;
-    font-weight: $button-font-weight;
-    cursor: pointer;
-    color: $dark-color;
-  
-  }
