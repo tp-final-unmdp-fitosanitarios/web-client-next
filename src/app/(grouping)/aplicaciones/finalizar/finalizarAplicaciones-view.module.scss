@@ -64,3 +64,75 @@
     cursor: not-allowed;
     opacity: 0.7;
 }
+
+.fileInputContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+    margin-bottom: 1rem;
+}
+
+.fileInputWrapper {
+    display: flex;
+    align-items: center;
+}
+
+.filePreviewContainer {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-top: 0.5rem;
+}
+
+.fileName {
+    font-style: italic;
+    font-size: 14px;
+    color: #404e5c;
+}
+
+.fileIcon {
+    cursor: pointer;
+    transition: opacity 0.2s ease-in-out;
+    opacity: 1;
+
+    &:hover {
+        opacity: 0.7;
+    }
+}
+
+.buttonSelect {
+    border: 2px solid $dark-color;
+    background-color: $light-color;
+    width: 80px;
+    height: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+  
+  .buttonChange {  
+    border: 2px solid $dark-color;
+    background-color: $light-color;
+    width: 80px;
+    height: 10px;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0;
+  }
+
+  .button {
+    min-width: 30%;
+    max-width: 80%;
+    padding: $spacing-small ;
+    border: none;
+    border-radius: $border-radius;
+    font-weight: $button-font-weight;
+    cursor: pointer;
+    color: $dark-color;
+  
+  }

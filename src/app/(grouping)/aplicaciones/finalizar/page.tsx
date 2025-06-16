@@ -13,7 +13,7 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import { Maquina } from "@/domain/models/Maquina";
 import GenericModal from "@/components/modal/GenericModal";
 import { useRouter } from 'next/navigation';
-import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Button, Paper, Typography } from '@mui/material';
+import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Button, Paper, Typography, Modal } from '@mui/material';
 import { RecipeItem } from "@/domain/models/RecipeItem";
 import AddRecipeItemModal from "@/components/AddRecipeItemModal/AddRecipeItemModalt";
 import { transformToItems } from "@/utilities/transform";
@@ -21,6 +21,9 @@ import { useItemsManager } from "@/hooks/useItemsManager";
 import { Stock } from "@/domain/models/Stock";
 import { Producto } from "@/domain/models/Producto";
 import { useLoading } from "@/hooks/useLoading";
+import Image from "next/image";
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import ClearIcon from '@mui/icons-material/Clear';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -51,6 +54,10 @@ export default function FinalizarAplicacion() {
     const [productosAAgregar, setProductosAAgregar] = useState<RecipeItemAAgregar[]>([]);
     const [productosExistentes, setProductosExistentes] = useState<ProductoExistente[]>([]);
     const [productosDetalles, setProductosDetalles] = useState<{[key: string]: string}>({});
+    const [selectedFile, setSelectedFile] = useState<File | null>(null);
+    const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [fileBase64, setFileBase64] = useState<string | null>(null);
+    const [isPreviewOpen, setIsPreviewOpen] = useState(false);
 
     // Custom hooks
     const {
@@ -138,8 +145,8 @@ export default function FinalizarAplicacion() {
             recipe_items: recipeItems
         }
         const attachment = {
-            attachment: "xxx",
-            mime_type: "xxx"
+            attachment: fileBase64,
+            mime_type: selectedFile?.type
         }
     
         const finishAplicationReq = {
@@ -187,6 +194,16 @@ export default function FinalizarAplicacion() {
             fetchProductosDetalles();
         }
     }, [aplicacion]);
+
+    useEffect(() => {
+        if (!selectedFile) {
+            setPreviewUrl(null);
+            return;
+        }
+        const url = URL.createObjectURL(selectedFile);
+        setPreviewUrl(url);
+        return () => URL.revokeObjectURL(url);
+    }, [selectedFile]);
 
     if (loading) 
         return <div>Cargando...</div>;
@@ -304,6 +321,46 @@ export default function FinalizarAplicacion() {
 
     const campos = ["display"];
 
+    const handleVerArchivo = () => {
+        if (!previewUrl) {
+            alert("Aún no has cargado un archivo.");
+            return;
+        }
+        if (selectedFile?.type.startsWith("image/")) {
+            setIsPreviewOpen(true);
+        } else {
+            window.open(previewUrl, "_blank");
+        }
+    };
+
+    const handleFileSelect = (file: File | null) => {
+        if (file) {
+            // Check file size (10MB = 10 * 1024 * 1024 bytes)
+            const maxSize = 10 * 1024 * 1024;
+            if (file.size > maxSize) {
+                alert("El archivo es demasiado grande. El tamaño máximo permitido es 10MB.");
+                return;
+            }
+
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                const base64String = reader.result as string;
+                // Remove the data URL prefix (e.g., "data:image/jpeg;base64,")
+                const base64WithoutPrefix = base64String.split(',')[1];
+                setFileBase64(base64WithoutPrefix);
+            };
+            reader.readAsDataURL(file);
+        } else {
+            setFileBase64(null);
+        }
+        setSelectedFile(file);
+    };
+
+    const handleClearFile = () => {
+        setSelectedFile(null);
+        setPreviewUrl(null);
+        setFileBase64(null);
+    };
 
     return (
         <div className="page-container">
@@ -314,7 +371,7 @@ export default function FinalizarAplicacion() {
                 {/* STEPPER */}
                 <Box sx={{ width: '100%', mb: 4 }}>
                     <Stepper activeStep={activeStep} alternativeLabel>
-                        {['Datos', 'Máquina', 'Productos'].map((label) => (
+                        {['Datos', 'Máquina', 'Archivo', 'Productos'].map((label) => (
                             <Step key={label}>
                                 <StepLabel>{label}</StepLabel>
                             </Step>
@@ -373,31 +430,26 @@ export default function FinalizarAplicacion() {
                                 </MenuItem>
                             ))}
                         </TextField>
-
-                        {selectedMaquina && (
-                            <>
-                                <TextField
-                                    fullWidth
-                                    label="Patente"
-                                    value={selectedMaquina.internal_plate || ''}
-                                    InputProps={{ readOnly: true }}
-                                    sx={{
-                                        mt: 2,
-                                        ...customInputSx
-                                    }}
-                                />
-                                <TextField
-                                    fullWidth
-                                    label="Modelo"
-                                    value={selectedMaquina.model || ''}
-                                    InputProps={{ readOnly: true }}
-                                    sx={{
-                                        mt: 2,
-                                        ...customInputSx
-                                    }}
-                                />
-                            </>
-                        )}
+                        <TextField
+                            fullWidth
+                            label="Patente"
+                            value={selectedMaquina?.internal_plate || ''}
+                            InputProps={{ readOnly: true }}
+                            sx={{
+                                mt: 2,
+                                ...customInputSx
+                            }}
+                        />
+                        <TextField
+                            fullWidth
+                            label="Modelo"
+                            value={selectedMaquina?.model || ''}
+                            InputProps={{ readOnly: true }}
+                            sx={{
+                                mt: 2,
+                                ...customInputSx
+                            }}
+                        />
 
                         <div className={styles.buttonContainer}>
                             <button
@@ -417,8 +469,59 @@ export default function FinalizarAplicacion() {
                     </div>
                 )}
 
-                {/* PASO 3: Productos */}
+                {/* PASO 3: Archivo */}
                 {activeStep === 2 && (
+                    <div className={styles.container}>
+                        <h3 className={styles.productTitle}>Cargar archivo de la aplicación</h3>
+                        <div className={styles.fileInputContainer}>
+                            <label htmlFor="archivoFile" className={styles.label}>
+                                Cargar Archivo
+                            </label>
+                            <div className={styles.fileInputWrapper}>
+                                <input
+                                    id="archivoFile"
+                                    type="file"
+                                    accept="image/*,application/pdf"
+                                    onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
+                                    style={{ display: "none" }}
+                                />
+                                <label
+                                    htmlFor="archivoFile"
+                                    className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    {selectedFile ? "Cambiar" : "Seleccionar"}
+                                </label>
+                            </div>
+                        </div>
+                        {selectedFile && (
+                            <div className={styles.filePreviewContainer}>
+                                <span className={styles.fileName}>{selectedFile.name}</span>
+                                <VisibilityIcon className={styles.fileIcon} onClick={handleVerArchivo} />
+                                <ClearIcon className={styles.fileIcon} onClick={handleClearFile} />
+                            </div>
+                        )}
+
+                        <div className={styles.buttonContainer}>
+                            <button
+                                className={`button button-secondary ${styles.button}`}
+                                onClick={() => setActiveStep(1)}
+                            >
+                                Volver
+                            </button>
+                            <button
+                                className={`button button-primary ${styles.button}`}
+                                onClick={() => setActiveStep(3)}
+                                disabled={!selectedFile}
+                            >
+                                Continuar
+                            </button>
+                        </div>
+                    </div>
+                )}
+
+                {/* PASO 4: Productos */}
+                {activeStep === 3 && (
                     <Box sx={{ maxWidth: '800px', mx: 'auto', p: 3 }}>
                         <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
                             <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
@@ -468,7 +571,7 @@ export default function FinalizarAplicacion() {
                             <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
                                 <Button
                                     variant="outlined"
-                                    onClick={() => setActiveStep(0)}
+                                    onClick={() => setActiveStep(2)}
                                     sx={{
                                         flex: 1,
                                         py: 1.5,
@@ -527,6 +630,36 @@ export default function FinalizarAplicacion() {
                     buttonTitle="Cerrar"
                     showSecondButton={false}
                 />
+
+                {/* Modal imagen archivo */}
+                <Modal open={isPreviewOpen} onClose={() => setIsPreviewOpen(false)}>
+                    <Box
+                        sx={{
+                            position: 'absolute' as const,
+                            top: '50%',
+                            left: '50%',
+                            transform: 'translate(-50%, -50%)',
+                            bgcolor: 'background.paper',
+                            boxShadow: 24,
+                            p: 2,
+                            width: '80vw',
+                            height: '80vh',
+                            overflow: 'hidden',
+                        }}
+                    >
+                        {previewUrl && selectedFile?.type.startsWith('image/') && (
+                            <Box sx={{ position: 'relative', width: '100%', height: '100%' }}>
+                                <Image
+                                    src={previewUrl}
+                                    alt={`Archivo — ${selectedFile.name}`}
+                                    fill
+                                    style={{ objectFit: 'contain' }}
+                                    unoptimized
+                                />
+                            </Box>
+                        )}
+                    </Box>
+                </Modal>
             </div>
             <Footer />
         </div>

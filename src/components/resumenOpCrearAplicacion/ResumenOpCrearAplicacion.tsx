@@ -35,8 +35,8 @@ const ResumenOpCrearAplicacion: React.FC<ResumenOpCrearAplicacionProps> = ({
         handleFinish();
     }
 
-    const items = transformToItems(products, "id", ["prodName", "amount", "unit", "doseType"]).map((item) => {
-        if(item.doseType==="SURFACE")
+    const items = transformToItems(products, "id", ["prodName", "amount", "unit", "dose_type"]).map((item) => {
+        if(item.dose_type==="SURFACE")
             return {
                 ...item,
                 display: `${item.prodName}: ${item.amount} ${item.unit} POR HECTAREA`
@@ -110,13 +110,13 @@ const ResumenOpCrearAplicacion: React.FC<ResumenOpCrearAplicacionProps> = ({
 
                 <div className={styles.buttonContainer}>
                     <button 
-                        className={`button ${styles.buttonCancel}`} 
+                        className={`button button-secondary ${styles.button}`} 
                         onClick={setModalClose}
                     > 
                         Cancelar
                     </button>
                     <button 
-                        className={`button ${styles.buttonFinish}`} 
+                        className={`button button-primary ${styles.button}`} 
                         onClick={handleSubmit}
                     >
                         Finalizar

@@ -1,3 +1,5 @@
+@use '../../../styles/variables' as *;
+
 .title {
     text-align: center;
     margin: 2rem 0;
@@ -26,4 +28,28 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    
+}
+
+.buttonContainer {
+    display: flex;
+    gap: 1rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+}
+
+.button {
+    min-width: 30%;
+    max-width: 80%;
+    padding: $spacing-small;
+    border: none;
+    border-radius: $border-radius;
+    font-weight: $button-font-weight;
+    cursor: pointer;
+    color: $dark-color;
+
+    &:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
 }

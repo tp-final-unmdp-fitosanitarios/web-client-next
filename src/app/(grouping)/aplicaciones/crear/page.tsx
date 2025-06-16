@@ -275,7 +275,7 @@ const CrearAplicacionPage: React.FC = () => {
 
     const handleCloseConfirmationModal = () => {
         setConfirmationModalOpen(false);
-        router.push("/stock");
+        router.push("/aplicaciones");
     }
 
     const filterField = (l: Locacion) => { //Se usaba para buscar campos hijos de una
@@ -465,25 +465,13 @@ const CrearAplicacionPage: React.FC = () => {
                                         />
                                     </DemoContainer>
                                 </LocalizationProvider>
-                                <Button 
+                                <button 
                                     type="submit" 
-                                    variant="contained" 
-                                    fullWidth
-                                    sx={{
-                                        mt: 2,
-                                        py: 1.5,
-                                        backgroundColor: '#4CAF50',
-                                        '&:hover': {
-                                            backgroundColor: '#45a049',
-                                        },
-                                        borderRadius: '10px',
-                                        textTransform: 'none',
-                                        fontSize: '1rem',
-                                        fontWeight: 'bold'
-                                    }}
+                                    className={`button button-primary ${styles.button}`}
+                                    disabled = {!hectareas || selectedWarehouse==="" || cultivo===""}
                                 >
                                     Continuar
-                                </Button>
+                                </button>
                             </form>
                         </Paper>
                     </Box>
@@ -524,77 +512,37 @@ const CrearAplicacionPage: React.FC = () => {
                                     </Typography>
                                 )}
 
-                                <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-                                    <Button
-                                        variant="outlined"
+                                <div className={styles.buttonContainer}>
+                                    <button
                                         onClick={() => setAddRecipeModalOpen(true)}
                                         disabled={!isDataValid()}
-                                        sx={{
-                                            flex: 1,
-                                            py: 1.5,
-                                            borderColor: '#404e5c',
-                                            color: '#404e5c',
-                                            '&:hover': {
-                                                borderColor: '#404e5c',
-                                                backgroundColor: 'rgba(64, 78, 92, 0.04)',
-                                            },
-                                            borderRadius: '10px',
-                                            textTransform: 'none',
-                                            fontSize: '1rem',
-                                            fontWeight: 'bold'
-                                        }}
+                                        className={`button button-secondary ${styles.button}`}
                                     >
                                         Agregar Producto
-                                    </Button>
-                                </Box>
+                                    </button>
+                                </div>
                             </>
                             : (
                                 <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
                                     No hay stock disonible en el campo seleccionado
                                 </Typography>
                             )}
-                            <Box sx={{ display: 'flex', gap: 2, mt: 3 }}>
-                                <Button
-                                    variant="outlined"
+                            <div className={styles.buttonContainer}>
+                                <button
                                     onClick={() => setActiveStep(0)}
-                                    sx={{
-                                        flex: 1,
-                                        py: 1.5,
-                                        borderColor: '#404e5c',
-                                        color: '#404e5c',
-                                        '&:hover': {
-                                            borderColor: '#404e5c',
-                                            backgroundColor: 'rgba(64, 78, 92, 0.04)',
-                                        },
-                                        borderRadius: '10px',
-                                        textTransform: 'none',
-                                        fontSize: '1rem',
-                                        fontWeight: 'bold'
-                                    }}
+                                    className={`button button-secondary ${styles.button}`}
                                 >
                                     Volver
-                                </Button>
-                                <Button
-                                    variant="contained"
+                                </button>
+                                <button
                                     onClick={() => setActiveStep(2)}
                                     disabled={productosAAgregar.length === 0}
                                     type="button"
-                                    sx={{
-                                        flex: 1,
-                                        py: 1.5,
-                                        backgroundColor: '#4CAF50',
-                                        '&:hover': {
-                                            backgroundColor: '#45a049',
-                                        },
-                                        borderRadius: '10px',
-                                        textTransform: 'none',
-                                        fontSize: '1rem',
-                                        fontWeight: 'bold'
-                                    }}
+                                    className={`button button-primary ${styles.button}`}
                                 >
                                     Confirmar
-                                </Button>
-                            </Box>
+                                </button>
+                            </div>
                         </Paper>
                     </Box>
                 )}
