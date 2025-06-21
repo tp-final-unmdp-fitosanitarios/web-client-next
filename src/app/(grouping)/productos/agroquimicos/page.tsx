@@ -113,6 +113,20 @@ export default function AgroquimicosView() {
             alert("Error al conectar con el servidor");
         }
     };
+
+    const handleDeleteSingleItem = async (id: string) => {
+        try {
+            const response = await apiService.delete("agrochemicals", id);
+            if (response.success) {
+                // Actualizar la lista local eliminando el item
+                setAgroquimicosFromServer(prev => prev.filter(item => item.id !== id));
+            } else {
+                alert("No se pudo eliminar el agroquímico.");
+            }
+        } catch (err) {
+            alert("Error al conectar con el servidor");
+        }
+    };
     
     const handleModificarItems = async () => {
         router.push(`agroquimicos/edit?Id=${selectedIds[0]}`);
@@ -165,7 +179,8 @@ export default function AgroquimicosView() {
                         onSelect={toggleSelectItem}
                         selectedIds={selectedIds}
                         selectItems={true}
-                        deleteItems={false}
+                        deleteItems={true}
+                        onDelete={handleDeleteSingleItem}
                         selectSingleItem={false}
                     />
                 ) : (
@@ -173,13 +188,6 @@ export default function AgroquimicosView() {
                 )}
                 <div className={styles.buttonContainer}>
                 <>
-                    <button
-                        className={`button button-secondary ${styles.buttonHome}`}
-                        onClick={handleQuitarItems}
-                        disabled={selectedIds.length !== 1}
-                    >
-                        Quitar
-                    </button>
                     <button
                         className={`button button-secondary ${styles.buttonHome}`}
                         onClick={handleModificarItems}

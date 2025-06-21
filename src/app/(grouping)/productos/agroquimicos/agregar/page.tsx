@@ -16,7 +16,6 @@ interface CreateAgrochemicalPayload {
     active_principle: string;
     description: string;
     category: string;
-    company_id: string;
     created_at: string;
     updated_at: string;
 }
@@ -24,24 +23,19 @@ interface CreateAgrochemicalPayload {
 export default function AgregarAgroquimicos() { // TO DO REVISAR POR QUE FALLA EL POST
     const title = "Agregar Agroquímico";
     const router = useRouter();
-    const { getApiService, user } = useAuth();
+    const { getApiService } = useAuth();
     const apiService = getApiService();
 
     const [modalOpen, setModalOpen] = useState(false);
     const [newAgroquimico, setNewAgroquimico] = useState<Agroquimico | null>(null);
 
     const handleFormSubmit = async (formData: Record<string, string>) => {
-        if (!user?.company_id) {
-            alert("Error: No se pudo obtener el ID de la compañía");
-            return;
-        }
-
+    
         const now = new Date().toISOString();
         const payload: CreateAgrochemicalPayload = {
             active_principle: formData.principio_activo,
             description: formData.descripcion,
             category: formData.categoria,
-            company_id: user.company_id,
             created_at: now,
             updated_at: now
         };
