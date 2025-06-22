@@ -13,10 +13,11 @@ export interface Aplicacion {
     unidad: Unidad;
     cantidad: number;
     surface: number;
-    aplicadorId: string;
+    applicator_id: string;
     engineer_id: string;
     recipe: Recipe;
     actual_application: Aplicacion;
     type: string;
     location: Locacion;
+    application_date: Date;
 }

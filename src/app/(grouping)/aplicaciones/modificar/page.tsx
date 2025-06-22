@@ -3,7 +3,7 @@ import Formulario from '@/components/formulario/formulario';
 import MenuBar from '@/components/menuBar/MenuBar';
 import { Field } from '@/domain/models/Field';
 import React, { useEffect, useState, useMemo } from 'react';
-import styles from "./crearAplicacion.module.scss"
+import styles from "./modificarAplicacion.module.scss"
 import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { Locacion } from '@/domain/models/Locacion';
@@ -24,11 +24,12 @@ import { useItemsManager } from '@/hooks/useItemsManager';
 import { Stock } from '@/domain/models/Stock';
 import ResumenOpCrearAplicacion from '@/components/resumenOpCrearAplicacion/ResumenOpCrearAplicacion';
 import GenericModal from '@/components/modal/GenericModal';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLoading } from '@/hooks/useLoading';
 import dayjs from 'dayjs';
 import { Roles } from '@/domain/enum/Roles';
 import { User } from '@/domain/models/User';
+import { Aplicacion } from '@/domain/models/Aplicacion';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -40,8 +41,12 @@ type ProductoExistente = Producto & {
     cantidadEnStock: number;
 }
 
-const CrearAplicacionPage: React.FC = () => {
+const ModificarAplicacionPage: React.FC = () => {
+    const searchParams = useSearchParams();
+    const applicationId = searchParams.get("id");
     const [activeStep, setActiveStep] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [aplicacion, setAplicacion] = useState<Aplicacion | null>(null);
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [applicators, setApplicators] = useState<User[]>([]);
     const [selectedApplicator, setSelectedApplicator] = useState<string>("");
@@ -59,7 +64,7 @@ const CrearAplicacionPage: React.FC = () => {
     const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
     const { withLoading } = useLoading();
-    const title = 'Crear Aplicación'
+    const title = 'Modificar Aplicación'
     
     const customInputSx = {
         '& .MuiInputBase-root': {
@@ -87,6 +92,49 @@ const CrearAplicacionPage: React.FC = () => {
         },
     };
 
+    const fetchApplication = async () => {
+        if (!applicationId) return;
+        try {
+            const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
+            const app = response.data;
+            setAplicacion(app);
+            
+            // Cargar datos de la aplicación existente
+            setHectareas(app.surface || 0);
+            setSelectedWarehouse(app.stock_location_id || "");
+            setSelectedApplicator(app.applicator_id || "");
+            setExpirationDate(app.application_date ? dayjs(app.application_date) : dayjs());
+            
+            // Cargar productos existentes
+            if (app.recipe?.recipe_items) {
+                const productosExistentes = app.recipe.recipe_items.map((item) => ({
+                    product_id: item.product_id,
+                    id: item.product_id,
+                    prodName: item.product_id, // Se actualizará cuando se carguen los detalles
+                    amount: item.amount,
+                    unit: item.unit,
+                    dose_type: item.dose_type,
+                    lot_number: item.lot_number || ""
+                }));
+                setProductosAAgregar(productosExistentes);
+            }
+            
+            // Cargar ubicación
+            if (app.location) {
+                setCultivo(app.location.id);
+                if (app.location.parent_location) {
+                    setCampo(app.location.parent_location.id);
+                    if (app.location.parent_location.parent_location) {
+                        setZona(app.location.parent_location.parent_location.id);
+                    }
+                }
+            }
+            
+        } catch (e: any) {
+            console.error("Error al cargar la aplicación:", e.message);
+        }
+    };
+
     const fetchLocations = async (): Promise<Locacion[]> => {
         try {
             const response = await apiService.get<Locacion[]>("locations?type=ZONE&type=FIELD&type=CROP&type=WAREHOUSE");
@@ -103,7 +151,6 @@ const CrearAplicacionPage: React.FC = () => {
         try {
             const response = await apiService.get<any>("users/applicators");
             const aplicadores = response.data.users || [];
-            console.log(aplicadores.users);
             setApplicators(aplicadores);
             return aplicadores;
         }
@@ -129,21 +176,28 @@ const CrearAplicacionPage: React.FC = () => {
             console.log(e.message);
             return [];
         }
-
     }
 
     useEffect(() => {
-        if (!isReady) return;
+        if (!isReady || !applicationId) return;
         const fetchData = async () => {
+            setLoading(true);
+            await fetchApplication();
             const locs = await fetchLocations();
             await fetchApplicators();
             setLocations(locs);
+            
+            // Cargar productos del almacén seleccionado
+            if (aplicacion?.stock_location_id) {
+                await fetchProductos(aplicacion.stock_location_id);
+            }
+            setLoading(false);
         };
         fetchData();
-    }, [isReady])
+    }, [isReady, applicationId]);
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
+        e.preventDefault();
         if(hectareas > 0 && cultivo !== "" && expirationDate !== null && selectedWarehouse !== ""){
             setActiveStep(1);
             const locId = locations.find(c => c.id === selectedWarehouse)?.id;
@@ -162,9 +216,6 @@ const CrearAplicacionPage: React.FC = () => {
         if(!producto) return;
         if(!doseType) return;
 
-
-       // const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
-
         const existingProductIndex = productosAAgregar.findIndex((p) => p.product_id === producto.id);
 
         if (existingProductIndex !== -1) {
@@ -175,7 +226,7 @@ const CrearAplicacionPage: React.FC = () => {
                 [...productosAAgregar,
                 {
                     product_id: producto.id,
-                    id: producto.id, //Esto se hace para poder usar el useItemManager
+                    id: producto.id,
                     prodName: producto.name,
                     amount: amount,
                     unit: producto.unit,
@@ -220,7 +271,7 @@ const CrearAplicacionPage: React.FC = () => {
     };
 
     const handleFinish = async () => {
-        console.log("Finishing application creation");
+        console.log("Finishing application modification");
         const recipeItems = productosAAgregar.map((p) => ({
             product_id: p.product_id,
             amount: p.amount,
@@ -236,7 +287,7 @@ const CrearAplicacionPage: React.FC = () => {
         if(!locId)
             alert("Error al encontrar la locacion");
 
-        const createAplicationReq = {
+        const updateAplicationReq = {
             location_id: locId,
             stock_location_id: selectedWarehouse,
             surface: hectareas,
@@ -245,19 +296,12 @@ const CrearAplicacionPage: React.FC = () => {
             application_date: expirationDate?.toISOString()
         }
 
-        console.log(createAplicationReq);
+        console.log(updateAplicationReq);
         try {
-            let response
-            if(user?.roles.includes(Roles.Aplicador))
-                response = await withLoading(
-                    apiService.create("applications/instant", createAplicationReq),
-                    "Creando aplicación..."
-                );
-            else
-                response = await withLoading(
-                    apiService.create("applications", createAplicationReq),
-                    "Creando aplicación..."
-                );
+            const response = await withLoading(
+                apiService.update(`applications/${applicationId}`,applicationId? applicationId : "", updateAplicationReq),
+                "Modificando aplicación..."
+            );
             if (response.success) {
                 setConfirmationModalOpen(true);
                 setAddRecipeModalOpen(false);
@@ -266,10 +310,10 @@ const CrearAplicacionPage: React.FC = () => {
                 setExpirationDate(null);
                 setHectareas(0);
             } else {
-                console.error("Error al crear la aplicacion:", response.error);
+                console.error("Error al modificar la aplicacion:", response.error);
             }
         } catch (error) {
-            console.error("Error al crear la aplicacion:", error);
+            console.error("Error al modificar la aplicacion:", error);
         }
         setActiveStep(0);
     };
@@ -279,8 +323,8 @@ const CrearAplicacionPage: React.FC = () => {
         router.push("/aplicaciones");
     }
 
-    const filterField = (l: Locacion) => { //Se usaba para buscar campos hijos de una
-        if (l.type !== 'FIELD') return false;//zona recibida por paramettro
+    const filterField = (l: Locacion) => {
+        if (l.type !== 'FIELD') return false;
 
         const parentLoc = locations.find((loc) => loc.id === zona);
         if (!parentLoc) return false;
@@ -294,7 +338,15 @@ const CrearAplicacionPage: React.FC = () => {
         const parentLoc = locations.find((loc) => loc.id === campo);
         if (!parentLoc) return false;
 
-        return l.parent_location.parent_location_id === parentLoc.id //El padre del lote debe ser el campo
+        return l.parent_location.id === parentLoc.id
+    }
+
+    if (loading) {
+        return <div>Cargando aplicación...</div>;
+    }
+
+    if (!aplicacion) {
+        return <div>No se encontró la aplicación.</div>;
     }
 
     return (
@@ -323,6 +375,7 @@ const CrearAplicacionPage: React.FC = () => {
                                     fullWidth
                                     type="number"
                                     name="hectareas"
+                                    value={hectareas}
                                     onChange={(e) => setHectareas(Number(e.target.value))}
                                     placeholder="Hectáreas"
                                     label="Hectáreas"
@@ -385,7 +438,7 @@ const CrearAplicacionPage: React.FC = () => {
                                 >
                                     {locations?.filter((l) => filterCrop(l)).map((l) => (
                                         <MenuItem key={l.id ?? l.name} value={l.id}>
-                                            {l.name} - {l.parent_location.name}
+                                            {l.name}
                                         </MenuItem>
                                     ))}
                                 </TextField>
@@ -561,7 +614,6 @@ const CrearAplicacionPage: React.FC = () => {
                     />
                 )}
 
-
             {addRecipeItemModal && (
                 <AddRecipeItemModal
                     handleAddProducto={handleAddProducto}
@@ -574,8 +626,8 @@ const CrearAplicacionPage: React.FC = () => {
             <GenericModal
                 isOpen={confirmationModalOpen}
                 onClose={handleCloseConfirmationModal}
-                title="Aplicacion creada"
-                modalText="Se creo la aplicacion correctamente"
+                title="Aplicacion modificada"
+                modalText="Se modificó la aplicacion correctamente"
                 buttonTitle="Cerrar"
                 showSecondButton={false}
              />
@@ -585,4 +637,4 @@ const CrearAplicacionPage: React.FC = () => {
     );
 };
 
-export default CrearAplicacionPage;
+export default ModificarAplicacionPage; 

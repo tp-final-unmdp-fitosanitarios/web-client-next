@@ -60,6 +60,8 @@ export default function FinalizarAplicacion() {
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
     const [recipeItemAmounts, setRecipeItemAmounts] = useState<{[key: string]: number}>({});
     const [recipeItemDoseTypes, setRecipeItemDoseTypes] = useState<{[key: string]: string}>({});
+    const [combustibleUtilizado, setCombustibleUtilizado] = useState<string>("");
+    const [cantidadHectareas, setCantidadHectareas] = useState<string>("");
 
     // Custom hooks
     const {
@@ -180,7 +182,9 @@ export default function FinalizarAplicacion() {
         const finishAplicationReq = {
             actual_application: recipeReq,
             attachment: attachment,
-            machine_id: selectedMaquina?.id
+            machine_id: selectedMaquina?.id,
+            fuel_consumption: Number(combustibleUtilizado),
+            actual_surface: Number(cantidadHectareas)
         }
 
         console.log(finishAplicationReq);
@@ -478,7 +482,21 @@ export default function FinalizarAplicacion() {
                                 ...customInputSx
                             }}
                         />
-
+                        <TextField
+                            fullWidth
+                            required
+                            type="number"
+                            label="Cantidad de combustible utilizado (litros)"
+                            value={combustibleUtilizado}
+                            onChange={e => setCombustibleUtilizado(e.target.value)}
+                            sx={{
+                                mt: 2,
+                                ...customInputSx
+                            }}
+                            inputProps={{ min: 0, step: 'any' }}
+                            error={combustibleUtilizado !== "" && (isNaN(Number(combustibleUtilizado)) || Number(combustibleUtilizado) <= 0)}
+                            helperText={combustibleUtilizado !== "" && (isNaN(Number(combustibleUtilizado)) || Number(combustibleUtilizado) <= 0) ? "Ingrese un valor válido mayor a 0" : ''}
+                        />
                         <div className={styles.buttonContainer}>
                             <button
                                 className={`button button-secondary ${styles.button}`}
@@ -489,7 +507,12 @@ export default function FinalizarAplicacion() {
                             <button
                                 className={`button button-primary ${styles.button}`}
                                 onClick={() => setActiveStep(2)}
-                                disabled={!selectedMaquina}
+                                disabled={
+                                    !selectedMaquina ||
+                                    !combustibleUtilizado ||
+                                    isNaN(Number(combustibleUtilizado)) ||
+                                    Number(combustibleUtilizado) <= 0
+                                }
                             >
                                 Continuar
                             </button>
@@ -555,6 +578,25 @@ export default function FinalizarAplicacion() {
                             <Typography variant="h6" sx={{ mb: 3, color: '#404e5c' }}>
                                 Productos de la Aplicación
                             </Typography>
+
+                            {/* Campo de hectáreas */}
+                            <Box sx={{ mb: 4 }}>
+                                <TextField
+                                    fullWidth
+                                    required
+                                    type="number"
+                                    label="Cantidad de hectáreas aplicadas"
+                                    value={cantidadHectareas}
+                                    onChange={e => setCantidadHectareas(e.target.value)}
+                                    sx={{
+                                        mb: 3,
+                                        ...customInputSx
+                                    }}
+                                    inputProps={{ min: 0, step: 'any' }}
+                                    error={cantidadHectareas !== "" && (isNaN(Number(cantidadHectareas)) || Number(cantidadHectareas) <= 0)}
+                                    helperText={cantidadHectareas !== "" && (isNaN(Number(cantidadHectareas)) || Number(cantidadHectareas) <= 0) ? "Ingrese un valor válido mayor a 0" : ''}
+                                />
+                            </Box>
 
                             {/* Form for existing recipe items */}
                             <Box sx={{ mb: 4 }}>
@@ -648,6 +690,11 @@ export default function FinalizarAplicacion() {
                                     className={`button button-primary ${styles.button}`}
                                     onClick={handleFinalizarAplicacion}
                                     type="button"
+                                    disabled={
+                                        !cantidadHectareas ||
+                                        isNaN(Number(cantidadHectareas)) ||
+                                        Number(cantidadHectareas) <= 0
+                                    }
                                 >
                                     Confirmar
                                 </button>
