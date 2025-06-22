@@ -358,7 +358,8 @@ export default function StockView() {
 
             {loading ? (
                 <div>Cargando stock...</div>
-            ) : items.length > 0 ? (
+            ) : items.length > 0 ? (<div>
+                <h3 className={styles.informationText}> Stock disponible en locacion: {locations.find(l => l.id === actualLocation)?.name}</h3>
                 <ItemList
                     items={items}
                     displayKeys={campos}
@@ -367,6 +368,7 @@ export default function StockView() {
                     selectSingleItem={true}
                     onSelectSingleItem={handleItemClick}
                 />
+                </div>
             ) : (
                 <h3 className={styles.title}>No hay elementos en el stock para esta ubicación</h3>
             )}
