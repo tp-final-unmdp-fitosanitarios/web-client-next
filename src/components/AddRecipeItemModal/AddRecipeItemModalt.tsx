@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Box, TextField, Autocomplete, MenuItem } from '@mui/material';
+import { Modal, Box, TextField, MenuItem } from '@mui/material';
 import styles from "./AddRecipeItemModal.module.scss"
 import { Producto } from '@/domain/models/Producto';
 
@@ -74,11 +74,12 @@ const AddRecipeItemModal: React.FC<Props> = ({ open, setModalClose, products, ha
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: 400,
+                    width: { xs: '90vw', sm: 400 },
+                    maxWidth: { xs: 380, sm: 400 },
                     bgcolor: '#f5f7f6',
                     boxShadow: 24,
-                    p: 4,
-                    borderRadius: 8,
+                    p: { xs: 2, sm: 4 },
+                    borderRadius: { xs: 2, sm: 2, md: 2, lg: 2, xl: 2 },
                     border: '3px solid #404e5c',
                 }}
             >
@@ -148,14 +149,14 @@ const AddRecipeItemModal: React.FC<Props> = ({ open, setModalClose, products, ha
                     <div className={styles.buttonContainer}>
                         <button
                             type="button"
-                            className={`button ${styles.buttonCancel}`}
+                            className={`button button-secondary ${styles.buttonCancel}`}
                             onClick={setModalClose}
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className={`button ${styles.buttonFinish}`}
+                            className={`button button-primary ${styles.buttonFinish}`}
                             disabled={selectedProduct=="" || amount <= 0}
                         >
                             Agregar
