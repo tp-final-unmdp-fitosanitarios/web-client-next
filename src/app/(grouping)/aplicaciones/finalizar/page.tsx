@@ -3,8 +3,6 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import MenuBar from "@/components/menuBar/MenuBar";
 import ItemList from "@/components/itemList/ItemList";
-import { EstadoAplicacion } from "@/domain/enum/EstadoAplicacion";
-import { Unidad } from "@/domain/enum/Unidad";
 import styles from "./finalizarAplicaciones-view.module.scss";
 import Footer from "@/components/Footer/Footer";
 import { Aplicacion } from "@/domain/models/Aplicacion";
@@ -13,7 +11,7 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import { Maquina } from "@/domain/models/Maquina";
 import GenericModal from "@/components/modal/GenericModal";
 import { useRouter } from 'next/navigation';
-import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Button, Paper, Typography, Modal } from '@mui/material';
+import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Paper, Typography, Modal } from '@mui/material';
 import { RecipeItem } from "@/domain/models/RecipeItem";
 import AddRecipeItemModal from "@/components/AddRecipeItemModal/AddRecipeItemModalt";
 import { transformToItems } from "@/utilities/transform";
@@ -38,7 +36,7 @@ type ProductoExistente = Producto & {
 export default function FinalizarAplicacion() {
     const searchParams = useSearchParams();
     const applicationId = searchParams.get("id");
-    const { getApiService, isReady } = useAuth();
+    const { getApiService } = useAuth();
     const apiService = getApiService();
     const router = useRouter();
     const { withLoading } = useLoading();
@@ -66,11 +64,7 @@ export default function FinalizarAplicacion() {
     // Custom hooks
     const {
         selectedIds,
-        deletedItems,
-        isModalOpen,
         toggleSelectItem,
-        quitarItems,
-        closeModal,
     } = useItemsManager(productosAAgregar);
 
     const fetchProductos = async (locId: string) => {
@@ -135,7 +129,7 @@ export default function FinalizarAplicacion() {
 
     const handleFinalizarAplicacion = async () => {
         console.log("Finishing application");
-        let recipeItems: RecipeItem[] = [];
+        const recipeItems: RecipeItem[] = [];
         
         // Add modified recipe items
         aplicacion?.recipe.recipe_items.forEach(ri => {
@@ -573,9 +567,21 @@ export default function FinalizarAplicacion() {
 
                 {/* PASO 4: Productos */}
                 {activeStep === 3 && (
-                    <Box sx={{ maxWidth: '800px', mx: 'auto', p: 3 }}>
-                        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-                            <Typography variant="h6" sx={{ mb: 3, color: '#404e5c' }}>
+                    <Box sx={{ 
+                        maxWidth: '340px', 
+                        mx: 'auto', 
+                        p: { xs: 2, sm: 3 },
+                        width: '100%'
+                    }}>
+                        <Paper elevation={3} sx={{ 
+                            p: { xs: 2, sm: 4 }, 
+                            borderRadius: 2 
+                        }}>
+                            <Typography variant="h6" sx={{ 
+                                mb: 3, 
+                                color: '#404e5c',
+                                fontSize: { xs: '1.1rem', sm: '1.25rem' }
+                            }}>
                                 Productos de la Aplicación
                             </Typography>
 
@@ -603,28 +609,41 @@ export default function FinalizarAplicacion() {
                                 {aplicacion.recipe.recipe_items.map((item) => (
                                     <Box key={item.product_id} sx={{ 
                                         display: 'flex', 
-                                        alignItems: 'center', 
+                                        flexDirection: { xs: 'column', sm: 'row' },
+                                        alignItems: { xs: 'stretch', sm: 'center' }, 
                                         mb: 2,
-                                        p: 2,
+                                        p: { xs: 1.5, sm: 2 },
                                         backgroundColor: '#f5f5f5',
-                                        borderRadius: '8px'
+                                        borderRadius: '8px',
+                                        gap: { xs: 1, sm: 2 }
                                     }}>
-                                        <Box sx={{ flex: 1 }}>
-                                            <Typography variant="subtitle1" sx={{ fontWeight: 'bold' }}>
+                                        <Box sx={{ flex: 1, mb: { xs: 1, sm: 0 } }}>
+                                            <Typography variant="subtitle1" sx={{ 
+                                                fontWeight: 'bold',
+                                                fontSize: { xs: '0.9rem', sm: '1rem' }
+                                            }}>
                                                 {productosDetalles[item.product_id] || item.product_id}
                                             </Typography>
-                                            <Typography variant="body2" color="text.secondary">
+                                            <Typography variant="body2" color="text.secondary" sx={{
+                                                fontSize: { xs: '0.8rem', sm: '0.875rem' }
+                                            }}>
                                                 Cantidad solicitada: {item.amount} {item.unit} {item.dose_type === "SURFACE" ? "/Ha" : "en total"}
                                             </Typography>
                                         </Box>
-                                        <Box sx={{ display: 'flex', gap: 2, alignItems: 'center' }}>
+                                        <Box sx={{ 
+                                            display: 'flex', 
+                                            flexDirection: { xs: 'column', sm: 'row' },
+                                            gap: { xs: 2, sm: 3 }, 
+                                            alignItems: { xs: 'stretch', sm: 'center' },
+                                            width: { xs: '100%', sm: 'auto' }
+                                        }}>
                                             <TextField
                                                 type="number"
                                                 label="Nueva cantidad"
                                                 value={recipeItemAmounts[item.product_id] || ''}
                                                 onChange={(e) => handleAmountChange(item.product_id, parseFloat(e.target.value))}
                                                 sx={{
-                                                    width: '150px',
+                                                    width: { xs: '100%', sm: '150px' },
                                                     ...customInputSx
                                                 }}
                                                 InputProps={{
@@ -637,7 +656,7 @@ export default function FinalizarAplicacion() {
                                                 value={recipeItemDoseTypes[item.product_id] || item.dose_type}
                                                 onChange={(e) => handleDoseTypeChange(item.product_id, e.target.value)}
                                                 sx={{
-                                                    width: '150px',
+                                                    width: { xs: '100%', sm: '150px' },
                                                     ...customInputSx
                                                 }}
                                             >
@@ -649,7 +668,11 @@ export default function FinalizarAplicacion() {
                                 ))}
                             </Box>
 
-                            <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
+                            <Typography variant="body1" sx={{ 
+                                mb: 2, 
+                                color: '#666',
+                                fontSize: { xs: '0.9rem', sm: '1rem' }
+                            }}>
                                 Productos adicionales ({productosAAgregar.length})
                             </Typography>
 
@@ -665,21 +688,42 @@ export default function FinalizarAplicacion() {
                                     selectSingleItem={false}
                                 />
                             ) : (
-                                <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
+                                <Typography variant="body1" sx={{ 
+                                    mb: 3, 
+                                    color: '#666', 
+                                    textAlign: 'center',
+                                    fontSize: { xs: '0.9rem', sm: '1rem' }
+                                }}>
                                     Ingrese productos adicionales a la aplicacion
                                 </Typography>
                             )}
 
-                            <Box sx={{ display: 'flex',justifyContent:'center', gap: 2, mt: 3 }}>
+                            <Box sx={{ 
+                                display: 'flex',
+                                justifyContent: 'center', 
+                                gap: 2, 
+                                mt: 3 
+                            }}>
                                 <button
                                     className={`button button-outlined ${styles.button}`}
                                     onClick={() => setAddRecipeModalOpen(true)}
+                                    style={{
+                                        minWidth: 'auto',
+                                        width: '100%',
+                                        maxWidth: '300px'
+                                    }}
                                 >
                                     Agregar Producto
                                 </button>
                             </Box>
 
-                            <Box sx={{ display: 'flex', flexDirection:'row',justifyContent:'space-between', gap: 2, mt: 3 }}>
+                            <Box sx={{ 
+                                display: 'flex', 
+                                flexDirection: { xs: 'column', sm: 'row' },
+                                justifyContent: 'space-between', 
+                                gap: 2, 
+                                mt: 3 
+                            }}>
                                 <button
                                     className={`button button-outlined ${styles.button}`}
                                     onClick={() => setActiveStep(2)}
