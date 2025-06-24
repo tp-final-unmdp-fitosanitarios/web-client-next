@@ -11,6 +11,7 @@ import styles from "./agregarStock.module.scss"
 import { Box, Modal, Step, StepLabel, Stepper } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ClearIcon from '@mui/icons-material/Clear';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import Link from 'next/link';
 import ItemList from '@/components/itemList/ItemList';
 import { transformToItems } from '@/utilities/transform';
@@ -24,6 +25,7 @@ import { ResponseItems } from '@/domain/models/ResponseItems';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import Footer from '@/components/Footer/Footer';
 import GenericModal from '@/components/modal/GenericModal';
+import CameraCapture from '@/components/CameraCapture/CameraCapture';
 import Image from 'next/image';
 import { Proveedor } from '@/domain/models/Proveedor';
 
@@ -53,6 +55,7 @@ const AgregarStockPage: React.FC = () => {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [fileBase64, setFileBase64] = useState<string | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
     const { getApiService, isReady } = useAuth();
@@ -308,14 +311,6 @@ const AgregarStockPage: React.FC = () => {
 
     const campos = ["display"];
 
-    const buttons = [
-        { label: "Cancelar", path: "/stock" },
-        { label: "Mover", path: "/stock/mover" },
-        { label: "Retirar", path: "/stock/retirar" },
-        { label: "Ver Movimientos", path: "/stock/movimientos" },
-        { label: "Proveedores", path: "/stock/proveedores" },
-    ];
-
     const {
         selectedIds,
         deletedItems,
@@ -334,6 +329,23 @@ const AgregarStockPage: React.FC = () => {
         router.push("/stock");
     }
 
+    const handleCameraCapture = (base64Data: string, fileName: string) => {
+        // Create a File object from the base64 data
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        
+        handleFileSelect(file);
+    };
+
+    const handleOpenCamera = () => {
+        setIsCameraOpen(true);
+    };
 
     return (
     <div className="page-container">
@@ -384,6 +396,13 @@ const AgregarStockPage: React.FC = () => {
                   >
                     {selectedFile ? "Cambiar" : "Seleccionar"}
                   </label>
+                  <button
+                    type="button"
+                    className={`${styles.button} ${styles.buttonCamera}`}
+                    onClick={handleOpenCamera}
+                  >
+                    <CameraAltIcon />
+                  </button>
                 </div>
               </div>
               {selectedFile && (
@@ -477,6 +496,12 @@ const AgregarStockPage: React.FC = () => {
         limite={remito?.cantProductos}
       />
     )}
+
+    <CameraCapture
+      isOpen={isCameraOpen}
+      onClose={() => setIsCameraOpen(false)}
+      onCapture={handleCameraCapture}
+    />
 
     <GenericModal
       isOpen={confirmationModalOpen}

@@ -46,6 +46,7 @@ export default function StockView() {
 
     const isAdmin = user?.roles.includes(Roles.Admin);
     const isAplicador = user?.roles.includes(Roles.Aplicador);
+    const isIngeniero = user?.roles.includes(Roles.Encargado);
 
     const adminButtons = [
         { label: "Agregar", path: "/stock/agregar" },
@@ -57,6 +58,14 @@ export default function StockView() {
         { label: "Mover", action: () => setShowMoverModal(true) },
         { label: "Retirar", action: () => setShowRetirarModal(true) },
         { label: "Agregar", path: "/stock/agregar" },
+    ];
+
+    const engineerButtons = [
+        { label: "Agregar", path: "/stock/agregar" },
+        { label: "Ver Movimientos", path: "/stock/movimientos" },
+        { label: "Proveedores", path: "/stock/proveedores" },
+        { label: "Mover", action: () => setShowMoverModal(true) },
+        { label: "Retirar", action: () => setShowRetirarModal(true) }
     ];
 
     const customInputSx = {
@@ -404,7 +413,27 @@ export default function StockView() {
                             )
                         ))}
                     </>
-                ) : null}
+                ) : (
+                    <>
+                    {engineerButtons.map((button, index) => (
+                            button.action ? (
+                                <button
+                                    key={index}
+                                    className={`button button-primary ${styles.buttonHome}`}
+                                    onClick={button.action}
+                                >
+                                    {button.label}
+                                </button>
+                            ) : (
+                                <NavigationLink key={index} href={button.path}>
+                                    <button className={`button button-primary ${styles.buttonHome}`}>
+                                        {button.label}
+                                    </button>
+                                </NavigationLink>
+                            )
+                        ))}
+                    </>
+                )}
             </div>
             </div>
             <Footer />

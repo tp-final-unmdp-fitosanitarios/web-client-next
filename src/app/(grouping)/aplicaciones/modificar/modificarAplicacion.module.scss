@@ -46,10 +46,14 @@
     border-radius: $border-radius;
     font-weight: $button-font-weight;
     cursor: pointer;
-    color: $dark-color;
 
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
     }
-} 
+}
+
+.danger{
+    background-color: rgba(228, 51, 51, 0.983);
+    margin-top: 15px;
+}
