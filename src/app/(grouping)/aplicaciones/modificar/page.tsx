@@ -92,11 +92,12 @@ const ModificarAplicacionPage: React.FC = () => {
         },
     };
 
-    const fetchApplication = async () => {
-        if (!applicationId) return;
+    const fetchApplication = async (): Promise<Aplicacion | null> => {
+        if (!applicationId) return null;
         try {
             const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
             const app = response.data;
+            console.log(app);
             setAplicacion(app);
             
             // Cargar datos de la aplicación existente
@@ -130,8 +131,10 @@ const ModificarAplicacionPage: React.FC = () => {
                 }
             }
             
+            return app;
         } catch (e: any) {
             console.error("Error al cargar la aplicación:", e.message);
+            return null;
         }
     };
 
@@ -182,15 +185,16 @@ const ModificarAplicacionPage: React.FC = () => {
         if (!isReady || !applicationId) return;
         const fetchData = async () => {
             setLoading(true);
-            await fetchApplication();
+            const app = await fetchApplication();
             const locs = await fetchLocations();
             await fetchApplicators();
             setLocations(locs);
             
             // Cargar productos del almacén seleccionado
-            if (aplicacion?.stock_location_id) {
-                await fetchProductos(aplicacion.stock_location_id);
-            }
+            if (app?.stock_location_id) 
+                await fetchProductos(app.stock_location_id);
+            else
+                await fetchProductos(campo);
             setLoading(false);
         };
         fetchData();

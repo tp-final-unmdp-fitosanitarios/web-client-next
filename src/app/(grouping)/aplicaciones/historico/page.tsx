@@ -49,12 +49,15 @@ import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 interface FiltrosAplicacion {
     fechaDesde: Dayjs | null;
     fechaHasta: Dayjs | null;
-    estado: string;
-    ubicacion: string;
-    aplicador: string;
     producto: string;
     superficieMin: number | null;
     superficieMax: number | null;
+    externalId: string;
+    type: string;
+    status: string;
+    locationName: string;
+    applicatorName: string;
+    engineerName: string;
 }
 
 interface PaginacionRequest {
@@ -87,12 +90,15 @@ export default function HistoricoAplicacionesPage() {
 
     // Estados de filtros
     const [filtros, setFiltros] = useState<FiltrosAplicacion>({
+        externalId: "",
+        type: "",
+        status: "",
+        locationName: "",
+        applicatorName: "",
+        engineerName: "",
+        producto: "",
         fechaDesde: null,
         fechaHasta: null,
-        estado: "",
-        ubicacion: "",
-        aplicador: "",
-        producto: "",
         superficieMin: null,
         superficieMax: null
     });
@@ -142,14 +148,14 @@ export default function HistoricoAplicacionesPage() {
         if (filtros.fechaHasta) {
             params.append('fechaHasta', filtros.fechaHasta.toISOString());
         }
-        if (filtros.estado) {
-            params.append('status', filtros.estado);
+        if (filtros.status) {
+            params.append('status', filtros.status);
         }
-        if (filtros.ubicacion) {
-            params.append('locationId', filtros.ubicacion);
+        if (filtros.locationName) {
+            params.append('locationId', filtros.locationName);
         }
-        if (filtros.aplicador) {
-            params.append('applicatorId', filtros.aplicador);
+        if (filtros.applicatorName) {
+            params.append('applicatorId', filtros.applicatorName);
         }
         if (filtros.producto) {
             params.append('productId', filtros.producto);
@@ -170,6 +176,7 @@ export default function HistoricoAplicacionesPage() {
     const fetchAplicaciones = async () => {
         try {
             const queryParams = construirQueryParams();
+            console.log(queryParams);
             const response = await withLoading(
                 apiService.get<ResponseItems<Aplicacion>>(`applications?${queryParams}`),
                 "Cargando aplicaciones..."
@@ -267,12 +274,15 @@ export default function HistoricoAplicacionesPage() {
         setFiltros({
             fechaDesde: null,
             fechaHasta: null,
-            estado: "",
-            ubicacion: "",
-            aplicador: "",
+            status: "",
+            locationName: "",
+            applicatorName: "",
             producto: "",
             superficieMin: null,
-            superficieMax: null
+            superficieMax: null,
+            externalId: "",
+            type: "",
+            engineerName: ""
         });
         setPaginacion(prev => ({ ...prev, page: 0 }));
     };
@@ -381,8 +391,8 @@ export default function HistoricoAplicacionesPage() {
                                     fullWidth
                                     select
                                     label="Ubicación"
-                                    value={filtros.ubicacion}
-                                    onChange={(e) => handleFiltroChange('ubicacion', e.target.value)}
+                                    value={filtros.locationName}
+                                    onChange={(e) => handleFiltroChange('locationName', e.target.value)}
                                     sx={customInputSx}
                                 >
                                     <MenuItem value="">Todas las ubicaciones</MenuItem>
@@ -398,8 +408,8 @@ export default function HistoricoAplicacionesPage() {
                                     fullWidth
                                     select
                                     label="Aplicador"
-                                    value={filtros.aplicador}
-                                    onChange={(e) => handleFiltroChange('aplicador', e.target.value)}
+                                    value={filtros.applicatorName}
+                                    onChange={(e) => handleFiltroChange('applicatorName', e.target.value)}
                                     sx={customInputSx}
                                 >
                                     <MenuItem value="">Todos los aplicadores</MenuItem>
