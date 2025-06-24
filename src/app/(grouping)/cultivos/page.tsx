@@ -72,13 +72,18 @@ export default function CultivosPage() {
       <div className="content-wrap">
         <MenuBar showMenu={true} showArrow={true} path="home" />
         <div className={styles.titleContainer}>
-          <Typography 
-            variant={isMobile ? "h5" : "h4"} 
+          <Typography
+            variant={isMobile ? "h5" : "h4"}
             className={styles.title}
           >
             Cultivos
           </Typography>
         </div>
+        {isMobile && (
+          <span className={styles['scroll-message']}>
+            Desliza horizontalmente para ver más columnas
+          </span>
+        )}
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
             <CircularProgress />
@@ -88,23 +93,24 @@ export default function CultivosPage() {
             <Table className={styles.table}>
               <TableHead className={styles.tableHead}>
                 <TableRow>
-                  <TableCell>Nombre del Cúltivo</TableCell>
-                  <TableCell>Fin de Siembra</TableCell>
+                  <TableCell>Nombre del Cultivo</TableCell>
                   <TableCell>Número de Cultivo</TableCell>
+                  <TableCell>Fin de Siembra</TableCell>
                   <TableCell>Nombre del Lote</TableCell>
                   <TableCell>Nombre del Campo</TableCell>
                   <TableCell>Variedad</TableCell>
                   <TableCell>Superficie</TableCell>
                 </TableRow>
               </TableHead>
+
               <TableBody>
                 {crops
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
                   .map((crop, index) => (
                     <TableRow key={index} className={styles.tableRow}>
                       <TableCell className={styles.tableCell}>{crop.crop_name}</TableCell>
-                      <TableCell className={styles.tableCell}>{crop.end_of_sowing}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.crop_number}</TableCell>
+                      <TableCell className={styles.tableCell}>{crop.end_of_sowing}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.lot_name}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.field_name}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.variety}</TableCell>

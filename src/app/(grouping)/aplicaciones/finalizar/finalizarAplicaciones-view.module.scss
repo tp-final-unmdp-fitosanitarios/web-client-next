@@ -50,6 +50,11 @@
     gap: 1.5rem;
     margin-top: 1.5rem;
     justify-content: center;
+    
+    @media (max-width: 768px) {
+        flex-direction: column;
+        gap: 1rem;
+    }
 }
 
 .button {
@@ -65,6 +70,12 @@
     &:disabled {
         opacity: 0.5;
         cursor: not-allowed;
+    }
+    
+    @media (max-width: 768px) {
+        min-width: 100%;
+        max-width: 100%;
+        width: 100%;
     }
 }
 
@@ -87,6 +98,11 @@
     align-items: center;
     justify-content: center;
     margin: 0;
+    
+    @media (max-width: 768px) {
+        width: 100%;
+        min-width: 120px;
+    }
   }
   
   .buttonChange {  
@@ -99,6 +115,11 @@
     align-items: center;
     justify-content: center;
     margin: 0;
+    
+    @media (max-width: 768px) {
+        width: 100%;
+        min-width: 120px;
+    }
   }
 
 .fileInputContainer {
@@ -107,11 +128,21 @@
     gap: 1rem;
     width: 100%;
     margin-bottom: 1rem;
+    
+    @media (max-width: 768px) {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 0.5rem;
+    }
 }
 
 .fileInputWrapper {
     display: flex;
     align-items: center;
+    
+    @media (max-width: 768px) {
+        width: 100%;
+    }
 }
 
 .filePreviewContainer {
@@ -119,12 +150,22 @@
     align-items: center;
     gap: 1rem;
     margin-top: 0.5rem;
+    
+    @media (max-width: 768px) {
+        flex-wrap: wrap;
+        gap: 0.5rem;
+    }
 }
 
 .fileName {
     font-style: italic;
     font-size: 14px;
     color: #404e5c;
+    
+    @media (max-width: 768px) {
+        font-size: 12px;
+        word-break: break-word;
+    }
 }
 
 .fileIcon {
@@ -225,4 +266,26 @@
     font-size: 18px;
     color: $dark-color;
   }
+}
+
+// Estilos responsive adicionales
+@media (max-width: 768px) {
+    .finalizarAplicacionContainer {
+        padding: 8px;
+    }
+    
+    .finalizarHeader {
+        font-size: 20px;
+        margin-bottom: 16px;
+    }
+    
+    .container {
+        padding: 12px;
+        margin-bottom: 16px;
+    }
+    
+    .productTitle {
+        font-size: 16px;
+        margin-bottom: 12px;
+    }
 }
