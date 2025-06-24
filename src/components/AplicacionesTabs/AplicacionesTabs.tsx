@@ -15,6 +15,7 @@ import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../Auth/AuthProvider';
+import { Roles } from '@/domain/enum/Roles';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -122,7 +123,12 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
 });
 
 const startApplication = (id: string) => {
-  router.push(`aplicaciones/iniciar?id=${id}`);
+  const roles = user?.roles
+  console.log(user);
+  if(roles?.includes(Roles.Encargado))
+    router.push(`aplicaciones/modificar?id=${id}`);
+  else
+    router.push(`aplicaciones/iniciar?id=${id}`);
 }
 
 const finishApplication = (id: string) => {

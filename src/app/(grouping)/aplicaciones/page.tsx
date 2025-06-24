@@ -95,7 +95,7 @@ export default function AplicacionesPage() {
 
   const buttons = [
     { label: "Crear", path: "/aplicaciones/crear" },
-    { label: "Ver Todas", path: "/aplicaciones/vertodas" },
+    { label: "Ver Todas", path: "/aplicaciones/historico" },
   ];
 
 

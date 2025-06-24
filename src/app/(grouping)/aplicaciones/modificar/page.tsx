@@ -1,8 +1,10 @@
 "use client"
+import Formulario from '@/components/formulario/formulario';
 import MenuBar from '@/components/menuBar/MenuBar';
-import React, { useEffect, useState } from 'react';
-import styles from "./crearAplicacion.module.scss"
-import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Typography, Paper } from '@mui/material';
+import { Field } from '@/domain/models/Field';
+import React, { useEffect, useState, useMemo } from 'react';
+import styles from "./modificarAplicacion.module.scss"
+import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Button, Typography, Paper } from '@mui/material';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import { Locacion } from '@/domain/models/Locacion';
 import Footer from '@/components/Footer/Footer';
@@ -15,17 +17,19 @@ import ItemList from '@/components/itemList/ItemList';
 import { Producto } from '@/domain/models/Producto';
 import { ResponseItems } from '@/domain/models/ResponseItems';
 import { RecipeItem } from '@/domain/models/RecipeItem';
+import { Unidad } from '@/domain/enum/Unidad';
 import AddRecipeItemModal from '@/components/AddRecipeItemModal/AddRecipeItemModalt';
 import { transformToItems } from '@/utilities/transform';
 import { useItemsManager } from '@/hooks/useItemsManager';
 import { Stock } from '@/domain/models/Stock';
 import ResumenOpCrearAplicacion from '@/components/resumenOpCrearAplicacion/ResumenOpCrearAplicacion';
 import GenericModal from '@/components/modal/GenericModal';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 import { useLoading } from '@/hooks/useLoading';
 import dayjs from 'dayjs';
 import { Roles } from '@/domain/enum/Roles';
 import { User } from '@/domain/models/User';
+import { Aplicacion } from '@/domain/models/Aplicacion';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -37,13 +41,18 @@ type ProductoExistente = Producto & {
     cantidadEnStock: number;
 }
 
-const CrearAplicacionPage: React.FC = () => {
+const ModificarAplicacionPage: React.FC = () => {
+    const searchParams = useSearchParams();
+    const applicationId = searchParams.get("id");
     const [activeStep, setActiveStep] = useState(0);
+    const [loading, setLoading] = useState(true);
+    const [aplicacion, setAplicacion] = useState<Aplicacion | null>(null);
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [applicators, setApplicators] = useState<User[]>([]);
     const [selectedApplicator, setSelectedApplicator] = useState<string>("");
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
     const [hectareas, setHectareas] = useState<number>(0);
+    const [zona, setZona] = useState<string>("");
     const [campo, setCampo] = useState<string>("");
     const [cultivo, setCultivo] = useState<string>("");
     const [expirationDate, setExpirationDate] = useState<Dayjs | null>(dayjs());
@@ -55,28 +64,101 @@ const CrearAplicacionPage: React.FC = () => {
     const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
     const { withLoading } = useLoading();
-    const title = 'Crear Aplicación'
+    const title = 'Modificar Aplicación'
+    
+    const customInputSx = {
+        '& .MuiInputBase-root': {
+            borderRadius: '10px',
+            backgroundColor: '#e6ebea',
+            paddingX: 1,
+            fontWeight: 'bold',
+        },
+        '& .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+            borderWidth: '2px',
+        },
+        '&:hover .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+            borderColor: '#404e5c',
+        },
+        '& .MuiInputLabel-root': {
+            fontWeight: 'bold',
+            color: '#404e5c',
+        },
+        '&.Mui-focused .MuiInputLabel-root': {
+            color: '#404e5c',
+        },
+    };
+
+    const fetchApplication = async (): Promise<Aplicacion | null> => {
+        if (!applicationId) return null;
+        try {
+            const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
+            const app = response.data;
+            console.log(app);
+            setAplicacion(app);
+            
+            // Cargar datos de la aplicación existente
+            setHectareas(app.surface || 0);
+            setSelectedWarehouse(app.stock_location_id || "");
+            setSelectedApplicator(app.applicator_id || "");
+            setExpirationDate(app.application_date ? dayjs(app.application_date) : dayjs());
+            
+            // Cargar productos existentes
+            if (app.recipe?.recipe_items) {
+                const productosExistentes = app.recipe.recipe_items.map((item) => ({
+                    product_id: item.product_id,
+                    id: item.product_id,
+                    prodName: item.product_id, // Se actualizará cuando se carguen los detalles
+                    amount: item.amount,
+                    unit: item.unit,
+                    dose_type: item.dose_type,
+                    lot_number: item.lot_number || ""
+                }));
+                setProductosAAgregar(productosExistentes);
+            }
+            
+            // Cargar ubicación
+            if (app.location) {
+                setCultivo(app.location.id);
+                if (app.location.parent_location) {
+                    setCampo(app.location.parent_location.id);
+                    if (app.location.parent_location.parent_location) {
+                        setZona(app.location.parent_location.parent_location.id);
+                    }
+                }
+            }
+            
+            return app;
+        } catch (e: any) {
+            console.error("Error al cargar la aplicación:", e.message);
+            return null;
+        }
+    };
 
     const fetchLocations = async (): Promise<Locacion[]> => {
         try {
             const response = await apiService.get<Locacion[]>("locations?type=ZONE&type=FIELD&type=CROP&type=WAREHOUSE");
-            return response.data;
+            const locaciones = response.data;
+            return locaciones;
         }
-        catch (e: unknown) {
-            if (e instanceof Error) console.log(e.message);
+        catch (e: any) {
+            console.log(e.message);
             return [];
         }
     }
 
     const fetchApplicators = async (): Promise<User[]> => {
         try {
-            const response = await apiService.get<{ users: User[] }>("users/applicators");
+            const response = await apiService.get<any>("users/applicators");
             const aplicadores = response.data.users || [];
             setApplicators(aplicadores);
             return aplicadores;
         }
-        catch (e: unknown) {
-            if (e instanceof Error) console.log(e.message);
+        catch (e: any) {
+            console.log(e.message);
             setApplicators([]);
             return [];
         }
@@ -93,39 +175,50 @@ const CrearAplicacionPage: React.FC = () => {
             }));
             setProductosExistentes(prods);
         }
-        catch (e: unknown) {
-            if (e instanceof Error) console.log(e.message);
+        catch (e: any) {
+            console.log(e.message);
             return [];
         }
     }
 
     useEffect(() => {
-        if (!isReady) return;
+        if (!isReady || !applicationId) return;
         const fetchData = async () => {
+            setLoading(true);
+            const app = await fetchApplication();
             const locs = await fetchLocations();
             await fetchApplicators();
             setLocations(locs);
+            
+            // Cargar productos del almacén seleccionado
+            if (app?.stock_location_id) 
+                await fetchProductos(app.stock_location_id);
+            else
+                await fetchProductos(campo);
+            setLoading(false);
         };
         fetchData();
-    }, [isReady])
+    }, [isReady, applicationId]);
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault(); // Prevenir el comportamiento por defecto del formulario
-        if (hectareas > 0 && cultivo !== "" && expirationDate !== null && selectedWarehouse !== "") {
+        e.preventDefault();
+        if(hectareas > 0 && cultivo !== "" && expirationDate !== null && selectedWarehouse !== ""){
             setActiveStep(1);
             const locId = locations.find(c => c.id === selectedWarehouse)?.id;
-            if (locId)
+            if(locId)
                 fetchProductos(locId);
             else
                 alert("Error al encontrar la locacion");
         }
-        else {
+        else{
             alert("Complete bien los campos");
         }
     };
 
     const handleAddProducto = (producto: ProductoExistente, amount: number, doseType: string) => {
-        if (!amount || !producto || !doseType) return;
+        if (!amount ) return;
+        if(!producto) return;
+        if(!doseType) return;
 
         const existingProductIndex = productosAAgregar.findIndex((p) => p.product_id === producto.id);
 
@@ -137,7 +230,7 @@ const CrearAplicacionPage: React.FC = () => {
                 [...productosAAgregar,
                 {
                     product_id: producto.id,
-                    id: producto.id, //Esto se hace para poder usar el useItemManager
+                    id: producto.id,
                     prodName: producto.name,
                     amount: amount,
                     unit: producto.unit,
@@ -149,7 +242,11 @@ const CrearAplicacionPage: React.FC = () => {
 
     const {
         selectedIds,
+        deletedItems,
+        isModalOpen,
         toggleSelectItem,
+        quitarItems,
+        closeModal,
     } = useItemsManager(productosAAgregar);
 
     const quitarItem = (id: string) => {
@@ -157,27 +254,28 @@ const CrearAplicacionPage: React.FC = () => {
     };
 
     const items = transformToItems(productosAAgregar, "id", ["prodName", "amount", "unit", "dose_type"]).map((item) => {
-        if (item.dose_type === "SURFACE")
+        if(item.dose_type==="SURFACE")
             return {
                 ...item,
                 display: `${item.prodName}: ${item.amount} ${item.unit} POR HECTAREA`
             };
         else
-            return {
-                ...item,
-                display: `${item.prodName}: ${item.amount} ${item.unit} EN TOTAL`
-            };
+        return {
+            ...item,
+            display: `${item.prodName}: ${item.amount} ${item.unit} EN TOTAL`
+        };
     });
 
     const campos = ["display"];
 
     const isDataValid = () => {
         return campo !== "" &&
-            expirationDate !== null &&
-            hectareas !== 0
+               expirationDate !== null &&
+               hectareas !== 0 
     };
 
     const handleFinish = async () => {
+        console.log("Finishing application modification");
         const recipeItems = productosAAgregar.map((p) => ({
             product_id: p.product_id,
             amount: p.amount,
@@ -185,19 +283,15 @@ const CrearAplicacionPage: React.FC = () => {
             dose_type: p.dose_type,
             lot_number: p.lot_number
         }));
-
         const recipeReq = {
             type: "ENGINEER_RECIPE",
             recipe_items: recipeItems
         }
-
         const locId = locations.find(c => c.id === cultivo)?.id;
-        if (!locId) {
+        if(!locId)
             alert("Error al encontrar la locacion");
-            return;
-        }
 
-        const createAplicationReq = {
+        const updateAplicationReq = {
             location_id: locId,
             stock_location_id: selectedWarehouse,
             surface: hectareas,
@@ -206,13 +300,12 @@ const CrearAplicacionPage: React.FC = () => {
             application_date: expirationDate?.toISOString()
         }
 
+        console.log(updateAplicationReq);
         try {
-            const endpoint = user?.roles.includes(Roles.Aplicador) ? "applications/instant" : "applications";
             const response = await withLoading(
-                apiService.create(endpoint, createAplicationReq),
-                "Creando aplicación..."
+                apiService.update(`applications/${applicationId}`,applicationId? applicationId : "", updateAplicationReq),
+                "Modificando aplicación..."
             );
-
             if (response.success) {
                 setConfirmationModalOpen(true);
                 setAddRecipeModalOpen(false);
@@ -221,10 +314,10 @@ const CrearAplicacionPage: React.FC = () => {
                 setExpirationDate(null);
                 setHectareas(0);
             } else {
-                console.error("Error al crear la aplicacion:", response.error);
+                console.error("Error al modificar la aplicacion:", response.error);
             }
         } catch (error) {
-            console.error("Error al crear la aplicacion:", error);
+            console.error("Error al modificar la aplicacion:", error);
         }
         setActiveStep(0);
     };
@@ -234,13 +327,30 @@ const CrearAplicacionPage: React.FC = () => {
         router.push("/aplicaciones");
     }
 
+    const filterField = (l: Locacion) => {
+        if (l.type !== 'FIELD') return false;
+
+        const parentLoc = locations.find((loc) => loc.id === zona);
+        if (!parentLoc) return false;
+
+        return l.parent_location.id === parentLoc.id
+    }
+
     const filterCrop = (l: Locacion) => {
         if (l.type !== 'CROP') return false;
 
         const parentLoc = locations.find((loc) => loc.id === campo);
         if (!parentLoc) return false;
 
-        return l.parent_location.parent_location_id === parentLoc.id //El padre del lote debe ser el campo
+        return l.parent_location.id === parentLoc.id
+    }
+
+    if (loading) {
+        return <div>Cargando aplicación...</div>;
+    }
+
+    if (!aplicacion) {
+        return <div>No se encontró la aplicación.</div>;
     }
 
     return (
@@ -249,6 +359,7 @@ const CrearAplicacionPage: React.FC = () => {
                 <MenuBar showMenu={false} showArrow={true} path='/aplicaciones' />
                 <h1 className={styles.title}>{title}</h1>
 
+                {/* STEPPER */}
                 <Box sx={{ width: '100%', mb: 4 }}>
                     <Stepper activeStep={activeStep} alternativeLabel>
                         {['Ubicación', 'Productos', 'Confirmación'].map((label) => (
@@ -259,6 +370,7 @@ const CrearAplicacionPage: React.FC = () => {
                     </Stepper>
                 </Box>
 
+                {/* PASO 1: Formulario */}
                 {activeStep === 0 && (
                     <Box sx={{ maxWidth: '600px', mx: 'auto', p: 3 }}>
                         <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
@@ -267,6 +379,7 @@ const CrearAplicacionPage: React.FC = () => {
                                     fullWidth
                                     type="number"
                                     name="hectareas"
+                                    value={hectareas}
                                     onChange={(e) => setHectareas(Number(e.target.value))}
                                     placeholder="Hectáreas"
                                     label="Hectáreas"
@@ -315,7 +428,7 @@ const CrearAplicacionPage: React.FC = () => {
                                     onChange={(e) => setCultivo(e.target.value)}
                                     label="Selecciona un cultivo"
                                     variant="outlined"
-                                    disabled={campo === ""}
+                                    disabled = {campo===""}
                                     sx={{
                                         mb: 2,
                                         '& .MuiOutlinedInput-root': {
@@ -329,7 +442,7 @@ const CrearAplicacionPage: React.FC = () => {
                                 >
                                     {locations?.filter((l) => filterCrop(l)).map((l) => (
                                         <MenuItem key={l.id ?? l.name} value={l.id}>
-                                            {l.name} - {l.parent_location.name}
+                                            {l.name}
                                         </MenuItem>
                                     ))}
                                 </TextField>
@@ -379,7 +492,7 @@ const CrearAplicacionPage: React.FC = () => {
                                 >
                                     {Array.isArray(applicators) && applicators.map((applicator) => (
                                         <MenuItem key={applicator.id} value={applicator.id}>
-                                            {applicator.first_name + " " + applicator.last_name}
+                                            {applicator.first_name+" "+applicator.last_name}
                                         </MenuItem>
                                     ))}
                                 </TextField>
@@ -410,10 +523,10 @@ const CrearAplicacionPage: React.FC = () => {
                                         />
                                     </DemoContainer>
                                 </LocalizationProvider>
-                                <button
-                                    type="submit"
+                                <button 
+                                    type="submit" 
                                     className={`button button-primary ${styles.button}`}
-                                    disabled={!hectareas || selectedWarehouse === "" || cultivo === ""}
+                                    disabled = {!hectareas || selectedWarehouse==="" || cultivo===""}
                                 >
                                     Continuar
                                 </button>
@@ -422,120 +535,110 @@ const CrearAplicacionPage: React.FC = () => {
                     </Box>
                 )}
 
+                {/* PASO 2: Agregar productos */}
                 {activeStep === 1 && (
-                    <div>
-                        <Box sx={{ maxWidth: '800px', mx: 'auto', p: 3 }}>
-                            <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
-                                <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
-                                    {productosAAgregar.length === 0 ? (
-                                        'No se ingresaron productos aún.'
-                                    ) : productosAAgregar.length === 1 ? (
-                                        'Se ingresó 1 producto.'
-                                    ) : (
-                                        <>Se ingresaron <strong>{productosAAgregar.length}</strong> productos.</>
-                                    )}
-                                </Typography>
-
-                                <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
-                                    Lugar de aplicación: <strong>{locations.find(l => l.id === cultivo)?.name || 'N/A'}</strong>
-                                </Typography>
-
-                                <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
-                                    Hectáreas: <strong>{hectareas}</strong>
-                                </Typography>
-
-                                <Typography variant="body1" sx={{ mb: 3, color: '#666' }}>
-                                    Fecha de aplicación: <strong>{expirationDate?.format('DD/MM/YYYY')}</strong>
-                                </Typography>
-
-                                {productosExistentes.length > 0 ? (
-                                    <>
-                                        {productosAAgregar.length > 0 ? (
-                                            <ItemList
-                                                items={items}
-                                                displayKeys={campos}
-                                                onSelect={toggleSelectItem}
-                                                selectedIds={selectedIds}
-                                                selectItems={false}
-                                                deleteItems={true}
-                                                onDelete={quitarItem}
-                                                selectSingleItem={false}
-                                            />
-                                        ) : (
-                                            <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
-                                                Ingrese productos para agregar
-                                            </Typography>
-                                        )}
-
-                                        <div className={styles.buttonContainer}>
-                                            <button
-                                                onClick={() => setAddRecipeModalOpen(true)}
-                                                disabled={!isDataValid()}
-                                                className={`button button-secondary ${styles.button}`}
-                                            >
-                                                Agregar Producto
-                                            </button>
-                                        </div>
-                                    </>
-                                ) : (
+                    <Box sx={{ maxWidth: '800px', mx: 'auto', p: 3 }}>
+                        <Paper elevation={3} sx={{ p: 4, borderRadius: 2 }}>
+                            <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
+                                Ingresó {productosAAgregar.length} productos
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
+                                Fecha de Aplicación: {expirationDate?.format('DD/MM/YYYY')}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
+                                Lugar de aplicación: {campo}
+                            </Typography>
+                            <Typography variant="body1" sx={{ mb: 3, color: '#666' }}>
+                                Hectáreas: {hectareas}
+                            </Typography>
+                            {productosExistentes.length > 0 ?
+                            <>
+                                {productosAAgregar.length > 0 ?
+                                    <ItemList
+                                        items={items}
+                                        displayKeys={campos}
+                                        onSelect={toggleSelectItem}
+                                        selectedIds={selectedIds}
+                                        selectItems={false}
+                                        deleteItems={true}
+                                        onDelete={quitarItem}
+                                        selectSingleItem={false}
+                                    />
+                                : (
                                     <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
-                                        No hay stock disponible en el campo seleccionado
+                                        Ingrese productos para agregar
                                     </Typography>
                                 )}
-                            </Paper>
-                        </Box>
-                        <div className={styles.buttonContainer}>
-                            <button
-                                onClick={() => setActiveStep(0)}
-                                className={`button button-secondary ${styles.button}`}
-                            >
-                                Volver
-                            </button>
-                            <button
-                                onClick={() => setActiveStep(2)}
-                                disabled={productosAAgregar.length === 0}
-                                type="button"
-                                className={`button button-primary ${styles.button}`}
-                            >
-                                Confirmar
-                            </button>
-                        </div>
-                    </div>
-                )}
 
+                                <div className={styles.buttonContainer}>
+                                    <button
+                                        onClick={() => setAddRecipeModalOpen(true)}
+                                        disabled={!isDataValid()}
+                                        className={`button button-secondary ${styles.button}`}
+                                    >
+                                        Agregar Producto
+                                    </button>
+                                </div>
+                            </>
+                            : (
+                                <Typography variant="body1" sx={{ mb: 3, color: '#666', textAlign: 'center' }}>
+                                    No hay stock disonible en el campo seleccionado
+                                </Typography>
+                            )}
+                            <div className={styles.buttonContainer}>
+                                <button
+                                    onClick={() => setActiveStep(0)}
+                                    className={`button button-secondary ${styles.button}`}
+                                >
+                                    Volver
+                                </button>
+                                <button
+                                    onClick={() => setActiveStep(2)}
+                                    disabled={productosAAgregar.length === 0}
+                                    type="button"
+                                    className={`button button-primary ${styles.button}`}
+                                >
+                                    Confirmar
+                                </button>
+                            </div>
+                        </Paper>
+                    </Box>
+                )}
+                
+                {/* Paso 3 Confirmacion */}
                 {activeStep === 2 && (
                     <ResumenOpCrearAplicacion
                         handleFinish={handleFinish}
                         products={productosAAgregar}
                         open={true}
                         setModalClose={() => setActiveStep(1)}
-                        locacion={locations.find((l) => l.id === cultivo)?.name || ''}
+                        locacion={campo}
                         hectareas={hectareas}
                         fechaVencimiento={expirationDate?.format('DD/MM/YYYY') || ''}
                     />
                 )}
 
-                {addRecipeItemModal && (
-                    <AddRecipeItemModal
-                        handleAddProducto={handleAddProducto}
-                        products={productosExistentes}
-                        open={addRecipeItemModal}
-                        setModalClose={() => setAddRecipeModalOpen(false)}
-                    />
-                )}
-
-                <GenericModal
-                    isOpen={confirmationModalOpen}
-                    onClose={handleCloseConfirmationModal}
-                    title="Aplicacion creada"
-                    modalText="Se creo la aplicacion correctamente"
-                    buttonTitle="Cerrar"
-                    showSecondButton={false}
+            {addRecipeItemModal && (
+                <AddRecipeItemModal
+                    handleAddProducto={handleAddProducto}
+                    products={productosExistentes}
+                    open={addRecipeItemModal}
+                    setModalClose={() => setAddRecipeModalOpen(false)}
                 />
+            )}
+
+            <GenericModal
+                isOpen={confirmationModalOpen}
+                onClose={handleCloseConfirmationModal}
+                title="Aplicacion modificada"
+                modalText="Se modificó la aplicacion correctamente"
+                buttonTitle="Cerrar"
+                showSecondButton={false}
+             />
             </div>
             <Footer />
         </div>
     );
 };
 
-export default CrearAplicacionPage;
+export default ModificarAplicacionPage; 
