@@ -107,7 +107,7 @@ const CrearAplicacionPage: React.FC = () => {
             setLocations(locs);
         };
         fetchData();
-    }, [isReady, apiService])
+    }, [isReady])
 
     const handleFormSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault(); // Prevenir el comportamiento por defecto del formulario

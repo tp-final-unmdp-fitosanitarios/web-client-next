@@ -10,8 +10,8 @@ import { format } from "date-fns";
 import { es } from "date-fns/locale";
 
 interface NeededStock {
-  productId: string;
-  productName: string;
+  product_id: string;
+  product_name: string;
   amount: number;
   unit: string;
 }
@@ -213,13 +213,16 @@ export default function ConsolidadoPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {consolidatedData.needed_stocks.map((stock) => (
-                      <tr key={stock.productId}>
-                        <td>{stock.productName}</td>
-                        <td>{stock.amount}</td>
-                        <td>{stock.unit}</td>
-                      </tr>
-                    ))}
+                    {consolidatedData.needed_stocks.map((stock) => {
+                      return (
+                        <tr key={stock.product_id}>
+                          <td>{stock.product_name}</td>
+                          <td>{stock.amount}</td>
+                          <td>{stock.unit}</td>
+                        </tr>
+                      );
+                    })}
+
                   </tbody>
                 </table>
               ) : (
@@ -232,7 +235,7 @@ export default function ConsolidadoPage() {
               {consolidatedData.applications.length > 0 ? (
                 consolidatedData.applications.map((app) => (
                   <div key={app.id} className={styles.applicationCard}>
-                    <div 
+                    <div
                       className={styles.applicationHeader}
                       onClick={() => toggleApplication(app.id)}
                     >
@@ -241,13 +244,13 @@ export default function ConsolidadoPage() {
                         {expandedApplications.has(app.id) ? "▼" : "▶"}
                       </span>
                     </div>
-                    
+
                     {expandedApplications.has(app.id) && (
                       <div className={styles.applicationDetails}>
                         <p><strong>Estado:</strong> {app.status}</p>
                         <p><strong>Superficie:</strong> {app.surface} ha</p>
                         <p><strong>Fecha:</strong> {format(new Date(app.createdAt), "dd/MM/yyyy", { locale: es })}</p>
-                        
+
                         <div className={styles.recipeSection}>
                           <h4>Receta</h4>
                           <table className={styles.table}>
