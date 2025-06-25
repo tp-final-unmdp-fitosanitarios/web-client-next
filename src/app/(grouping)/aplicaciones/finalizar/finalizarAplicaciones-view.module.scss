@@ -54,8 +54,11 @@
     @media (max-width: 768px) {
         flex-direction: column;
         gap: 1rem;
+        align-items: center;
     }
 }
+
+step4ButtonContainer
 
 .button {
     min-width: 30%;
