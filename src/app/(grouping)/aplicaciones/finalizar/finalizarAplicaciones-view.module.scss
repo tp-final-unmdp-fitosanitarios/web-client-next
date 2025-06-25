@@ -181,6 +181,96 @@ step4ButtonContainer
     }
 }
 
+.title {
+  display: flex;
+  justify-content: center;
+  color: $dark-color;
+  margin-bottom: $spacing-large;
+  text-align: center;
+}
+
+.container {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #fff;
+  border-radius: 10px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.productTitle {
+  font-size: 18px;
+  color: $dark-color;
+  margin: 20px 0;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: space-between;
+  gap: 15px;
+  margin-top: 30px;
+}
+
+.button {
+  flex: 1;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.3s ease;
+
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.button-primary {
+  background-color: $primary-color;
+  color: $dark-color;
+}
+
+.button-secondary {
+  background-color: #6c757d;
+  color: white;
+}
+
+.button-outlined {
+  background-color: transparent;
+  border: 2px solid $dark-color;
+  color: $dark-color;
+}
+
+.label {
+  margin-left: $spacing-medium;
+  font-size: 15px;
+  font-weight: 600;
+  align-self: flex-start;
+}
+
+.buttonCamera {
+  border: 2px solid $dark-color;
+  background-color: $light-color;
+  width: 40px;
+  padding: $spacing-small;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  margin-left: 8px;
+  
+  &:hover {
+    background-color: darken($light-color, 5%);
+  }
+  
+  svg {
+    font-size: 18px;
+    color: $dark-color;
+  }
+}
+
 // Estilos responsive adicionales
 @media (max-width: 768px) {
     .finalizarAplicacionContainer {

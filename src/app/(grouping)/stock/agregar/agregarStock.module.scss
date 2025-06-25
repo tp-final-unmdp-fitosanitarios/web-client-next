@@ -116,6 +116,29 @@
   margin: 0;
 }
 
+.buttonCamera {
+  border: 2px solid $dark-color;
+  background-color: $light-color;
+  width: 40px;
+  height: 10px;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+  margin-left: 8px;
+  padding: 8px;
+  
+  &:hover {
+    background-color: darken($light-color, 5%);
+  }
+  
+  svg {
+    font-size: 18px;
+    color: $dark-color;
+  }
+}
+
 @media (max-width:500px) {
   .formAndItemListContainer {
     flex-direction: column-reverse;

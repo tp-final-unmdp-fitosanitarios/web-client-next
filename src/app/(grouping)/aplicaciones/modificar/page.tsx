@@ -24,6 +24,7 @@ import { useItemsManager } from '@/hooks/useItemsManager';
 import { Stock } from '@/domain/models/Stock';
 import ResumenOpCrearAplicacion from '@/components/resumenOpCrearAplicacion/ResumenOpCrearAplicacion';
 import GenericModal from '@/components/modal/GenericModal';
+import ModalConfirmacionEliminacion from '@/components/ModalConfimacionEliminacion/ModalConfirmacionEliminacion';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useLoading } from '@/hooks/useLoading';
 import dayjs from 'dayjs';
@@ -60,6 +61,8 @@ const ModificarAplicacionPage: React.FC = () => {
     const [productosExistentes, setProductosExistentes] = useState<ProductoExistente[]>([]);
     const [addRecipeItemModal, setAddRecipeModalOpen] = useState<boolean>(false);
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
+    const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false);
+    const [deleteSuccessModalOpen, setDeleteSuccessModalOpen] = useState(false);
     const router = useRouter();
     const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
@@ -322,6 +325,42 @@ const ModificarAplicacionPage: React.FC = () => {
         setActiveStep(0);
     };
 
+    const handleDelete = (e: React.MouseEvent) => {
+        e.preventDefault();
+        setDeleteConfirmationModalOpen(true);
+    };
+
+    const handleConfirmDelete = async () => {
+        if (!applicationId) return;
+        
+        try {
+            const response = await withLoading(
+                apiService.delete("applications", applicationId),
+                "Eliminando aplicación..."
+            );
+            
+            if (response.success) {
+                setDeleteConfirmationModalOpen(false);
+                setDeleteSuccessModalOpen(true);
+            } else {
+                console.error("Error al eliminar la aplicación:", response.error);
+                alert("Error al eliminar la aplicación");
+            }
+        } catch (error) {
+            console.error("Error al eliminar la aplicación:", error);
+            alert("Error al eliminar la aplicación");
+        }
+    };
+
+    const handleCloseDeleteConfirmationModal = () => {
+        setDeleteConfirmationModalOpen(false);
+    };
+
+    const handleCloseDeleteSuccessModal = () => {
+        setDeleteSuccessModalOpen(false);
+        router.push("/aplicaciones");
+    };
+
     const handleCloseConfirmationModal = () => {
         setConfirmationModalOpen(false);
         router.push("/aplicaciones");
@@ -530,6 +569,13 @@ const ModificarAplicacionPage: React.FC = () => {
                                 >
                                     Continuar
                                 </button>
+                                <button 
+                                    type="submit" 
+                                    className={`button ${styles.danger} ${styles.button}`}
+                                    onClick={handleDelete}
+                                >
+                                    Eliminar
+                                </button>
                             </form>
                         </Paper>
                     </Box>
@@ -635,6 +681,23 @@ const ModificarAplicacionPage: React.FC = () => {
                 buttonTitle="Cerrar"
                 showSecondButton={false}
              />
+
+            <ModalConfirmacionEliminacion
+                isOpen={deleteConfirmationModalOpen}
+                onClose={handleCloseDeleteConfirmationModal}
+                onConfirm={handleConfirmDelete}
+                text="la aplicación"
+            />
+
+            <GenericModal
+                isOpen={deleteSuccessModalOpen}
+                onClose={handleCloseDeleteSuccessModal}
+                title="Aplicación Eliminada"
+                modalText="La aplicación ha sido eliminada correctamente"
+                buttonTitle="Cerrar"
+                showSecondButton={false}
+            />
+
             </div>
             <Footer />
         </div>

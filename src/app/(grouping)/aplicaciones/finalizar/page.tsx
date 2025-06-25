@@ -1,6 +1,6 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import MenuBar from "@/components/menuBar/MenuBar";
 import ItemList from "@/components/itemList/ItemList";
 import styles from "./finalizarAplicaciones-view.module.scss";
@@ -10,8 +10,7 @@ import { ResponseItems } from "@/domain/models/ResponseItems";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import { Maquina } from "@/domain/models/Maquina";
 import GenericModal from "@/components/modal/GenericModal";
-import { useRouter } from 'next/navigation';
-import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Paper, Typography, Modal } from '@mui/material';
+import { Box, Step, StepLabel, Stepper, TextField, MenuItem, Button, Paper, Typography, Modal } from '@mui/material';
 import { RecipeItem } from "@/domain/models/RecipeItem";
 import AddRecipeItemModal from "@/components/AddRecipeItemModal/AddRecipeItemModalt";
 import { transformToItems } from "@/utilities/transform";
@@ -22,6 +21,8 @@ import { useLoading } from "@/hooks/useLoading";
 import Image from "next/image";
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ClearIcon from '@mui/icons-material/Clear';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
+import CameraCapture from '@/components/CameraCapture/CameraCapture';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -36,7 +37,7 @@ type ProductoExistente = Producto & {
 export default function FinalizarAplicacion() {
     const searchParams = useSearchParams();
     const applicationId = searchParams.get("id");
-    const { getApiService } = useAuth();
+    const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
     const router = useRouter();
     const { withLoading } = useLoading();
@@ -60,6 +61,7 @@ export default function FinalizarAplicacion() {
     const [recipeItemDoseTypes, setRecipeItemDoseTypes] = useState<{ [key: string]: string }>({});
     const [combustibleUtilizado, setCombustibleUtilizado] = useState<string>("");
     const [cantidadHectareas, setCantidadHectareas] = useState<string>("");
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
 
     // Custom hooks
     const {
@@ -388,6 +390,24 @@ export default function FinalizarAplicacion() {
         setFileBase64(null);
     };
 
+    const handleCameraCapture = (base64Data: string, fileName: string) => {
+        // Create a File object from the base64 data
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        
+        handleFileSelect(file);
+    };
+
+    const handleOpenCamera = () => {
+        setIsCameraOpen(true);
+    };
+
     return (
         <div className="page-container">
             <div className="content-wrap">
@@ -537,6 +557,13 @@ export default function FinalizarAplicacion() {
                                 >
                                     {selectedFile ? "Cambiar" : "Seleccionar"}
                                 </label>
+                                <button
+                                    type="button"
+                                    className={`${styles.button} ${styles.buttonCamera}`}
+                                    onClick={handleOpenCamera}
+                                >
+                                    <CameraAltIcon />
+                                </button>
                             </div>
                         </div>
                         {selectedFile && (
@@ -760,6 +787,12 @@ export default function FinalizarAplicacion() {
                         setModalClose={() => setAddRecipeModalOpen(false)}
                     />
                 )}
+
+                <CameraCapture
+                    isOpen={isCameraOpen}
+                    onClose={() => setIsCameraOpen(false)}
+                    onCapture={handleCameraCapture}
+                />
 
                 <GenericModal
                     isOpen={confirmationModalOpen}
