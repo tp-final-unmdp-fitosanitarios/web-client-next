@@ -121,10 +121,14 @@ export default function ConfirmarAplicacion() {
     }));
 
     const items = productos?.map(p => ({
+       
+
         id: p.id.toString(),
         title: p.title,
         description: p.description
     })) || [];
+
+    console.log("items:",items);
 
     return (
         <div className="page-container">
@@ -144,7 +148,7 @@ export default function ConfirmarAplicacion() {
                         deleteItems={false}
                         selectSingleItem={false}
                     />
-                    <div className={styles.buttonContainer}>
+                    <div className={`${styles.buttonContainer}`}>
                         <button 
                             className={`button button-danger ${styles.button}`} 
                             onClick={handleRechazar}

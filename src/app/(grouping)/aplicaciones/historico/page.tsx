@@ -12,18 +12,18 @@ import { Locacion } from '@/domain/models/Locacion';
 import { Producto } from '@/domain/models/Producto';
 import { User } from '@/domain/models/User';
 import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
-import { 
-    Box, 
-    Paper, 
-    TextField, 
-    MenuItem, 
-    Button, 
-    Typography, 
-    Table, 
-    TableBody, 
-    TableCell, 
-    TableContainer, 
-    TableHead, 
+import {
+    Box,
+    Paper,
+    TextField,
+    MenuItem,
+    Button,
+    Typography,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
     TableRow,
     Pagination,
     FormControl,
@@ -34,7 +34,8 @@ import {
     IconButton,
     Collapse,
     Card,
-    CardContent
+    CardContent,
+    useTheme, useMediaQuery
 } from '@mui/material';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
@@ -106,6 +107,8 @@ export default function HistoricoAplicacionesPage() {
     // Estados de UI
     const [filtrosExpandidos, setFiltrosExpandidos] = useState<boolean>(false);
     const [aplicacionExpandida, setAplicacionExpandida] = useState<string | null>(null);
+    const theme = useTheme();
+    const isMobile = useMediaQuery(theme.breakpoints.down('sm'));
 
     const customInputSx = {
         '& .MuiInputBase-root': {
@@ -135,7 +138,7 @@ export default function HistoricoAplicacionesPage() {
 
     const construirQueryParams = () => {
         const params = new URLSearchParams();
-        
+
         // Parámetros de paginación
         params.append('page', paginacion.page.toString());
         params.append('size', paginacion.size.toString());
@@ -344,7 +347,7 @@ export default function HistoricoAplicacionesPage() {
                         <Typography variant="h6" color="#404e5c">
                             Filtros de búsqueda
                         </Typography>
-                        <IconButton 
+                        <IconButton
                             onClick={() => setFiltrosExpandidos(!filtrosExpandidos)}
                             size="small"
                         >
@@ -475,144 +478,211 @@ export default function HistoricoAplicacionesPage() {
                 </Paper>
 
                 {/* Tabla de aplicaciones */}
-                <Paper elevation={3} sx={{ mb: 3 }}>
-                    <TableContainer>
-                        <Table>
-                            <TableHead>
-                                <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
-                                    <TableCell 
-                                        sx={{ fontWeight: 'bold', cursor: 'pointer' }}
-                                        onClick={() => handleSortChange('created_at')}
-                                    >
-                                        Fecha Creación
-                                    </TableCell>
-                                    <TableCell 
-                                        sx={{ fontWeight: 'bold', cursor: 'pointer' }}
-                                        onClick={() => handleSortChange('application_date')}
-                                    >
-                                        Fecha Aplicación
-                                    </TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Ubicación</TableCell>
-                                    <TableCell 
-                                        sx={{ fontWeight: 'bold', cursor: 'pointer' }}
-                                        onClick={() => handleSortChange('surface')}
-                                    >
-                                        Superficie (Ha)
-                                    </TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Aplicador</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Estado</TableCell>
-                                    <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
-                                </TableRow>
-                            </TableHead>
-                            <TableBody>
-                                {aplicaciones.map((aplicacion) => (
-                                    <React.Fragment key={aplicacion.id}>
-                                        <TableRow hover>
-                                            <TableCell>{formatDate(aplicacion.created_at)}</TableCell>
-                                            <TableCell>
-                                                {aplicacion.application_date ? formatDate(aplicacion.application_date) : 'N/A'}
-                                            </TableCell>
-                                            <TableCell>{aplicacion.location?.name || 'N/A'}</TableCell>
-                                            <TableCell>{aplicacion.surface || 0}</TableCell>
-                                            <TableCell>
-                                                {aplicacion.applicator_id ? 
-                                                    aplicadores.find(a => a.id === aplicacion.applicator_id)?.first_name + ' ' +
-                                                    aplicadores.find(a => a.id === aplicacion.applicator_id)?.last_name : 
-                                                    'N/A'
+                <Paper elevation={3} sx={{ mb: 3, p: isMobile ? 2 : 0 }}>
+                    {isMobile ? (
+                        <Box display="flex" flexDirection="column" gap={2}>
+                            {aplicaciones.map((aplicacion) => (
+                                <Card key={aplicacion.id} variant="outlined">
+                                    <CardContent>
+                                        <Typography variant="subtitle1" fontWeight="bold">
+                                            {formatDate(aplicacion.created_at)}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <strong>Aplicación:</strong> {aplicacion.application_date ? formatDate(aplicacion.application_date) : 'N/A'}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <strong>Ubicación:</strong> {aplicacion.location?.name || 'N/A'}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <strong>Superficie:</strong> {aplicacion.surface || 0} Ha
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <strong>Aplicador:</strong>{' '}
+                                            {aplicacion.applicator_id
+                                                ? aplicadores.find(a => a.id === aplicacion.applicator_id)?.first_name + ' ' +
+                                                aplicadores.find(a => a.id === aplicacion.applicator_id)?.last_name
+                                                : 'N/A'}
+                                        </Typography>
+                                        <Box mt={1}>
+                                            <Chip
+                                                label={getEstadoLabel(aplicacion.status)}
+                                                color={getEstadoColor(aplicacion.status) as any}
+                                                size="small"
+                                            />
+                                        </Box>
+                                        <Box display="flex" justifyContent="space-between" mt={2}>
+                                            <IconButton
+                                                size="small"
+                                                onClick={() =>
+                                                    setAplicacionExpandida(aplicacionExpandida === aplicacion.id ? null : aplicacion.id)
                                                 }
-                                            </TableCell>
-                                            <TableCell>
-                                                <Chip 
-                                                    label={getEstadoLabel(aplicacion.status)} 
-                                                    color={getEstadoColor(aplicacion.status) as any}
-                                                    size="small"
-                                                />
-                                            </TableCell>
-                                            <TableCell>
-                                                <IconButton
-                                                    size="small"
-                                                    onClick={() => setAplicacionExpandida(
-                                                        aplicacionExpandida === aplicacion.id ? null : aplicacion.id
-                                                    )}
-                                                >
-                                                    {aplicacionExpandida === aplicacion.id ? 
-                                                        <ExpandLessIcon /> : <ExpandMoreIcon />
-                                                    }
+                                            >
+                                                {aplicacionExpandida === aplicacion.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                                            </IconButton>
+                                            <NavigationLink href={`/aplicaciones/modificar?id=${aplicacion.id}`}>
+                                                <IconButton size="small">
+                                                    <VisibilityIcon />
                                                 </IconButton>
-                                                <NavigationLink href={`/aplicaciones/modificar?id=${aplicacion.id}`}>
-                                                    <IconButton size="small">
-                                                        <VisibilityIcon />
+                                            </NavigationLink>
+                                        </Box>
+                                        <Collapse in={aplicacionExpandida === aplicacion.id} timeout="auto" unmountOnExit>
+                                            <Box mt={2}>
+                                                <Typography variant="body2" fontWeight="bold">Productos:</Typography>
+                                                {aplicacion.recipe?.recipe_items?.map((item, idx) => (
+                                                    <Typography key={idx} variant="body2" sx={{ ml: 1 }}>
+                                                        • {item.amount} {item.unit}{' '}
+                                                        {item.dose_type === 'SURFACE' ? '/Ha' : ' en total'}
+                                                    </Typography>
+                                                ))}
+                                            </Box>
+                                        </Collapse>
+                                    </CardContent>
+                                </Card>
+                            ))}
+                        </Box>
+                    ) : (
+                        <TableContainer>
+                            <Table>
+                                <TableHead>
+                                    <TableRow sx={{ backgroundColor: '#f5f5f5' }}>
+                                        <TableCell
+                                            sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+                                            onClick={() => handleSortChange('created_at')}
+                                        >
+                                            Fecha Creación
+                                        </TableCell>
+                                        <TableCell
+                                            sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+                                            onClick={() => handleSortChange('application_date')}
+                                        >
+                                            Fecha Aplicación
+                                        </TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Ubicación</TableCell>
+                                        <TableCell
+                                            sx={{ fontWeight: 'bold', cursor: 'pointer' }}
+                                            onClick={() => handleSortChange('surface')}
+                                        >
+                                            Superficie (Ha)
+                                        </TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Aplicador</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Estado</TableCell>
+                                        <TableCell sx={{ fontWeight: 'bold' }}>Acciones</TableCell>
+                                    </TableRow>
+                                </TableHead>
+                                <TableBody>
+                                    {aplicaciones.map((aplicacion) => (
+                                        <React.Fragment key={aplicacion.id}>
+                                            <TableRow hover>
+                                                <TableCell>{formatDate(aplicacion.created_at)}</TableCell>
+                                                <TableCell>
+                                                    {aplicacion.application_date ? formatDate(aplicacion.application_date) : 'N/A'}
+                                                </TableCell>
+                                                <TableCell>{aplicacion.location?.name || 'N/A'}</TableCell>
+                                                <TableCell>{aplicacion.surface || 0}</TableCell>
+                                                <TableCell>
+                                                    {aplicacion.applicator_id ?
+                                                        aplicadores.find(a => a.id === aplicacion.applicator_id)?.first_name + ' ' +
+                                                        aplicadores.find(a => a.id === aplicacion.applicator_id)?.last_name :
+                                                        'N/A'
+                                                    }
+                                                </TableCell>
+                                                <TableCell>
+                                                    <Chip
+                                                        label={getEstadoLabel(aplicacion.status)}
+                                                        color={getEstadoColor(aplicacion.status) as any}
+                                                        size="small"
+                                                    />
+                                                </TableCell>
+                                                <TableCell>
+                                                    <IconButton
+                                                        size="small"
+                                                        onClick={() => setAplicacionExpandida(
+                                                            aplicacionExpandida === aplicacion.id ? null : aplicacion.id
+                                                        )}
+                                                    >
+                                                        {aplicacionExpandida === aplicacion.id ?
+                                                            <ExpandLessIcon /> : <ExpandMoreIcon />
+                                                        }
                                                     </IconButton>
-                                                </NavigationLink>
-                                            </TableCell>
-                                        </TableRow>
-                                        <TableRow>
-                                            <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
-                                                <Collapse in={aplicacionExpandida === aplicacion.id} timeout="auto" unmountOnExit>
-                                                    <Card sx={{ margin: 1 }}>
-                                                        <CardContent>
-                                                            <Typography variant="h6" gutterBottom>
-                                                                Detalles de la Aplicación
-                                                            </Typography>
-                                                            <Grid container spacing={2}>
-                                                                <Grid item xs={12} md={6}>
-                                                                    <Typography variant="body2">
-                                                                        <strong>ID:</strong> {aplicacion.id}
-                                                                    </Typography>
-                                                                    <Typography variant="body2">
-                                                                        <strong>Ubicación:</strong> {aplicacion.location?.name}
-                                                                    </Typography>
-                                                                    <Typography variant="body2">
-                                                                        <strong>Superficie:</strong> {aplicacion.surface} Ha
-                                                                    </Typography>
-                                                                </Grid>
-                                                                <Grid item xs={12} md={6}>
-                                                                    <Typography variant="body2">
-                                                                        <strong>Productos:</strong>
-                                                                    </Typography>
-                                                                    {aplicacion.recipe?.recipe_items?.map((item, index) => (
-                                                                        <Typography key={index} variant="body2" sx={{ ml: 2 }}>
-                                                                            • {item.amount} {item.unit} 
-                                                                            {item.dose_type === 'SURFACE' ? '/Ha' : ' en total'}
+                                                    <NavigationLink href={`/aplicaciones/modificar?id=${aplicacion.id}`}>
+                                                        <IconButton size="small">
+                                                            <VisibilityIcon />
+                                                        </IconButton>
+                                                    </NavigationLink>
+                                                </TableCell>
+                                            </TableRow>
+                                            <TableRow>
+                                                <TableCell style={{ paddingBottom: 0, paddingTop: 0 }} colSpan={7}>
+                                                    <Collapse in={aplicacionExpandida === aplicacion.id} timeout="auto" unmountOnExit>
+                                                        <Card sx={{ margin: 1 }}>
+                                                            <CardContent>
+                                                                <Typography variant="h6" gutterBottom>
+                                                                    Detalles de la Aplicación
+                                                                </Typography>
+                                                                <Grid container spacing={2}>
+                                                                    <Grid item xs={12} md={6}>
+                                                                        <Typography variant="body2">
+                                                                            <strong>ID:</strong> {aplicacion.id}
                                                                         </Typography>
-                                                                    ))}
+                                                                        <Typography variant="body2">
+                                                                            <strong>Ubicación:</strong> {aplicacion.location?.name}
+                                                                        </Typography>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Superficie:</strong> {aplicacion.surface} Ha
+                                                                        </Typography>
+                                                                    </Grid>
+                                                                    <Grid item xs={12} md={6}>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Productos:</strong>
+                                                                        </Typography>
+                                                                        {aplicacion.recipe?.recipe_items?.map((item, index) => (
+                                                                            <Typography key={index} variant="body2" sx={{ ml: 2 }}>
+                                                                                • {item.amount} {item.unit}
+                                                                                {item.dose_type === 'SURFACE' ? '/Ha' : ' en total'}
+                                                                            </Typography>
+                                                                        ))}
+                                                                    </Grid>
                                                                 </Grid>
-                                                            </Grid>
-                                                        </CardContent>
-                                                    </Card>
-                                                </Collapse>
-                                            </TableCell>
-                                        </TableRow>
-                                    </React.Fragment>
-                                ))}
-                            </TableBody>
-                        </Table>
-                    </TableContainer>
+                                                            </CardContent>
+                                                        </Card>
+                                                    </Collapse>
+                                                </TableCell>
+                                            </TableRow>
+                                        </React.Fragment>
+                                    ))}
+                                </TableBody>
+                            </Table>
+                        </TableContainer>
+
+                    )}
                 </Paper>
 
-                {/* Paginación */}
-                <Box sx={{ display: 'flex', justifyContent: 'center', mb: 3 }}>
-                    <Pagination
-                        count={totalPages}
-                        page={paginacion.page + 1}
-                        onChange={handlePageChange}
-                        color="primary"
-                        size="large"
-                    />
-                </Box>
+                {!isMobile && (
+                    <Box sx={{ mb: 3 }}>
+                        <Box sx={{ display: 'flex', justifyContent: 'center', mb: 2 }}>
+                            <Pagination
+                                count={totalPages}
+                                page={paginacion.page + 1}
+                                onChange={handlePageChange}
+                                color="primary"
+                                size="large"
+                            />
+                        </Box>
 
-                {/* Información de paginación */}
-                <Box sx={{ textAlign: 'center', mb: 3 }}>
-                    <Typography variant="body2" color="text.secondary">
-                        Mostrando {aplicaciones.length} de {totalElements} aplicaciones
-                    </Typography>
-                </Box>
+                        <Box sx={{ textAlign: 'center', mb: 2 }}>
+                            <Typography variant="body2" color="text.secondary">
+                                Mostrando {aplicaciones.length} de {totalElements} aplicaciones
+                            </Typography>
+                        </Box>
 
-                {error && (
-                    <Typography color="error" sx={{ textAlign: 'center', mb: 2 }}>
-                        {error}
-                    </Typography>
+                        {error && (
+                            <Typography color="error" sx={{ textAlign: 'center' }}>
+                                {error}
+                            </Typography>
+                        )}
+                    </Box>
                 )}
+
             </div>
             <Footer />
         </div>

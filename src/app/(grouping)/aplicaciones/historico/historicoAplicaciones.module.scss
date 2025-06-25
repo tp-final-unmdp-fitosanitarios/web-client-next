@@ -129,4 +129,19 @@
     .tableContainer {
         overflow-x: auto;
     }
-} 
+}
+
+.mobileCard {
+    background-color: #fff;
+    border-radius: 10px;
+    box-shadow: $box-shadow;
+    padding: 1rem;
+
+    p {
+        margin: 0.25rem 0;
+    }
+
+    strong {
+        color: #333;
+    }
+}

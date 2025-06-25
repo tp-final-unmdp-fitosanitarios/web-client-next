@@ -34,6 +34,7 @@
 
 .buttonContainer {
     display: flex;
+
     justify-content: space-between;
     gap: 15px;
     margin-top: 30px;
@@ -67,4 +68,12 @@
 .button-primary {
     background-color: #4CAF50;
     color: white;
-} 
+}
+
+@media (max-width:768px) {
+    .buttonContainer {
+        flex-direction: column;
+        gap: 5px;
+        align-items: center;
+    }
+}
