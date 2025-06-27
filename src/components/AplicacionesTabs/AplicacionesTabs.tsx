@@ -71,15 +71,23 @@ function LinkTab(props: LinkTabProps) {
 
 const StyledTabs = styled(Tabs)(({ theme }) => ({
   backgroundColor: '#e6ebea',
+
+  fontFamily: 'Roboto, sans-serif',
+  fontWeight: 700,
   '& .MuiTabs-indicator': {
     backgroundColor: '#404e5c',
+  },
+  '& .MuiTab-root': {
+    textTransform: 'capitalize',
+    fontWeight: 700,
+    fontFamily: 'Roboto, sans-serif',
   },
 }));
 
 const StyledAppBar = styled(AppBar)({
   backgroundColor: '#e6ebea',
   boxShadow: 'none',
-  borderBottom: '2px solid #404e5c',
+  borderBottom: '0px',
 });
 
 interface AplicacionesTabsProps {
