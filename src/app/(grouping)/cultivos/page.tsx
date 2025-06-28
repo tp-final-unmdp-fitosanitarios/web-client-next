@@ -79,16 +79,31 @@ export default function CultivosPage() {
             Cultivos
           </Typography>
         </div>
-        {isMobile && (
-          <span className={styles['scroll-message']}>
-            Desliza horizontalmente para ver más columnas
-          </span>
-        )}
+  
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
             <CircularProgress />
           </Box>
+        ) : isMobile ? (
+          // Vista mobile como cards
+          <Box className={styles.cardsContainer}>
+            {crops
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((crop, index) => (
+                <Paper key={index} className={styles.card}>
+                  <Typography><strong>Cultivo:</strong> {crop.crop_name}</Typography>
+                  <Typography><strong>Nro:</strong> {crop.crop_number}</Typography>
+                  <Typography><strong>Fin de Siembra:</strong> {crop.end_of_sowing}</Typography>
+                  <Typography><strong>Lote:</strong> {crop.lot_name}</Typography>
+                  <Typography><strong>Campo:</strong> {crop.field_name}</Typography>
+                  <Typography><strong>Variedad:</strong> {crop.variety}</Typography>
+                  <Typography><strong>Superficie:</strong> {crop.surface}</Typography>
+                </Paper>
+              ))}
+          
+          </Box>
         ) : (
+          // Vista desktop como tabla
           <TableContainer component={Paper} className={styles.tableContainer}>
             <Table className={styles.table}>
               <TableHead className={styles.tableHead}>
@@ -102,7 +117,6 @@ export default function CultivosPage() {
                   <TableCell>Superficie</TableCell>
                 </TableRow>
               </TableHead>
-
               <TableBody>
                 {crops
                   .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
@@ -134,4 +148,5 @@ export default function CultivosPage() {
       <Footer />
     </div>
   );
+  
 } 

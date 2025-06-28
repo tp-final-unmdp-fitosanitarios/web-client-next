@@ -1,184 +1,192 @@
 @use '../../../styles/variables' as *;
 
 .finalizarAplicacionContainer {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-    padding: 16px;
-    background-color: #f5f7f6;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  padding: 16px;
+  background-color: #f5f7f6;
 }
 
 .finalizarHeader {
-    font-size: 24px;
-    font-weight: bold;
-    color: #404e5c;
-    margin-bottom: 24px;
-    text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #404e5c;
+  margin-bottom: 24px;
+  text-align: center;
 }
 
 .container {
-    background-color: white;
-    border-radius: 8px;
-    padding: 16px;
-    margin-bottom: 24px;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    max-width: 800px;
-    margin-left: auto;
-    margin-right: auto;
+  background-color: white;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .finalizarInfo {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 8px;
-    margin-bottom: 16px;
-    color: #404e5c;
-    font-weight: 500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 16px;
+  color: #404e5c;
+  font-weight: 500;
 }
 
 .productTitle {
-    color: #404e5c;
-    font-size: 18px;
-    margin-bottom: 16px;
-    font-weight: bold;
-    text-align: center;
+  color: #404e5c;
+  font-size: 18px;
+  margin-bottom: 16px;
+  font-weight: bold;
+  text-align: center;
 }
 
 .buttonContainer {
-    display: flex;
-    gap: 1.5rem;
-    margin-top: 1.5rem;
-    justify-content: center;
-    
-    @media (max-width: 768px) {
-        flex-direction: column;
-        gap: 1rem;
-        align-items: center;
-    }
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 1.5rem;
+  justify-content: center;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    gap: 1rem;
+    align-items: center;
+  }
 }
 
-step4ButtonContainer
+step4ButtonContainer .button {
+  min-width: 30%;
+  max-width: 80%;
+  padding: $spacing-small;
+  border: none;
+  border-radius: $border-radius;
+  font-weight: $button-font-weight;
+  cursor: pointer;
+  color: $dark-color;
 
-.button {
-    min-width: 30%;
-    max-width: 80%;
-    padding: $spacing-small;
-    border: none;
-    border-radius: $border-radius;
-    font-weight: $button-font-weight;
-    cursor: pointer;
-    color: $dark-color;
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-    &:disabled {
-        opacity: 0.5;
-        cursor: not-allowed;
-    }
-    
-    @media (max-width: 768px) {
-        min-width: 100%;
-        max-width: 100%;
-        width: 100%;
-    }
+  @media (max-width: 768px) {
+    min-width: 100%;
+    max-width: 100%;
+    width: 100%;
+  }
 }
 
 .button-outlined {
-    background-color: transparent;
-    border: 2px solid #404e5c;
-    color: #404e5c;
-    &:hover {
-        background-color: rgba(64, 78, 92, 0.04);
-    }
+  background-color: transparent;
+  border: 2px solid #404e5c;
+  color: #404e5c;
+
+  &:hover {
+    background-color: rgba(64, 78, 92, 0.04);
+  }
 }
 
 .buttonSelect {
-    border: 2px solid $dark-color;
-    background-color: $light-color;
-    width: 80px;
-    padding: $spacing-small;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    
-    @media (max-width: 768px) {
-        width: 100%;
-        min-width: 120px;
-    }
+  border: 2px solid $dark-color;
+  background-color: $light-color;
+  width: 80px;
+  padding: $spacing-small;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    min-width: 120px;
   }
-  
-  .buttonChange {  
-    border: 2px solid $dark-color;
-    background-color: $light-color;
-    width: 80px;
-    padding: $spacing-small;
-    font-size: 14px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0;
-    
-    @media (max-width: 768px) {
-        width: 100%;
-        min-width: 120px;
-    }
+}
+
+.buttonChange {
+  border: 2px solid $dark-color;
+  background-color: $light-color;
+  width: 80px;
+  padding: $spacing-small;
+  font-size: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    min-width: 120px;
   }
+}
 
 .fileInputContainer {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    width: 100%;
-    margin-bottom: 1rem;
-    
-    @media (max-width: 768px) {
-        flex-direction: column;
-        align-items: stretch;
-        gap: 0.5rem;
-    }
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 1rem;
+  width: 100%;
+  margin-bottom: 1rem;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.5rem;
+  }
 }
 
 .fileInputWrapper {
-    display: flex;
-    align-items: center;
-    
-    @media (max-width: 768px) {
-        width: 100%;
-    }
+  display: flex;
+  align-items: center;
+  gap: $spacing-large;
+
+  @media (max-width: 768px) {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+.fileTextContainer {
+  display: flex;
+  align-items: center;
 }
 
 .filePreviewContainer {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin-top: 0.5rem;
-    
-    @media (max-width: 768px) {
-        flex-wrap: wrap;
-        gap: 0.5rem;
-    }
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-top: 0.5rem;
+
+  @media (max-width: 768px) {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
 }
 
 .fileName {
-    font-style: italic;
-    font-size: 14px;
-    color: #404e5c;
-    
-    @media (max-width: 768px) {
-        font-size: 12px;
-        word-break: break-word;
-    }
+  font-style: italic;
+  font-size: 14px;
+  color: #404e5c;
+
+  @media (max-width: 768px) {
+    font-size: 12px;
+    word-break: break-word;
+  }
 }
 
 .fileIcon {
-    cursor: pointer;
-    transition: opacity 0.2s ease-in-out;
-    opacity: 1;
+  cursor: pointer;
+  transition: opacity 0.2s ease-in-out;
+  opacity: 1;
 
-    &:hover {
-        opacity: 0.7;
-    }
+  &:hover {
+    opacity: 0.7;
+  }
 }
 
 .title {
@@ -206,9 +214,13 @@ step4ButtonContainer
 
 .buttonContainer {
   display: flex;
-  justify-content: space-between;
   gap: 15px;
   margin-top: 30px;
+
+
+  @media(min-width:1000px){
+    margin-top: 300px;
+  }
 }
 
 .button {
@@ -224,6 +236,7 @@ step4ButtonContainer
   &:hover {
     opacity: 0.9;
   }
+  max-width: 300px;
 }
 
 .button-primary {
@@ -243,6 +256,7 @@ step4ButtonContainer
 }
 
 .label {
+  margin-top: $spacing-small;
   margin-left: $spacing-medium;
   font-size: 15px;
   font-weight: 600;
@@ -260,35 +274,43 @@ step4ButtonContainer
   justify-content: center;
   margin: 0;
   margin-left: 8px;
-  
+
   &:hover {
     background-color: darken($light-color, 5%);
   }
-  
+
   svg {
     font-size: 18px;
     color: $dark-color;
   }
 }
 
+.buttonSelect,
+.buttonChange {
+  font-size: 14px;
+  padding: 6px;
+  margin-left: 10px;
+
+}
+
 // Estilos responsive adicionales
 @media (max-width: 768px) {
-    .finalizarAplicacionContainer {
-        padding: 8px;
-    }
-    
-    .finalizarHeader {
-        font-size: 20px;
-        margin-bottom: 16px;
-    }
-    
-    .container {
-        padding: 12px;
-        margin-bottom: 16px;
-    }
-    
-    .productTitle {
-        font-size: 16px;
-        margin-bottom: 12px;
-    }
+  .finalizarAplicacionContainer {
+    padding: 8px;
+  }
+
+  .finalizarHeader {
+    font-size: 20px;
+    margin-bottom: 16px;
+  }
+
+  .container {
+    padding: 12px;
+    margin-bottom: 16px;
+  }
+
+  .productTitle {
+    font-size: 16px;
+    margin-bottom: 12px;
+  }
 }

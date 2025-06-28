@@ -23,6 +23,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ClearIcon from '@mui/icons-material/Clear';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CameraCapture from '@/components/CameraCapture/CameraCapture';
+import { useLoaderStore } from '@/contexts/loaderStore';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -41,6 +42,7 @@ export default function FinalizarAplicacion() {
     const apiService = getApiService();
     const router = useRouter();
     const { withLoading } = useLoading();
+    const { hideLoader } = useLoaderStore();
 
     // State hooks
     const [aplicacion, setAplicacion] = useState<Aplicacion | null>(null);
@@ -233,6 +235,12 @@ export default function FinalizarAplicacion() {
         return () => URL.revokeObjectURL(url);
     }, [selectedFile]);
 
+    useEffect(() => {
+        if (!loading) {
+            hideLoader();
+        }
+    }, [loading]);
+
     if (loading)
         return <div>Cargando...</div>;
     if (!aplicacion) return <div>No se encontró la aplicación.</div>;
@@ -400,7 +408,7 @@ export default function FinalizarAplicacion() {
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'image/jpeg' });
         const file = new File([blob], fileName, { type: 'image/jpeg' });
-        
+
         handleFileSelect(file);
     };
 
@@ -429,8 +437,8 @@ export default function FinalizarAplicacion() {
                 {activeStep === 0 && (
                     <div className={styles.container}>
                         <div className={styles.finalizarInfo}>
-                            <div>Cultivo: {cultivo}</div>
-                            <div>Fecha: {fecha}</div>
+                            <div>Cultivo: <strong> {cultivo} </strong></div>
+                            <div>Fecha:   <strong> {fecha} </strong></div>
                         </div>
                         <h3 className={styles.productTitle}>Productos aplicados</h3>
                         <ItemList
@@ -536,44 +544,56 @@ export default function FinalizarAplicacion() {
 
                 {/* PASO 3: Archivo */}
                 {activeStep === 2 && (
-                    <div className={styles.container}>
+                    <div>
                         <h3 className={styles.productTitle}>Cargar archivo de la aplicación</h3>
-                        <div className={styles.fileInputContainer}>
-                            <label htmlFor="archivoFile" className={styles.label}>
-                                Cargar Archivo
-                            </label>
-                            <div className={styles.fileInputWrapper}>
-                                <input
-                                    id="archivoFile"
-                                    type="file"
-                                    accept="image/*,application/pdf"
-                                    onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
-                                    style={{ display: "none" }}
-                                />
-                                <label
-                                    htmlFor="archivoFile"
-                                    className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    {selectedFile ? "Cambiar" : "Seleccionar"}
-                                </label>
-                                <button
-                                    type="button"
-                                    className={`${styles.button} ${styles.buttonCamera}`}
-                                    onClick={handleOpenCamera}
-                                >
-                                    <CameraAltIcon />
-                                </button>
-                            </div>
-                        </div>
-                        {selectedFile && (
-                            <div className={styles.filePreviewContainer}>
-                                <span className={styles.fileName}>{selectedFile.name}</span>
-                                <VisibilityIcon className={styles.fileIcon} onClick={handleVerArchivo} />
-                                <ClearIcon className={styles.fileIcon} onClick={handleClearFile} />
-                            </div>
-                        )}
+                        <div className={styles.container}>
 
+                            <div className={styles.fileInputContainer}>
+
+                                <div className={styles.fileInputWrapper}>
+                                    <div className={styles.fileTextContainer} >
+                                        <label htmlFor="archivoFile" className={styles.label}>
+                                            Cargar Archivo
+                                        </label>
+                                        <input
+                                            id="archivoFile"
+                                            type="file"
+                                            accept="image/*,application/pdf"
+                                            onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
+                                            style={{ display: "none" }}
+                                        />
+                                        <label
+                                            htmlFor="archivoFile"
+                                            className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            {selectedFile ? "Cambiar" : "Seleccionar"}
+                                        </label>
+                                    </div>
+                                    <div className={styles.fileTextContainer}>
+                                        <label htmlFor="fotoFile" className={styles.label}>
+                                            Tomar foto
+                                        </label>
+                                        <button
+                                            type="button"
+                                            className={`${styles.button} ${styles.buttonCamera}`}
+                                            onClick={handleOpenCamera}
+                                        >
+                                            <CameraAltIcon />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {selectedFile && (
+                                <div className={styles.filePreviewContainer}>
+                                    <span className={styles.fileName}>{selectedFile.name}</span>
+                                    <VisibilityIcon className={styles.fileIcon} onClick={handleVerArchivo} />
+                                    <ClearIcon className={styles.fileIcon} onClick={handleClearFile} />
+                                </div>
+                            )}
+
+
+                        </div>
                         <div className={styles.buttonContainer}>
                             <button
                                 className={`button button-secondary ${styles.button}`}
@@ -584,12 +604,13 @@ export default function FinalizarAplicacion() {
                             <button
                                 className={`button button-primary ${styles.button}`}
                                 onClick={() => setActiveStep(3)}
-                                disabled={!selectedFile}
+
                             >
                                 Continuar
                             </button>
                         </div>
                     </div>
+
                 )}
 
                 {/* PASO 4: Productos */}

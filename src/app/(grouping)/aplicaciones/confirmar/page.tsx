@@ -9,6 +9,7 @@ import { Aplicacion } from "@/domain/models/Aplicacion";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import GenericModal from "@/components/modal/GenericModal";
 import { useLoading } from "@/hooks/useLoading";
+import { useLoaderStore } from "@/contexts/loaderStore";
 
 export default function ConfirmarAplicacion() {
     const searchParams = useSearchParams();
@@ -22,13 +23,14 @@ export default function ConfirmarAplicacion() {
     const apiService = getApiService();
     const router = useRouter();
     const { withLoading } = useLoading();
+    const { hideLoader } = useLoaderStore();
 
     const fetchApplication = async () => {
         try {
             const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
             setAplicacion(response.data);
             setLoading(false);
-        } catch (e: any) {
+        } catch (e: unknown) {
             console.error("Error en la solicitud:", e.message);
             return null;
         }
@@ -39,10 +41,14 @@ export default function ConfirmarAplicacion() {
         fetchApplication();
     }, [applicationId, isReady]);
 
-    const handleRechazar = async () => {
-        const req = {
-            "status":"REJECTED"
+    useEffect(() => {
+        if (!loading) {
+            hideLoader();
         }
+    }, [loading]);
+
+    const handleRechazar = async () => {
+     
         try {
             const response = await withLoading(
                 apiService.create(`applications/${aplicacion?.id}/reject`, {}),

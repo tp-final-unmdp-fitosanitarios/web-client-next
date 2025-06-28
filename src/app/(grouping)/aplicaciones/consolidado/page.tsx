@@ -34,7 +34,7 @@ interface Application {
   companyId: string;
   locationId: string;
   status: string;
-  createdAt: string;
+  created_at: string;
   updatedAt: string;
   externalId: string;
   surface: number;
@@ -249,7 +249,7 @@ export default function ConsolidadoPage() {
                       <div className={styles.applicationDetails}>
                         <p><strong>Estado:</strong> {app.status}</p>
                         <p><strong>Superficie:</strong> {app.surface} ha</p>
-                        <p><strong>Fecha:</strong> {format(new Date(app.createdAt), "dd/MM/yyyy", { locale: es })}</p>
+                        <p><strong>Fecha:</strong> {format(new Date(app.created_at), "dd/MM/yyyy", { locale: es })}</p>
 
                         <div className={styles.recipeSection}>
                           <h4>Receta</h4>

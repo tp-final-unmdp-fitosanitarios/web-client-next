@@ -25,9 +25,8 @@
 }
   
 /* Estilos para el formulario dentro del modal */
-:global(.form-container) {
+.formContainer {
     max-height: 60vh;
     overflow-y: auto;
     padding-right: 10px;
-}
-  
+  }
