@@ -172,10 +172,11 @@ export default function FinalizarAplicacion() {
             type: "ENGINEER_RECIPE",
             recipe_items: recipeItems
         }
-        const attachment = {
+
+        const attachment = fileBase64 ? {
             attachment: fileBase64,
             mime_type: selectedFile?.type
-        }
+        } : null;
 
         const finishAplicationReq = {
             actual_application: recipeReq,
@@ -187,7 +188,7 @@ export default function FinalizarAplicacion() {
 
         console.log(finishAplicationReq);
         try {
-            const response = await withLoading(
+                const response = await withLoading(
                 apiService.create(`applications/${aplicacion?.id}/finish`, finishAplicationReq),
                 "Finalizando aplicación..."
             );
