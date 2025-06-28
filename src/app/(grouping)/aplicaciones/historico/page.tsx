@@ -42,8 +42,6 @@ import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import { Dayjs } from 'dayjs';
 import dayjs from 'dayjs';
-import NavigationLink from '@/components/NavigationLink/NavigationLink';
-import VisibilityIcon from '@mui/icons-material/Visibility';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 
@@ -518,11 +516,7 @@ export default function HistoricoAplicacionesPage() {
                                             >
                                                 {aplicacionExpandida === aplicacion.id ? <ExpandLessIcon /> : <ExpandMoreIcon />}
                                             </IconButton>
-                                            <NavigationLink href={`/aplicaciones/modificar?id=${aplicacion.id}`}>
-                                                <IconButton size="small">
-                                                    <VisibilityIcon />
-                                                </IconButton>
-                                            </NavigationLink>
+                                            
                                         </Box>
                                         <Collapse in={aplicacionExpandida === aplicacion.id} timeout="auto" unmountOnExit>
                                             <Box mt={2}>
@@ -603,11 +597,7 @@ export default function HistoricoAplicacionesPage() {
                                                             <ExpandLessIcon /> : <ExpandMoreIcon />
                                                         }
                                                     </IconButton>
-                                                    <NavigationLink href={`/aplicaciones/modificar?id=${aplicacion.id}`}>
-                                                        <IconButton size="small">
-                                                            <VisibilityIcon />
-                                                        </IconButton>
-                                                    </NavigationLink>
+                                                  
                                                 </TableCell>
                                             </TableRow>
                                             <TableRow>
