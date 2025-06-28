@@ -84,7 +84,7 @@ export default function HistoricoAplicacionesPage() {
     const [paginacion, setPaginacion] = useState<PaginacionRequest>({
         page: 0,
         size: 10,
-        sort: ["created_at,desc"]
+        sort: ["createdAt,desc"]
     });
     const [totalPages, setTotalPages] = useState<number>(0);
     const [totalElements, setTotalElements] = useState<number>(0);
