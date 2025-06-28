@@ -497,11 +497,10 @@ export default function HistoricoAplicacionesPage() {
                                             <strong>Superficie:</strong> {aplicacion.surface || 0} Ha
                                         </Typography>
                                         <Typography variant="body2">
-                                            <strong>Aplicador:</strong>{' '}
-                                            {aplicacion.applicator_id
-                                                ? aplicadores.find(a => a.id === aplicacion.applicator_id)?.first_name + ' ' +
-                                                aplicadores.find(a => a.id === aplicacion.applicator_id)?.last_name
-                                                : 'N/A'}
+                                            <strong>Aplicador:</strong>{aplicacion.applicator_name}
+                                        </Typography>
+                                        <Typography variant="body2">
+                                            <strong>Ingeniero:</strong>{aplicacion.engineer_name}
                                         </Typography>
                                         <Box mt={1}>
                                             <Chip

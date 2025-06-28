@@ -20,4 +20,6 @@ export interface Aplicacion {
     type: string;
     location: Locacion;
     application_date: Date;
+    applicator_name: string;
+    engineer_name: string;
 }

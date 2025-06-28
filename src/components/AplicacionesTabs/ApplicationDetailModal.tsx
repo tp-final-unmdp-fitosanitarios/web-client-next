@@ -75,14 +75,14 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                         <Typography fontWeight="bold">Superficie:</Typography>
                         <Typography>{aplicacion.surface} ha</Typography>
                     </Box>
-                    {/* <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
+                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography fontWeight="bold">Aplicador:</Typography>
-                        <Typography>{aplicacion.applicator_id || 'N/A'}</Typography>
+                        <Typography>{aplicacion.applicator_name || 'N/A'}</Typography>
                     </Box>
                     <Box sx={{ display: 'flex', justifyContent: 'space-between' }}>
                         <Typography fontWeight="bold">Ingeniero:</Typography>
-                        <Typography>{aplicacion.engineer_id || 'N/A'}</Typography>
-                    </Box> */}
+                        <Typography>{aplicacion.engineer_name || 'N/A'}</Typography>
+                    </Box> 
                     <Box>
                         <Typography fontWeight="bold" sx={{ mb: 1 }}>Productos aplicados:</Typography>
                         {aplicacion.recipe?.recipe_items && aplicacion.recipe.recipe_items.length > 0 ? (
