@@ -183,9 +183,11 @@ export default function HistoricoAplicacionesPage() {
                 "Cargando aplicaciones..."
             );
             if (response.success) {
-                setAplicaciones(response.data.content);
-                setTotalPages(response.data.pagination.totalPages);
-                setTotalElements(response.data.pagination.totalElements);
+                if (response.data) {
+                    setAplicaciones(response.data.content);
+                    setTotalPages(response.data.total_pages);
+                    setTotalElements(response.data.total_elements);
+                }
             } else {
                 setError(response.error || "Error al obtener las aplicaciones");
             }
