@@ -77,12 +77,20 @@ class ApiService {
     };
     
     try {
-      console.log("Request URL:", `${baseUrl}${url}`);
-      console.log("Request headers:", config.headers);
       const response = await this.axiosInstance(config);
       return { data: response.data, status: response.status, success: true };
     } catch (error: any) {
-      console.error("API Error:", error.response || error);
+      if (error.response?.status === 401) {
+        console.log("Fallo de autorizacion")
+        this.logout();
+      }
+      if (error.response?.status === 403) {
+        console.log("Acceso denegado")
+      }
+      if (error.response?.status === 500) {
+        console.error("API Error:", error.response || error);
+      }
+
       return {
         data: null as any,
         status: error.response?.status || 500,

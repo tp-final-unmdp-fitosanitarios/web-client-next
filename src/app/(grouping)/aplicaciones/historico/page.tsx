@@ -142,12 +142,12 @@ export default function HistoricoAplicacionesPage() {
         params.append('size', paginacion.size.toString());
         paginacion.sort.forEach(sort => params.append('sort', sort));
 
-        // Filtros
+        // Filtros según contrato Java
         if (filtros.fechaDesde) {
-            params.append('fechaDesde', filtros.fechaDesde.toISOString());
+            params.append('from', filtros.fechaDesde.toISOString());
         }
         if (filtros.fechaHasta) {
-            params.append('fechaHasta', filtros.fechaHasta.toISOString());
+            params.append('to', filtros.fechaHasta.toISOString());
         }
         if (filtros.status) {
             params.append('status', filtros.status);
@@ -158,18 +158,21 @@ export default function HistoricoAplicacionesPage() {
         if (filtros.applicatorName) {
             params.append('applicatorId', filtros.applicatorName);
         }
+        if (filtros.engineerName) {
+            params.append('engineerId', filtros.engineerName);
+        }
         if (filtros.producto) {
             params.append('productId', filtros.producto);
         }
-        if (filtros.superficieMin !== null) {
-            params.append('surfaceMin', filtros.superficieMin.toString());
+        if (filtros.externalId) {
+            params.append('externalId', filtros.externalId);
         }
-        if (filtros.superficieMax !== null) {
-            params.append('surfaceMax', filtros.superficieMax.toString());
+        if (filtros.type) {
+            params.append('type', filtros.type);
         }
 
-        // Filtro por estado finalizado
-        params.append('status', EstadoAplicacion.Finalizada);
+        // Filtro por estado finalizado (siempre agregar si así lo requiere la lógica)
+        // params.append('status', EstadoAplicacion.Finalizada); // <-- Si quieres forzar solo finalizadas, descomenta esto
 
         return params.toString();
     };
