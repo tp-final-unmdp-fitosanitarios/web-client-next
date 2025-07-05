@@ -11,7 +11,9 @@ import GenericModal from "@/components/modal/GenericModal";
 import { useEffect, useState } from "react";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import { Locacion } from "@/domain/models/Locacion";
-import { Autocomplete, TextField } from "@mui/material";
+import { Autocomplete, TextField, Paper, Box, Typography, IconButton, Collapse, Grid } from "@mui/material";
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { useAuth } from "@/components/Auth/AuthProvider";
 import MoverStockModal from "@/components/MoverStockModal/MoverStockModal";
 import RetirarStockModal from "@/components/RetirarStockModal/RetirarStockModal";
@@ -43,6 +45,7 @@ export default function StockView() {
     });
     const [products, setProducts] = useState<Producto[]>([]);
     const [activeSearchParams, setActiveSearchParams] = useState(searchParams);
+    const [filtrosExpandidos, setFiltrosExpandidos] = useState<boolean>(false);
 
     const isAdmin = user?.roles.includes(Roles.Admin);
     const isAplicador = user?.roles.includes(Roles.Aplicador);
@@ -281,89 +284,116 @@ export default function StockView() {
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Gestión de Stock</h1>
 
-            <div className={styles.searchForm}>
-                <div className={styles.searchRow}>
-                    <Autocomplete
-                        disablePortal
-                        options={options}
-                        value={options.find(option => option.label === locations.find(l => l.id === actualLocation)?.name) || null}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Locación"
-                                required
-                                sx={{...customInputSx}}
-                            />
-                        )}
-                        onChange={(e, newValue) => {
-                            if (newValue) {
-                                const selectedLocation = locations.find(l => l.name === newValue.label);
-                                if (selectedLocation) {
-                                    setActualLocation(selectedLocation.id);
-                                }
-                            }
-                        }}
-                        sx={{ width: '100%' }}
-                    />
-                    <Autocomplete
-                        disablePortal
-                        options={products.map(p => ({ label: p.name, id: p.id }))}
-                        renderInput={(params) => (
-                            <TextField
-                                {...params}
-                                label="Producto"
-                                sx={{...customInputSx}}
-                            />
-                        )}
-                        onChange={(e, newValue) => {
-                            setSearchParams(prev => ({
-                                ...prev,
-                                productId: newValue?.id || ""
-                            }));
-                        }}
-                        sx={{ width: '100%' }}
-                    />
-                    <TextField
-                        label="Número de Lote"
-                        value={searchParams.lotNumber}
-                        onChange={(e) => setSearchParams(prev => ({
-                            ...prev,
-                            lotNumber: e.target.value
-                        }))}
-                        sx={{...customInputSx, width: '100%'}}
-                    />
-                </div>
-                <div className={styles.searchRow}>
-                    <TextField
-                        label="Vencimiento Desde"
-                        type="date"
-                        value={searchParams.expirationAfter}
-                        onChange={(e) => setSearchParams(prev => ({
-                            ...prev,
-                            expirationAfter: e.target.value
-                        }))}
-                        InputLabelProps={{ shrink: true }}
-                        sx={{...customInputSx, width: '100%'}}
-                    />
-                    <TextField
-                        label="Vencimiento Hasta"
-                        type="date"
-                        value={searchParams.expirationBefore}
-                        onChange={(e) => setSearchParams(prev => ({
-                            ...prev,
-                            expirationBefore: e.target.value
-                        }))}
-                        InputLabelProps={{ shrink: true }}
-                        sx={{...customInputSx, width: '100%'}}
-                    />
-                    <button 
-                        className={`button button-primary ${styles.searchButton}`}
-                        onClick={handleSearch}
+            {/* Filtros */}
+            <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" color="#404e5c">
+                        Filtros de búsqueda
+                    </Typography>
+                    <IconButton
+                        onClick={() => setFiltrosExpandidos(!filtrosExpandidos)}
+                        size="small"
                     >
-                        Buscar
-                    </button>
-                </div>
-            </div>
+                        {filtrosExpandidos ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </IconButton>
+                </Box>
+
+                <Collapse in={filtrosExpandidos}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={4}>
+                            <Autocomplete
+                                disablePortal
+                                options={options}
+                                value={options.find(option => option.label === locations.find(l => l.id === actualLocation)?.name) || null}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Locación"
+                                        required
+                                        sx={{...customInputSx}}
+                                    />
+                                )}
+                                onChange={(e, newValue) => {
+                                    if (newValue) {
+                                        const selectedLocation = locations.find(l => l.name === newValue.label);
+                                        if (selectedLocation) {
+                                            setActualLocation(selectedLocation.id);
+                                        }
+                                    }
+                                }}
+                                sx={{ width: '100%' }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <Autocomplete
+                                disablePortal
+                                options={products.map(p => ({ label: p.name, id: p.id }))}
+                                renderInput={(params) => (
+                                    <TextField
+                                        {...params}
+                                        label="Producto"
+                                        sx={{...customInputSx}}
+                                    />
+                                )}
+                                onChange={(e, newValue) => {
+                                    setSearchParams(prev => ({
+                                        ...prev,
+                                        productId: newValue?.id || ""
+                                    }));
+                                }}
+                                sx={{ width: '100%' }}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={4}>
+                            <TextField
+                                label="Número de Lote"
+                                value={searchParams.lotNumber}
+                                onChange={(e) => setSearchParams(prev => ({
+                                    ...prev,
+                                    lotNumber: e.target.value
+                                }))}
+                                sx={{...customInputSx, width: '100%'}}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                label="Vencimiento Desde"
+                                type="date"
+                                value={searchParams.expirationAfter}
+                                onChange={(e) => setSearchParams(prev => ({
+                                    ...prev,
+                                    expirationAfter: e.target.value
+                                }))}
+                                InputLabelProps={{ shrink: true }}
+                                sx={{...customInputSx, width: '100%'}}
+                            />
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <TextField
+                                label="Vencimiento Hasta"
+                                type="date"
+                                value={searchParams.expirationBefore}
+                                onChange={(e) => setSearchParams(prev => ({
+                                    ...prev,
+                                    expirationBefore: e.target.value
+                                }))}
+                                InputLabelProps={{ shrink: true }}
+                                sx={{...customInputSx, width: '100%'}}
+                            />
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                                <button 
+                                    className={`button button-primary ${styles.searchButton}`}
+                                    onClick={handleSearch}
+                                >
+                                    Buscar
+                                </button>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Collapse>
+            </Paper>
 
             {loading ? (
                 <div>Cargando stock...</div>
