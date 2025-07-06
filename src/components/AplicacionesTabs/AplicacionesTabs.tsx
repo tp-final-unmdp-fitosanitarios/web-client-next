@@ -1,3 +1,4 @@
+"use client";
 import React from 'react';
 import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
@@ -13,9 +14,12 @@ import { transformToItems } from "@/utilities/transform";
 import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
-import { useRouter } from 'next/navigation';
 import { useAuth } from '../Auth/AuthProvider';
 import { Roles } from '@/domain/enum/Roles';
+import VisibilityIcon from '@mui/icons-material/Visibility';
+import ApplicationDetailModal from './ApplicationDetailModal';
+import { useRouter } from 'next/navigation';
+import { useLoaderStore } from '@/contexts/loaderStore';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -69,17 +73,25 @@ function LinkTab(props: LinkTabProps) {
   );
 }
 
-const StyledTabs = styled(Tabs)(({ theme }) => ({
+const StyledTabs = styled(Tabs)(() => ({
   backgroundColor: '#e6ebea',
+
+  fontFamily: 'Roboto, sans-serif',
+  fontWeight: 700,
   '& .MuiTabs-indicator': {
     backgroundColor: '#404e5c',
+  },
+  '& .MuiTab-root': {
+    textTransform: 'capitalize',
+    fontWeight: 700,
+    fontFamily: 'Roboto, sans-serif',
   },
 }));
 
 const StyledAppBar = styled(AppBar)({
   backgroundColor: '#e6ebea',
   boxShadow: 'none',
-  borderBottom: '2px solid #404e5c',
+  borderBottom: '0px',
 });
 
 interface AplicacionesTabsProps {
@@ -92,6 +104,20 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
   const router = useRouter();
   const [value, setValue] = React.useState(0);
   const {user} = useAuth();
+  const { showLoader } = useLoaderStore();
+
+  // Estado para el modal de detalles
+  const [modalOpen, setModalOpen] = React.useState(false);
+  const [selectedAppId, setSelectedAppId] = React.useState<string | null>(null);
+
+  const handleOpenModal = (id: string) => {
+    setSelectedAppId(id);
+    setModalOpen(true);
+  };
+  const handleCloseModal = () => {
+    setModalOpen(false);
+    setSelectedAppId(null);
+  };
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
@@ -118,28 +144,31 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
   const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
     return {
         ...item,
-        display: `${item.cultivo} - Fecha: ${item.fecha}`, 
+        cultivo: item.cultivo,
+        fecha: item.fecha,
     };
-});
+  });
 
-const startApplication = (id: string) => {
-  const roles = user?.roles
-  console.log(user);
-  if(roles?.includes(Roles.Encargado))
-    router.push(`aplicaciones/modificar?id=${id}`);
-  else
-    router.push(`aplicaciones/iniciar?id=${id}`);
-}
+  const campos = ["cultivo", "fecha"];
 
-const finishApplication = (id: string) => {
-  router.push(`aplicaciones/finalizar?id=${id}`);
-}
+  const startApplication = (id: string) => {
+    const roles = user?.roles
+    console.log(user);
+    if(roles?.includes(Roles.Encargado))
+      router.push(`aplicaciones/modificar?id=${id}`);
+    else
+      router.push(`aplicaciones/iniciar?id=${id}`);
+  }
 
-const confirmApplication = (id: string) => {
-  router.push(`aplicaciones/confirmar?id=${id}`);
-}
+  const finishApplication = (id: string) => {
+    showLoader('Cargando aplicación...');
+    router.push(`aplicaciones/finalizar?id=${id}`);
+  }
 
-const campos = ["display"];
+  const confirmApplication = (id: string) => {
+      showLoader('Cargando aplicación...');
+    router.push(`aplicaciones/confirmar?id=${id}`);
+  }
 
   return (
     <Box className={styles.container}>
@@ -171,6 +200,15 @@ const campos = ["display"];
             deleteItems={false}
             selectSingleItem={true}
             onSelectSingleItem={startApplication}
+            actions={(item) => (
+              <VisibilityIcon
+                style={{ cursor: 'pointer', color: '#404e5c' }}
+                onClick={e => {
+                  e.stopPropagation();
+                  handleOpenModal(item.id);
+                }}
+              />
+            )}
           />
         ) : (
           <div style={{textAlign: "center"}}>No hay aplicaciones pendientes</div>
@@ -186,6 +224,15 @@ const campos = ["display"];
             deleteItems={false}
             selectSingleItem={true}
             onSelectSingleItem={finishApplication}
+            actions={(item) => (
+              <VisibilityIcon
+                style={{ cursor: 'pointer', color: '#404e5c' }}
+                onClick={e => {
+                  e.stopPropagation();
+                  handleOpenModal(item.id);
+                }}
+              />
+            )}
           />
         ) : (
           <div style={{textAlign: "center"}}>No hay aplicaciones en curso</div>
@@ -201,11 +248,27 @@ const campos = ["display"];
             deleteItems={false}
             selectSingleItem={user?.roles.includes("ENGINEER") ? true : false}
             onSelectSingleItem={confirmApplication}
+            actions={(item) => (
+              <VisibilityIcon
+                style={{ cursor: 'pointer', color: '#404e5c' }}
+                onClick={e => {
+                  e.stopPropagation();
+                  handleOpenModal(item.id);
+                }}
+              />
+            )}
           />
         ) : (
           <div style={{textAlign: "center"}}>No hay aplicaciones a confirmar</div>
         )}
       </TabPanel>
+      {/* Modal de detalles de aplicación */}
+      <ApplicationDetailModal
+        isOpen={modalOpen}
+        onClose={handleCloseModal}
+        aplicacion={aplicacionesToDisplay.find(app => app.id.toString() === selectedAppId) || null}
+        productos={productos}
+      />
     </Box>
   );
 } 

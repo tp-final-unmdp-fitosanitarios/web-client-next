@@ -1,11 +1,11 @@
 export interface Paginacion {
-    totalPages: number;
-    totalElements: number;
+    total_pages: number;
+    total_elements: number;
     first: boolean;
     last: boolean;
     size: number;
     number: number;
-    numberOfElements: number;
+    number_of_elements: number;
     empty: boolean;
     sort: {
       empty: boolean;
@@ -19,8 +19,8 @@ export interface Paginacion {
         sorted: boolean;
         unsorted: boolean;
       };
-      pageNumber: number;
-      pageSize: number;
+      page_number: number;
+      page_size: number;
       paged: boolean;
       unpaged: boolean;
     };

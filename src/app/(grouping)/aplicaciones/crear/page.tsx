@@ -40,6 +40,7 @@ type ProductoExistente = Producto & {
 const CrearAplicacionPage: React.FC = () => {
     const [activeStep, setActiveStep] = useState(0);
     const [locations, setLocations] = useState<Locacion[]>([]);
+    const [cultivos, setCultivos] = useState<Locacion[]>([]);
     const [applicators, setApplicators] = useState<User[]>([]);
     const [selectedApplicator, setSelectedApplicator] = useState<string>("");
     const [selectedWarehouse, setSelectedWarehouse] = useState<string>("");
@@ -243,6 +244,14 @@ const CrearAplicacionPage: React.FC = () => {
         return l.parent_location.parent_location.id === parentLoc.id //El padre del lote debe ser el campo
     }
 
+    const onSelectCampo = async (e: any) => { 
+        setCampo(e.target.value);
+       let res =  await apiService.get<Locacion[]>("locations/crops/"+e.target.value);
+       console.log(res.data[0]);
+       setCultivos(res.data);
+      
+     }
+
     return (
         <div className="page-container">
             <div className="content-wrap">
@@ -287,7 +296,7 @@ const CrearAplicacionPage: React.FC = () => {
                                     select
                                     name="campo"
                                     value={campo}
-                                    onChange={(e) => setCampo(e.target.value)}
+                                    onChange={onSelectCampo}
                                     label="Selecciona un campo"
                                     variant="outlined"
                                     sx={{
@@ -327,7 +336,7 @@ const CrearAplicacionPage: React.FC = () => {
                                         },
                                     }}
                                 >
-                                    {locations?.filter((l) => filterCrop(l)).map((l) => (
+                                    {cultivos?.map((l) => (
                                         <MenuItem key={l.id ?? l.name} value={l.id}>
                                             {l.name} - {l.parent_location.name}
                                         </MenuItem>

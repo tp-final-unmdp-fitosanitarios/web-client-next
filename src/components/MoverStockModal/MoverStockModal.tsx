@@ -38,13 +38,13 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
     const destino = formValues["destino"];
     const origenId = locations.find(loc => loc.name === origen)?.id;
     const destinoId = locations.find(loc => loc.name === destino)?.id;
-  
+
     // Redirigimos con los valores como query params se hace esto porque el router no permite pasar valores por el state
     if (origenId && destinoId)
       router.push(`/stock/mover?origen=${encodeURIComponent(origenId)}&destino=${encodeURIComponent(destinoId)}&oid=${encodeURIComponent(origen)}&did=${encodeURIComponent(destino)}`);
     else
       console.error("Error al mover stock: Locaciones no encontradas");
-    
+
     onClose();
   };
 
@@ -69,7 +69,9 @@ const MoverStockModal: React.FC<Props> = ({ onClose }) => {
     <div className={styles.modalOverlay}>
       <div className={`${styles.modalContent} modal-content`}>
         <h2 className={styles.title}>Mover Stock</h2>
-        <GenericForm fields={fields} onSubmit={handleFormSubmit} onCancel={onClose} buttonName="Mover" />
+        <div className={styles.formContainer}>
+          <GenericForm fields={fields} onSubmit={handleFormSubmit} onCancel={onClose} buttonName="Mover" />
+        </div>
       </div>
     </div>
   );

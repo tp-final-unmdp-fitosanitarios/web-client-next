@@ -2,6 +2,7 @@
 import { IconButton } from "@mui/material";
 import DeleteIcon from "@mui/icons-material/Delete";
 import styles from "./ItemList.module.scss";
+import React from "react";
 
 interface GenericListProps {
   items: Record<string, string>[];
@@ -48,10 +49,15 @@ const ItemList: React.FC<GenericListProps> = ({
             onClick={handleClick}
           >
             <div className={styles.cardContent}>
-              {displayKeys.map((key) => (
-                <div key={key} className={styles.itemField}>
-                  <span className={styles.itemValue}>{item[key]}</span>
-                </div>
+              {displayKeys.map((key, idx) => (
+                <React.Fragment key={key}>
+                  <div className={styles.itemField}>
+                    <span className={styles.itemValue}>{item[key]}</span>
+                  </div>
+                  {idx === 0 && displayKeys.length > 1 && (
+                    <span className={styles.dash}>-</span>
+                  )}
+                </React.Fragment>
               ))}
             </div>
 

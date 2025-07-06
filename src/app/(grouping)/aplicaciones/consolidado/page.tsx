@@ -8,6 +8,8 @@ import styles from "./consolidado.module.scss";
 import { Locacion } from "@/domain/models/Locacion";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
+import { useTheme, useMediaQuery } from "@mui/material";
+
 
 interface NeededStock {
   product_id: string;
@@ -26,7 +28,7 @@ interface RecipeItem {
 
 interface Recipe {
   type: string;
-  recipeItems: RecipeItem[];
+  recipe_items: RecipeItem[];
 }
 
 interface Application {
@@ -34,7 +36,7 @@ interface Application {
   companyId: string;
   locationId: string;
   status: string;
-  createdAt: string;
+  created_at: string;
   updatedAt: string;
   externalId: string;
   surface: number;
@@ -77,6 +79,8 @@ export default function ConsolidadoPage() {
   const { getApiService, isReady } = useAuth();
   const { withLoading } = useLoading();
   const apiService = getApiService();
+  const theme = useTheme();
+  const isMobile = useMediaQuery(theme.breakpoints.down("sm"));
 
   const fetchZones = async () => {
     try {
@@ -203,28 +207,38 @@ export default function ConsolidadoPage() {
           <div className={styles.content}>
             <div className={styles.stocksSection}>
               <h2>Stock Necesario</h2>
-              {consolidatedData.needed_stocks.length > 0 ? (
-                <table className={styles.table}>
-                  <thead>
-                    <tr>
-                      <th>Producto</th>
-                      <th>Cantidad</th>
-                      <th>Unidad</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {consolidatedData.needed_stocks.map((stock) => {
-                      return (
+
+              {consolidatedData?.needed_stocks?.length > 0 ? (
+                isMobile ? (
+                  <div className={styles.cardsContainer}>
+                    {consolidatedData.needed_stocks.map((stock) => (
+                      <div key={stock.product_id} className={styles.card}>
+                        <p><strong>Producto:</strong> {stock.product_name}</p>
+                        <p><strong>Cantidad:</strong> {stock.amount}</p>
+                        <p><strong>Unidad:</strong> {stock.unit}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <table className={styles.table}>
+                    <thead>
+                      <tr>
+                        <th>Producto</th>
+                        <th>Cantidad</th>
+                        <th>Unidad</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {consolidatedData.needed_stocks.map((stock) => (
                         <tr key={stock.product_id}>
                           <td>{stock.product_name}</td>
                           <td>{stock.amount}</td>
                           <td>{stock.unit}</td>
                         </tr>
-                      );
-                    })}
-
-                  </tbody>
-                </table>
+                      ))}
+                    </tbody>
+                  </table>
+                )
               ) : (
                 <p className={styles.noData}>No hay stock necesario para el período seleccionado</p>
               )}
@@ -232,7 +246,8 @@ export default function ConsolidadoPage() {
 
             <div className={styles.applicationsSection}>
               <h2>Aplicaciones</h2>
-              {consolidatedData.applications.length > 0 ? (
+
+              {consolidatedData?.applications?.length > 0 ? (
                 consolidatedData.applications.map((app) => (
                   <div key={app.id} className={styles.applicationCard}>
                     <div
@@ -249,32 +264,46 @@ export default function ConsolidadoPage() {
                       <div className={styles.applicationDetails}>
                         <p><strong>Estado:</strong> {app.status}</p>
                         <p><strong>Superficie:</strong> {app.surface} ha</p>
-                        <p><strong>Fecha:</strong> {format(new Date(app.createdAt), "dd/MM/yyyy", { locale: es })}</p>
+                        <p><strong>Fecha:</strong> {format(new Date(app.created_at), "dd/MM/yyyy", { locale: es })}</p>
 
                         <div className={styles.recipeSection}>
                           <h4>Receta</h4>
-                          <table className={styles.table}>
-                            <thead>
-                              <tr>
-                                <th>Producto</th>
-                                <th>Cantidad</th>
-                                <th>Unidad</th>
-                                <th>Tipo de Dosis</th>
-                                <th>Lote</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {app.recipe.recipeItems.map((item, index) => (
-                                <tr key={index}>
-                                  <td>{item.product_id}</td>
-                                  <td>{item.amount}</td>
-                                  <td>{item.unit}</td>
-                                  <td>{item.dose_type}</td>
-                                  <td>{item.lot_number}</td>
-                                </tr>
+                          {isMobile ? (
+                            <div className={styles.cardsContainer}>
+                              {app.recipe.recipe_items.map((item, index) => (
+                                <div key={index} className={styles.card}>
+                                  <p><strong>Producto:</strong> {item.product_id}</p>
+                                  <p><strong>Cantidad:</strong> {item.amount}</p>
+                                  <p><strong>Unidad:</strong> {item.unit}</p>
+                                  <p><strong>Tipo de Dosis:</strong> {item.dose_type}</p>
+                                  <p><strong>Lote:</strong> {item.lot_number}</p>
+                                </div>
                               ))}
-                            </tbody>
-                          </table>
+                            </div>
+                          ) : (
+                            <table className={styles.table}>
+                              <thead>
+                                <tr>
+                                  <th>Producto</th>
+                                  <th>Cantidad</th>
+                                  <th>Unidad</th>
+                                  <th>Tipo de Dosis</th>
+                                  <th>Lote</th>
+                                </tr>
+                              </thead>
+                              <tbody>
+                                {app.recipe.recipe_items.map((item, index) => (
+                                  <tr key={index}>
+                                    <td>{item.product_id}</td>
+                                    <td>{item.amount}</td>
+                                    <td>{item.unit}</td>
+                                    <td>{item.dose_type}</td>
+                                    <td>{item.lot_number}</td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          )}
                         </div>
                       </div>
                     )}
@@ -283,6 +312,7 @@ export default function ConsolidadoPage() {
               ) : (
                 <p className={styles.noData}>No hay aplicaciones para el período seleccionado</p>
               )}
+
             </div>
           </div>
         ) : null}

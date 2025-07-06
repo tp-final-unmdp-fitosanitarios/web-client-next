@@ -23,6 +23,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ClearIcon from '@mui/icons-material/Clear';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CameraCapture from '@/components/CameraCapture/CameraCapture';
+import { useLoaderStore } from '@/contexts/loaderStore';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -41,6 +42,7 @@ export default function FinalizarAplicacion() {
     const apiService = getApiService();
     const router = useRouter();
     const { withLoading } = useLoading();
+    const { hideLoader } = useLoaderStore();
 
     // State hooks
     const [aplicacion, setAplicacion] = useState<Aplicacion | null>(null);
@@ -52,13 +54,13 @@ export default function FinalizarAplicacion() {
     const [addRecipeItemModal, setAddRecipeModalOpen] = useState<boolean>(false);
     const [productosAAgregar, setProductosAAgregar] = useState<RecipeItemAAgregar[]>([]);
     const [productosExistentes, setProductosExistentes] = useState<ProductoExistente[]>([]);
-    const [productosDetalles, setProductosDetalles] = useState<{[key: string]: string}>({});
+    const [productosDetalles, setProductosDetalles] = useState<{ [key: string]: string }>({});
     const [selectedFile, setSelectedFile] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [fileBase64, setFileBase64] = useState<string | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
-    const [recipeItemAmounts, setRecipeItemAmounts] = useState<{[key: string]: number}>({});
-    const [recipeItemDoseTypes, setRecipeItemDoseTypes] = useState<{[key: string]: string}>({});
+    const [recipeItemAmounts, setRecipeItemAmounts] = useState<{ [key: string]: number }>({});
+    const [recipeItemDoseTypes, setRecipeItemDoseTypes] = useState<{ [key: string]: string }>({});
     const [combustibleUtilizado, setCombustibleUtilizado] = useState<string>("");
     const [cantidadHectareas, setCantidadHectareas] = useState<string>("");
     const [isCameraOpen, setIsCameraOpen] = useState(false);
@@ -110,7 +112,7 @@ export default function FinalizarAplicacion() {
     };
 
     const handleSelectMaquina = (maquina: Maquina) => {
-        if(maquina){
+        if (maquina) {
             setSelectedMaquina(maquina);
         }
     }
@@ -132,7 +134,7 @@ export default function FinalizarAplicacion() {
     const handleFinalizarAplicacion = async () => {
         console.log("Finishing application");
         const recipeItems: RecipeItem[] = [];
-        
+
         // Add modified recipe items
         aplicacion?.recipe.recipe_items.forEach(ri => {
             const newAmount = recipeItemAmounts[ri.product_id];
@@ -170,11 +172,12 @@ export default function FinalizarAplicacion() {
             type: "ENGINEER_RECIPE",
             recipe_items: recipeItems
         }
-        const attachment = {
+
+        const attachment = fileBase64 ? {
             attachment: fileBase64,
             mime_type: selectedFile?.type
-        }
-    
+        } : null;
+
         const finishAplicationReq = {
             actual_application: recipeReq,
             attachment: attachment,
@@ -185,7 +188,7 @@ export default function FinalizarAplicacion() {
 
         console.log(finishAplicationReq);
         try {
-            const response = await withLoading(
+                const response = await withLoading(
                 apiService.create(`applications/${aplicacion?.id}/finish`, finishAplicationReq),
                 "Finalizando aplicación..."
             );
@@ -208,7 +211,7 @@ export default function FinalizarAplicacion() {
         await fetchApplication();
         //if(aplicacion?.location){
         //    const loc = aplicacion?.location.parent_location;
-          //  fetchProductos(loc.id);
+        //  fetchProductos(loc.id);
         //}
         setLoading(false);
     }
@@ -233,7 +236,13 @@ export default function FinalizarAplicacion() {
         return () => URL.revokeObjectURL(url);
     }, [selectedFile]);
 
-    if (loading) 
+    useEffect(() => {
+        if (!loading) {
+            hideLoader();
+        }
+    }, [loading]);
+
+    if (loading)
         return <div>Cargando...</div>;
     if (!aplicacion) return <div>No se encontró la aplicación.</div>;
 
@@ -252,7 +261,7 @@ export default function FinalizarAplicacion() {
             const detallesMap = detalles.reduce((acc, curr) => {
                 acc[curr.id] = curr.name;
                 return acc;
-            }, {} as {[key: string]: string});
+            }, {} as { [key: string]: string });
             setProductosDetalles(detallesMap);
         } catch (error) {
             console.error("Error al obtener detalles de productos:", error);
@@ -262,7 +271,7 @@ export default function FinalizarAplicacion() {
     const productos = aplicacion.recipe?.recipe_items?.map((item) => ({
         id: item.product_id,
         title: productosDetalles[item.product_id] || item.product_id,
-        description: `${item.dose_type === "SURFACE" ? item.amount+item.unit + "/Ha" : item.amount+item.unit+" en total"}`
+        description: `${item.dose_type === "SURFACE" ? item.amount + item.unit + "/Ha" : item.amount + item.unit + " en total"}`
     })) || [];
 
     const items = productos.map(p => ({
@@ -303,12 +312,12 @@ export default function FinalizarAplicacion() {
     };
 
     const handleAddProducto = (producto: ProductoExistente, amount: number, dose_type: string) => {
-        if (!amount ) return;
-        if(!producto) return;
-        if(!dose_type) return;
+        if (!amount) return;
+        if (!producto) return;
+        if (!dose_type) return;
 
 
-       // const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
+        // const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
 
         const existingProductIndex = productosAAgregar.findIndex((p) => p.product_id === producto.id);
 
@@ -335,16 +344,16 @@ export default function FinalizarAplicacion() {
     };
 
     const productosAdicionales = transformToItems(productosAAgregar, "id", ["prodName", "amount", "unit", "dose_type"]).map((item) => {
-        if(item.dose_type==="SURFACE")
+        if (item.dose_type === "SURFACE")
             return {
                 ...item,
                 display: `${item.prodName}: ${item.amount} ${item.unit} POR HECTAREA`
             };
         else
-        return {
-            ...item,
-            display: `${item.prodName}: ${item.amount} ${item.unit} EN TOTAL`
-        };
+            return {
+                ...item,
+                display: `${item.prodName}: ${item.amount} ${item.unit} EN TOTAL`
+            };
     });
 
     const campos = ["display"];
@@ -400,7 +409,7 @@ export default function FinalizarAplicacion() {
         const byteArray = new Uint8Array(byteNumbers);
         const blob = new Blob([byteArray], { type: 'image/jpeg' });
         const file = new File([blob], fileName, { type: 'image/jpeg' });
-        
+
         handleFileSelect(file);
     };
 
@@ -411,7 +420,7 @@ export default function FinalizarAplicacion() {
     return (
         <div className="page-container">
             <div className="content-wrap">
-                <MenuBar showMenu={false} showArrow={true} path="/aplicaciones"/>
+                <MenuBar showMenu={false} showArrow={true} path="/aplicaciones" />
                 <div className={styles.finalizarHeader}>Finalizar Aplicación</div>
 
                 {/* STEPPER */}
@@ -429,8 +438,8 @@ export default function FinalizarAplicacion() {
                 {activeStep === 0 && (
                     <div className={styles.container}>
                         <div className={styles.finalizarInfo}>
-                            <div>Cultivo: {cultivo}</div>
-                            <div>Fecha: {fecha}</div>
+                            <div>Cultivo: <strong> {cultivo} </strong></div>
+                            <div>Fecha:   <strong> {fecha} </strong></div>
                         </div>
                         <h3 className={styles.productTitle}>Productos aplicados</h3>
                         <ItemList
@@ -441,8 +450,8 @@ export default function FinalizarAplicacion() {
                             selectSingleItem={false}
                         />
                         <div className={styles.buttonContainer}>
-                            <button 
-                                className={`button button-primary ${styles.button}`}  
+                            <button
+                                className={`button button-primary ${styles.button}`}
                                 onClick={() => setActiveStep(1)}
                             >
                                 Continuar
@@ -536,44 +545,56 @@ export default function FinalizarAplicacion() {
 
                 {/* PASO 3: Archivo */}
                 {activeStep === 2 && (
-                    <div className={styles.container}>
+                    <div>
                         <h3 className={styles.productTitle}>Cargar archivo de la aplicación</h3>
-                        <div className={styles.fileInputContainer}>
-                            <label htmlFor="archivoFile" className={styles.label}>
-                                Cargar Archivo
-                            </label>
-                            <div className={styles.fileInputWrapper}>
-                                <input
-                                    id="archivoFile"
-                                    type="file"
-                                    accept="image/*,application/pdf"
-                                    onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
-                                    style={{ display: "none" }}
-                                />
-                                <label
-                                    htmlFor="archivoFile"
-                                    className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
-                                    style={{ cursor: "pointer" }}
-                                >
-                                    {selectedFile ? "Cambiar" : "Seleccionar"}
-                                </label>
-                                <button
-                                    type="button"
-                                    className={`${styles.button} ${styles.buttonCamera}`}
-                                    onClick={handleOpenCamera}
-                                >
-                                    <CameraAltIcon />
-                                </button>
-                            </div>
-                        </div>
-                        {selectedFile && (
-                            <div className={styles.filePreviewContainer}>
-                                <span className={styles.fileName}>{selectedFile.name}</span>
-                                <VisibilityIcon className={styles.fileIcon} onClick={handleVerArchivo} />
-                                <ClearIcon className={styles.fileIcon} onClick={handleClearFile} />
-                            </div>
-                        )}
+                        <div className={styles.container}>
 
+                            <div className={styles.fileInputContainer}>
+
+                                <div className={styles.fileInputWrapper}>
+                                    <div className={styles.fileTextContainer} >
+                                        <label htmlFor="archivoFile" className={styles.label}>
+                                            Cargar Archivo
+                                        </label>
+                                        <input
+                                            id="archivoFile"
+                                            type="file"
+                                            accept="image/*,application/pdf"
+                                            onChange={e => handleFileSelect(e.target.files?.[0] ?? null)}
+                                            style={{ display: "none" }}
+                                        />
+                                        <label
+                                            htmlFor="archivoFile"
+                                            className={`${styles.button} ${selectedFile ? styles.buttonChange : styles.buttonSelect}`}
+                                            style={{ cursor: "pointer" }}
+                                        >
+                                            {selectedFile ? "Cambiar" : "Seleccionar"}
+                                        </label>
+                                    </div>
+                                    <div className={styles.fileTextContainer}>
+                                        <label htmlFor="fotoFile" className={styles.label}>
+                                            Tomar foto
+                                        </label>
+                                        <button
+                                            type="button"
+                                            className={`${styles.button} ${styles.buttonCamera}`}
+                                            onClick={handleOpenCamera}
+                                        >
+                                            <CameraAltIcon />
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            {selectedFile && (
+                                <div className={styles.filePreviewContainer}>
+                                    <span className={styles.fileName}>{selectedFile.name}</span>
+                                    <VisibilityIcon className={styles.fileIcon} onClick={handleVerArchivo} />
+                                    <ClearIcon className={styles.fileIcon} onClick={handleClearFile} />
+                                </div>
+                            )}
+
+
+                        </div>
                         <div className={styles.buttonContainer}>
                             <button
                                 className={`button button-secondary ${styles.button}`}
@@ -584,28 +605,29 @@ export default function FinalizarAplicacion() {
                             <button
                                 className={`button button-primary ${styles.button}`}
                                 onClick={() => setActiveStep(3)}
-                                disabled={!selectedFile}
+
                             >
                                 Continuar
                             </button>
                         </div>
                     </div>
+
                 )}
 
                 {/* PASO 4: Productos */}
                 {activeStep === 3 && (
-                    <Box sx={{ 
-                        maxWidth: '340px', 
-                        mx: 'auto', 
+                    <Box sx={{
+                        maxWidth: '900px',
+                        mx: 'auto',
                         p: { xs: 2, sm: 3 },
-                        width: '100%'
+                        width: '90%'
                     }}>
-                        <Paper elevation={3} sx={{ 
-                            p: { xs: 2, sm: 4 }, 
-                            borderRadius: 2 
+                        <Paper elevation={3} sx={{
+                            p: { xs: 2, sm: 4 },
+                            borderRadius: 2
                         }}>
-                            <Typography variant="h6" sx={{ 
-                                mb: 3, 
+                            <Typography variant="h6" sx={{
+                                mb: 3,
                                 color: '#404e5c',
                                 fontSize: { xs: '1.1rem', sm: '1.25rem' }
                             }}>
@@ -634,10 +656,10 @@ export default function FinalizarAplicacion() {
                             {/* Form for existing recipe items */}
                             <Box sx={{ mb: 4 }}>
                                 {aplicacion.recipe.recipe_items.map((item) => (
-                                    <Box key={item.product_id} sx={{ 
-                                        display: 'flex', 
+                                    <Box key={item.product_id} sx={{
+                                        display: 'flex',
                                         flexDirection: { xs: 'column', sm: 'row' },
-                                        alignItems: { xs: 'stretch', sm: 'center' }, 
+                                        alignItems: { xs: 'stretch', sm: 'center' },
                                         mb: 2,
                                         p: { xs: 1.5, sm: 2 },
                                         backgroundColor: '#f5f5f5',
@@ -645,7 +667,7 @@ export default function FinalizarAplicacion() {
                                         gap: { xs: 1, sm: 2 }
                                     }}>
                                         <Box sx={{ flex: 1, mb: { xs: 1, sm: 0 } }}>
-                                            <Typography variant="subtitle1" sx={{ 
+                                            <Typography variant="subtitle1" sx={{
                                                 fontWeight: 'bold',
                                                 fontSize: { xs: '0.9rem', sm: '1rem' }
                                             }}>
@@ -657,10 +679,10 @@ export default function FinalizarAplicacion() {
                                                 Cantidad solicitada: {item.amount} {item.unit} {item.dose_type === "SURFACE" ? "/Ha" : "en total"}
                                             </Typography>
                                         </Box>
-                                        <Box sx={{ 
-                                            display: 'flex', 
+                                        <Box sx={{
+                                            display: 'flex',
                                             flexDirection: { xs: 'column', sm: 'row' },
-                                            gap: { xs: 2, sm: 3 }, 
+                                            gap: { xs: 2, sm: 3 },
                                             alignItems: { xs: 'stretch', sm: 'center' },
                                             width: { xs: '100%', sm: 'auto' }
                                         }}>
@@ -695,8 +717,8 @@ export default function FinalizarAplicacion() {
                                 ))}
                             </Box>
 
-                            <Typography variant="body1" sx={{ 
-                                mb: 2, 
+                            <Typography variant="body1" sx={{
+                                mb: 2,
                                 color: '#666',
                                 fontSize: { xs: '0.9rem', sm: '1rem' }
                             }}>
@@ -715,9 +737,9 @@ export default function FinalizarAplicacion() {
                                     selectSingleItem={false}
                                 />
                             ) : (
-                                <Typography variant="body1" sx={{ 
-                                    mb: 3, 
-                                    color: '#666', 
+                                <Typography variant="body1" sx={{
+                                    mb: 3,
+                                    color: '#666',
                                     textAlign: 'center',
                                     fontSize: { xs: '0.9rem', sm: '1rem' }
                                 }}>
@@ -725,11 +747,11 @@ export default function FinalizarAplicacion() {
                                 </Typography>
                             )}
 
-                            <Box sx={{ 
+                            <Box sx={{
                                 display: 'flex',
-                                justifyContent: 'center', 
-                                gap: 2, 
-                                mt: 3 
+                                justifyContent: 'center',
+                                gap: 2,
+                                mt: 3
                             }}>
                                 <button
                                     className={`button button-outlined ${styles.button}`}
@@ -744,33 +766,38 @@ export default function FinalizarAplicacion() {
                                 </button>
                             </Box>
 
-                            <Box sx={{ 
-                                display: 'flex', 
+                            <Box sx={{
+                                display: 'flex',
                                 flexDirection: { xs: 'column', sm: 'row' },
-                                justifyContent: 'space-between', 
-                                gap: 2, 
-                                mt: 3 
+                                justifyContent: 'space-between',
+                                gap: 2,
+                                mt: 3
                             }}>
-                                <button
-                                    className={`button button-outlined ${styles.button}`}
-                                    onClick={() => setActiveStep(2)}
-                                >
-                                    Volver
-                                </button>
-                                <button
-                                    className={`button button-primary ${styles.button}`}
-                                    onClick={handleFinalizarAplicacion}
-                                    type="button"
-                                    disabled={
-                                        !cantidadHectareas ||
-                                        isNaN(Number(cantidadHectareas)) ||
-                                        Number(cantidadHectareas) <= 0
-                                    }
-                                >
-                                    Confirmar
-                                </button>
+
                             </Box>
                         </Paper>
+                        <div className={`${styles.buttonContainer}`}>
+
+
+                            <button
+                                className={`button button-outlined ${styles.button}`}
+                                onClick={() => setActiveStep(2)}
+                            >
+                                Volver
+                            </button>
+                            <button
+                                className={`button button-primary ${styles.button}`}
+                                onClick={handleFinalizarAplicacion}
+                                type="button"
+                                disabled={
+                                    !cantidadHectareas ||
+                                    isNaN(Number(cantidadHectareas)) ||
+                                    Number(cantidadHectareas) <= 0
+                                }
+                            >
+                                Confirmar
+                            </button>
+                        </div>
                     </Box>
                 )}
 

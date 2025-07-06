@@ -159,3 +159,19 @@
   border-radius: 8px;
   margin-top: 1rem;
 } 
+
+.cardsContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.card {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  box-shadow: 0px 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+
