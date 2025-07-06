@@ -170,6 +170,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
     router.push(`aplicaciones/confirmar?id=${id}`);
   }
 
+
   return (
     <Box className={styles.container}>
       <StyledAppBar position="static">
@@ -246,7 +247,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
             selectedIds={selectedIds}
             selectItems={false}
             deleteItems={false}
-            selectSingleItem={user?.roles.includes("ENGINEER") ? true : false}
+            selectSingleItem={user?.roles[0].includes("ENGINEER") ? true : false}
             onSelectSingleItem={confirmApplication}
             actions={(item) => (
               <VisibilityIcon
