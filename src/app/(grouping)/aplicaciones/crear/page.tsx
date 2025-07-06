@@ -240,7 +240,7 @@ const CrearAplicacionPage: React.FC = () => {
         const parentLoc = locations.find((loc) => loc.id === campo);
         if (!parentLoc) return false;
 
-        return l.parent_location.parent_location_id === parentLoc.id //El padre del lote debe ser el campo
+        return l.parent_location.parent_location.id === parentLoc.id //El padre del lote debe ser el campo
     }
 
     return (
