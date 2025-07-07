@@ -40,9 +40,17 @@ export default function Login() {
         apiService.create("/auth/login", body),
         "Iniciando sesión..."
       );
-<<<<<<< HEAD
-      
-      if(res.success){
+      if (!res.success) {
+        if (res.status === 401) {
+          setErrorReq(true);
+          setErrorMessage("Credenciales inválidas. Por favor verifica tu email y contraseña.");
+        } else {
+          setErrorReq(true);
+          setErrorMessage("Ocurrió un error. Por favor intenta nuevamente.");
+        }
+        return;
+      }
+      else{
         const { token, user_id } = res.data as { token: string, user_id: string };
         
         // Obtener los datos del usuario inmediatamente después del login
@@ -67,36 +75,11 @@ export default function Login() {
         // Pequeño delay para asegurar que los estados se actualicen
         await new Promise(resolve => setTimeout(resolve, 100));
         
-
         router.push("/home");
       }
-      else{
-        setErrorReq(true);
-      }
-=======
-
-      if (!res.success) {
-        if (res.status === 401) {
-          setErrorReq(true);
-          setErrorMessage("Credenciales inválidas. Por favor verifica tu email y contraseña.");
-        } else {
-          setErrorReq(true);
-          setErrorMessage("Ocurrió un error. Por favor intenta nuevamente.");
-        }
-        return;
-      }
-
-      const { token, user_id } = res.data as { token: string, user_id: string };
-      login(token, user_id);
-      setErrorReq(false);
-      
-      // Mantener el loader durante la navegación
-      showLoader("Cargando página principal...");
-      router.push("/home");
->>>>>>> 7bb0e8bf40486a9f66f93194ae2acfa26f43f90d
     } catch (e: any) {
         console.error("Error en el login:", e);
-    }
+      }
   };
 
   return (
