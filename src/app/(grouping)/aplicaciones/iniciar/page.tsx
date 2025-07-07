@@ -16,6 +16,7 @@ import ModalElegirMaquina from "@/components/ModalElegirMaquina/ModalElegirMaqui
 import GenericModal from "@/components/modal/GenericModal";
 import { useRouter } from 'next/navigation';
 import { useLoading } from "@/hooks/useLoading";
+import { Roles } from "@/domain/enum/Roles";
 // import LoaderGlobal from "@/components/Loader/LoaderGlobal";
 
 
@@ -24,7 +25,7 @@ export default function IniciarAplicacion() {
     const applicationId = searchParams.get("id");
     const [aplicacion, setAplicacion] = useState<Aplicacion | null>(null);
     const [loading, setLoading] = useState(true);
-    const { getApiService, isReady } = useAuth();
+    const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
     const [confirmationModalOpen, setConfirmationModalOpen] = useState(false);
     const router = useRouter();
@@ -55,13 +56,14 @@ export default function IniciarAplicacion() {
         return <div>Cargando...</div>; // Elimina esta línea cuando uses el loader global
     if (!aplicacion) return <div>No se encontró la aplicación.</div>;
 
-    const cultivo = aplicacion.location_id;
-    const fecha = new Date(aplicacion.created_at).toLocaleDateString();
+    const cultivo = aplicacion.location.name;
+    const lote = aplicacion.location.parent_location.name
+    const fecha = new Date(aplicacion.application_date).toLocaleDateString();
 
     const productos = aplicacion.recipe?.recipe_items?.map((item) => ({
         id: item.product_id,
-        title: `${item.product_id+ 1}`,
-        description: `${item.amount}${item.unit}${item.dose_type === "SURFACE" ? " - "+item.amount + "/Ha" : item.amount}`
+        title: `${item.name}`,
+        description: `${item.amount}${item.unit}${item.dose_type === "SURFACE" ?" /Ha" : " En total"}`
     }));
 
     const items = productos.map(p => ({
@@ -94,6 +96,15 @@ export default function IniciarAplicacion() {
             }
     }
 
+    function handleEliminar(): void {
+        //
+        throw new Error("Function not implemented.");
+    }
+
+    function handleModificar(): void {
+        throw new Error("Function not implemented.");
+    }
+
     return (
         <div className="page-container">
             <div className="content-wrap">
@@ -102,6 +113,7 @@ export default function IniciarAplicacion() {
             <div className={styles.container}>
             <div className={styles.iniciarInfo}>
                 <div>Cultivo: {cultivo}</div>
+                <div>Lote: {lote}</div>
                 <div>Fecha: {fecha}</div>
             </div>
             <h3 className={styles.productTitle}>Productos a aplicar</h3>
@@ -113,9 +125,27 @@ export default function IniciarAplicacion() {
                     selectSingleItem={false}
                 />
             </div>
-            <div className={styles.buttonContainer}>
-                <button className={`button button-primary ${styles.button}`} onClick={handleConfirm}>Confirmar</button>
-            </div>
+            
+            {user?.roles.includes(Roles.Aplicador)?
+                <div className={styles.buttonContainer}>
+                    <button className={`button button-primary ${styles.button}`} onClick={handleConfirm}>Confirmar</button>
+                </div>
+            :
+                <div className={styles.buttonContainer}>
+                    <button 
+                        className={`button button-danger ${styles.button}`} 
+                        onClick={handleEliminar}
+                    >
+                        Eliminar
+                    </button>
+                    <button 
+                        className={`button button-primary ${styles.button}`} 
+                        onClick={handleModificar}
+                    >
+                        Modificar
+                    </button>
+                </div>
+            }
             
             <GenericModal
                 isOpen={confirmationModalOpen}

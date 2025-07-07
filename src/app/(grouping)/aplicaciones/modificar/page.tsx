@@ -31,6 +31,7 @@ import dayjs from 'dayjs';
 import { Roles } from '@/domain/enum/Roles';
 import { User } from '@/domain/models/User';
 import { Aplicacion } from '@/domain/models/Aplicacion';
+import { useUser } from '@/hooks/useUser';
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -64,36 +65,13 @@ const ModificarAplicacionPage: React.FC = () => {
     const [deleteConfirmationModalOpen, setDeleteConfirmationModalOpen] = useState(false);
     const [deleteSuccessModalOpen, setDeleteSuccessModalOpen] = useState(false);
     const router = useRouter();
-    const { getApiService, isReady, user } = useAuth();
+    const {getApiService} = useAuth();
+    const { isReady, user } = useUser();
     const apiService = getApiService();
     const { withLoading } = useLoading();
     const title = 'Modificar Aplicación'
     
-    const customInputSx = {
-        '& .MuiInputBase-root': {
-            borderRadius: '10px',
-            backgroundColor: '#e6ebea',
-            paddingX: 1,
-            fontWeight: 'bold',
-        },
-        '& .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#404e5c',
-            borderWidth: '2px',
-        },
-        '&:hover .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#404e5c',
-        },
-        '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
-            borderColor: '#404e5c',
-        },
-        '& .MuiInputLabel-root': {
-            fontWeight: 'bold',
-            color: '#404e5c',
-        },
-        '&.Mui-focused .MuiInputLabel-root': {
-            color: '#404e5c',
-        },
-    };
+    const isEngineer = user?.roles[0].includes(Roles.Encargado);
 
     const fetchApplication = async (): Promise<Aplicacion | null> => {
         if (!applicationId) return null;
@@ -127,9 +105,9 @@ const ModificarAplicacionPage: React.FC = () => {
             if (app.location) {
                 setCultivo(app.location.id);
                 if (app.location.parent_location) {
-                    setCampo(app.location.parent_location.id);
+                    setCampo(app.location.parent_location.parent_location.id);
                     if (app.location.parent_location.parent_location) {
-                        setZona(app.location.parent_location.parent_location.id);
+                        setZona(app.location.parent_location.parent_location.parent_location.id);
                     }
                 }
             }
@@ -306,7 +284,7 @@ const ModificarAplicacionPage: React.FC = () => {
         console.log(updateAplicationReq);
         try {
             const response = await withLoading(
-                apiService.update(`applications/${applicationId}`,applicationId? applicationId : "", updateAplicationReq),
+                apiService.update(`applications`,applicationId? applicationId : "", updateAplicationReq),
                 "Modificando aplicación..."
             );
             if (response.success) {
@@ -381,7 +359,7 @@ const ModificarAplicacionPage: React.FC = () => {
         const parentLoc = locations.find((loc) => loc.id === campo);
         if (!parentLoc) return false;
 
-        return l.parent_location.id === parentLoc.id
+        return l.parent_location.parent_location.id === parentLoc.id
     }
 
     if (loading) {
@@ -569,13 +547,15 @@ const ModificarAplicacionPage: React.FC = () => {
                                 >
                                     Continuar
                                 </button>
+                                {isEngineer ? (
                                 <button 
                                     type="submit" 
                                     className={`button ${styles.danger} ${styles.button}`}
                                     onClick={handleDelete}
                                 >
                                     Eliminar
-                                </button>
+                                </button>):(<></>)
+                                }
                             </form>
                         </Paper>
                     </Box>
@@ -592,7 +572,7 @@ const ModificarAplicacionPage: React.FC = () => {
                                 Fecha de Aplicación: {expirationDate?.format('DD/MM/YYYY')}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 2, color: '#666' }}>
-                                Lugar de aplicación: {campo}
+                                Cultivo: {locations.find(l => l.id===cultivo)?.name}
                             </Typography>
                             <Typography variant="body1" sx={{ mb: 3, color: '#666' }}>
                                 Hectáreas: {hectareas}

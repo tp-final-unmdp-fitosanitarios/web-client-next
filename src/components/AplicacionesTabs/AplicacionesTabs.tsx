@@ -15,6 +15,7 @@ import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
 import { useAuth } from '../Auth/AuthProvider';
+import { useUser } from '@/hooks/useUser';
 import { Roles } from '@/domain/enum/Roles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ApplicationDetailModal from './ApplicationDetailModal';
@@ -103,7 +104,7 @@ interface AplicacionesTabsProps {
 export default function AplicacionesTabs({ aplicaciones, productos, locaciones }: AplicacionesTabsProps) {
   const router = useRouter();
   const [value, setValue] = React.useState(0);
-  const {user} = useAuth();
+  const { user, isLoading } = useUser();
   const { showLoader } = useLoaderStore();
 
   // Estado para el modal de detalles
@@ -138,7 +139,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
       id: item.id.toString(),
       estado: item.status,
       cultivo: locaciones?.find((l) => l.id === item.location_id)?.name || 'Sin cultivo',
-      fecha: new Date(item.created_at).toLocaleDateString()
+      fecha: new Date(item.application_date).toLocaleDateString()
     }));
 
   const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
@@ -152,7 +153,12 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
   const campos = ["cultivo", "fecha"];
 
   const startApplication = (id: string) => {
-    const roles = user?.roles
+    if (isLoading || !user) {
+      console.warn('Usuario no disponible aún');
+      return;
+    }
+    
+    const roles = user.roles;
     console.log(user);
     if(roles?.includes(Roles.Encargado))
       router.push(`aplicaciones/modificar?id=${id}`);
@@ -246,7 +252,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
             selectedIds={selectedIds}
             selectItems={false}
             deleteItems={false}
-            selectSingleItem={user?.roles.includes("ENGINEER") ? true : false}
+            selectSingleItem={user?.roles?.includes("ENGINEER") ? true : false}
             onSelectSingleItem={confirmApplication}
             actions={(item) => (
               <VisibilityIcon

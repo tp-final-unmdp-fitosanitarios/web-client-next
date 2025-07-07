@@ -1,0 +1,192 @@
+@use '../../styles/variables' as *;
+
+.page-container {
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+  margin: 0;
+  width: 100%;
+  min-height: 100vh;
+}
+
+.title {
+  font-size: 2rem;
+  font-weight: 600;
+  margin: 2rem 0;
+  text-align: center;
+  width: 100%;
+  color: $dark-color;
+}
+
+.profileInfo {
+  width: 100%;
+  max-width: 800px;
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+.userCard {
+  display: flex;
+  align-items: center;
+  background: linear-gradient(135deg, #e6ebea 0%, #f5f7f5 100%);
+  border: 2px solid #404e5c;
+  border-radius: 15px;
+  padding: 2rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  margin-bottom: 2rem;
+}
+
+.avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #404e5c 0%, #5a6b7a 100%);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-right: 1.5rem;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.userDetails {
+  flex: 1;
+}
+
+.userDetails h2 {
+  color: $dark-color;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.email {
+  margin: 0.5rem 0;
+  color: #666;
+  font-size: 1rem;
+}
+
+.role {
+  margin: 0.5rem 0;
+  color: #404e5c;
+  font-weight: 500;
+  font-size: 0.9rem;
+  background-color: #b5c88d;
+  padding: 0.3rem 0.8rem;
+  border-radius: 20px;
+  display: inline-block;
+}
+
+.editSection {
+  width: 100%;
+  padding: 0 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 1.5rem;
+  color: $dark-color;
+  text-align: center;
+}
+
+.passwordSection {
+  width: 100%;
+  max-width: 600px;
+  margin: 2rem 0;
+  padding: 0 1rem;
+}
+
+.passwordCard {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #e6ebea 0%, #f5f7f5 100%);
+  border: 2px solid #404e5c;
+  border-radius: 15px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.passwordInfo {
+  flex: 1;
+}
+
+.passwordInfo h4 {
+  margin: 0 0 0.5rem 0;
+  color: $dark-color;
+  font-size: 1.1rem;
+  font-weight: 600;
+}
+
+.passwordInfo p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.passwordButton {
+  background-color: #b5c88d;
+  color: #404e5c;
+  border: 2px solid #404e5c;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+  white-space: nowrap;
+
+  &:hover {
+    background-color: #a5b879;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.12);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+@media (max-width: 768px) {
+  .title {
+    font-size: 1.5rem;
+  }
+
+  .userCard {
+    flex-direction: column;
+    text-align: center;
+    padding: 1.5rem;
+  }
+
+  .avatar {
+    margin-right: 0;
+    margin-bottom: 1rem;
+  }
+
+  .userDetails h2 {
+    font-size: 1.3rem;
+  }
+
+  .passwordCard {
+    flex-direction: column;
+    text-align: center;
+    gap: 1rem;
+  }
+
+  .passwordButton {
+    width: 100%;
+    max-width: 200px;
+  }
+} 
+
+.content{
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    padding: 0 1rem;
+}

@@ -34,6 +34,8 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
         return prod ? prod.name : productId;
     };
 
+    const lote = aplicacion.location.parent_location.name;
+
     return (
         <Modal
             open={isOpen}
@@ -90,7 +92,7 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
                                 {aplicacion.recipe.recipe_items.map((item, idx) => (
                                     <Box key={idx} sx={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid #eee', py: 0.5 }}>
                                         <Typography>{getProductName(item.product_id)}</Typography>
-                                        <Typography>{item.amount} {item.unit} | Lote: {item.lot_number || 'N/A'}</Typography>
+                                        <Typography>{item.amount} {item.unit} | Lote: {lote || 'N/A'}</Typography>
                                     </Box>
                                 ))}
                             </Box>

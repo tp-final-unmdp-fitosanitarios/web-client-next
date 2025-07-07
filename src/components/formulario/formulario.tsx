@@ -65,7 +65,7 @@ export default function Formulario({ fields, onSubmit, onCancel, buttonName, chi
     const newErrors: Record<string, string> = {};
 
     fields.forEach((field) => {
-      if (!formData[field.name]) {
+      if (!formData[field.name] && field.required) {
         newErrors[field.name] = `El campo "${field.label}" es obligatorio`;
         valid = false;
       }

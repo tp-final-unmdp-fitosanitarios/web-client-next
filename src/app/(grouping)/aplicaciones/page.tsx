@@ -31,6 +31,7 @@ export default function AplicacionesPage() {
             "Cargando aplicaciones..."
           );
           if (response.success) {
+              console.log(response.data.content);
               setAplicaciones(response.data.content);
           } else {
             setError(response.error || "Error al obtener las aplicaciones");
