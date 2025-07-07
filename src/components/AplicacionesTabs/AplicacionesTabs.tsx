@@ -176,6 +176,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
     router.push(`aplicaciones/confirmar?id=${id}`);
   }
 
+
   return (
     <Box className={styles.container}>
       <StyledAppBar position="static">

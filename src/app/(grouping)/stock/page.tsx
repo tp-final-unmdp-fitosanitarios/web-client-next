@@ -50,6 +50,8 @@ export default function StockView() {
     const [activeSearchParams, setActiveSearchParams] = useState(searchParams);
     const [filtrosExpandidos, setFiltrosExpandidos] = useState<boolean>(false);
     const [isShowingSummary, setIsShowingSummary] = useState<boolean>(true);
+    const [selectedSummaryItem, setSelectedSummaryItem] = useState<any>(null);
+    const [showSummaryDetailModal, setShowSummaryDetailModal] = useState(false);
 
     const isAdmin = user?.roles.includes(Roles.Admin);
     const isAplicador = user?.roles.includes(Roles.Aplicador);
@@ -240,12 +242,12 @@ export default function StockView() {
 
     if (isShowingSummary) {
         // Procesar resumen de stock
-        items = transformToItems(stockSummary, "product_id", ["product_name", "brand", "category", "amount", "unit"]).map((item) => {
-            return {
-                ...item,
-                display: `${item.product_name} (${item.brand}) - ${item.amount} ${item.unit} - ${item.category}`,
-            };
-        });
+        items = stockSummary.map((item) => ({
+            ...item,
+            id: item.product_id, // Necesario para identificar el item al clickear
+            display: `${item.product_name} (${item.brand}) - ${item.amount} ${item.unit}${item.category ? " - " + item.category : ""}`,
+            lotes: item.sum || []
+        }));
         campos = ["display"];
     } else {
         // Procesar stock específico
@@ -263,6 +265,8 @@ export default function StockView() {
                         expiration_date: item.expiration_date ? new Date(item.expiration_date).toLocaleDateString() : ''
                     };
                 });
+                console.log("Stock from server:: ",stock);
+                console.log("Stock to display:: ",displayStock);
         }
 
         items = transformToItems(displayStock, "id", ["producto", "amount", "unit", "lot_number", "expiration_date"]).map((item) => {
@@ -283,6 +287,14 @@ export default function StockView() {
         if (stockItem) {
             setSelectedStockItem(stockItem);
             setShowDetailsModal(true);
+        }
+    };
+
+    const handleSummaryItemClick = (id: string) => {
+        const summaryItem = stockSummary.find(item => item.product_id === id);
+        if (summaryItem) {
+            setSelectedSummaryItem(summaryItem);
+            setShowSummaryDetailModal(true);
         }
     };
 
@@ -479,8 +491,8 @@ export default function StockView() {
                         displayKeys={campos}
                         selectItems={false}
                         deleteItems={false}
-                        selectSingleItem={isShowingSummary ? false : true}
-                        onSelectSingleItem={isShowingSummary ? undefined : handleItemClick}
+                        selectSingleItem={isShowingSummary ? true : !isShowingSummary}
+                        onSelectSingleItem={isShowingSummary ? handleSummaryItemClick : (isShowingSummary ? undefined : handleItemClick)}
                     />
                 </div>
             ) : (
@@ -555,7 +567,24 @@ export default function StockView() {
                 buttonTitle="Cerrar"
                 showSecondButton={false}
             />
-
+            {/* Modal de detalle de lotes para el resumen */}
+            {showSummaryDetailModal && selectedSummaryItem && (
+                <GenericModal
+                    isOpen={showSummaryDetailModal}
+                    onClose={() => setShowSummaryDetailModal(false)}
+                    title={`Detalle de lotes para ${selectedSummaryItem.product_name}`}
+                    modalText={[
+                        "Lotes:",
+                        ...(((selectedSummaryItem as any).sum || [])
+                            .filter((lote: any) => lote.amount > 0)
+                            .map((lote: any) =>
+                                `Lote: ${lote.lot_number} | Cantidad: ${lote.amount} ${selectedSummaryItem.unit} | Vencimiento: ${lote.expiration_date ? new Date(lote.expiration_date).toLocaleDateString() : "-"}`
+                            ))
+                    ].join('\n')}
+                    buttonTitle="Cerrar"
+                    showSecondButton={false}
+                />
+            )}
             {showMoverModal && (
                 <MoverStockModal onClose={() => setShowMoverModal(false)} />
             )}
