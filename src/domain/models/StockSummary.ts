@@ -5,4 +5,12 @@ export interface StockSummary {
     category: string;
     amount: number;
     unit: string;
-} 
+    sum: StockLineItem[];
+}
+
+type StockLineItem = {
+    amount: number;
+    lotNumber: string;
+    locationName: string;
+    expirationDate: Date
+}
