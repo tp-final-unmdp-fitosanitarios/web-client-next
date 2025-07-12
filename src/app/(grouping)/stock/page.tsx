@@ -9,7 +9,7 @@ import { transformToItems } from "@/utilities/transform";
 import { Stock } from "@/domain/models/Stock";
 import { StockSummary } from "@/domain/models/StockSummary";
 import GenericModal from "@/components/modal/GenericModal";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { ResponseItems } from "@/domain/models/ResponseItems";
 import { Locacion } from "@/domain/models/Locacion";
 import { Autocomplete, TextField, Paper, Box, Typography, IconButton, Collapse, Grid, Pagination, MenuItem } from "@mui/material";
@@ -31,8 +31,6 @@ export default function StockView() {
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
     const [locations, setLocations] = useState<Locacion[]>([]);
-    const [actualLocation, setActualLocation] = useState<string>("");
-    const [initialLoadComplete, setInitialLoadComplete] = useState<boolean>(false);
     const [showMoverModal, setShowMoverModal] = useState(false);
     const [showRetirarModal, setShowRetirarModal] = useState(false);
     const { getApiService, isReady, user } = useAuth();
@@ -41,12 +39,13 @@ export default function StockView() {
     const [selectedStockItem, setSelectedStockItem] = useState<Stock | null>(null);
     const [showDetailsModal, setShowDetailsModal] = useState(false);
     const [searchParams, setSearchParams] = useState({
+        actualLocation: "",
         productId: "",
         lotNumber: "",
         expirationBefore: "",
         expirationAfter: ""
     });
-    var isMounted: boolean;
+    const isMounted = useRef(true);
     const [products, setProducts] = useState<Producto[]>([]);
     const [activeSearchParams, setActiveSearchParams] = useState(searchParams);
     const [filtrosExpandidos, setFiltrosExpandidos] = useState<boolean>(false);
@@ -58,6 +57,7 @@ export default function StockView() {
     const [pageSize, setPageSize] = useState(10); // Tamaño de página
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
+    const [pageElements, setPageElements] = useState(0);
 
     const isAdmin = user?.roles.includes(Roles.Admin);
     const isAplicador = user?.roles.includes(Roles.Aplicador);
@@ -112,19 +112,27 @@ export default function StockView() {
 
     // Cargar datos iniciales (resumen y ubicaciones)
     useEffect(() => {
-        if (!isReady || initialLoadComplete) return;
+        if (!isReady || !isShowingSummary) return;
         
         const loadInitialData = async () => {
             try {
                 // Cargar resumen de stock
+                const queryParams = new URLSearchParams();
+                queryParams.append('page', page.toString());
+                queryParams.append('size', pageSize.toString());
+
                 const summaryResponse = await withLoading(
-                    apiService.get<ResponseItems<StockSummary>>('stock/summary'),
+                    apiService.get<ResponseItems<StockSummary>>(`stock/summary?${queryParams.toString()}`),
                     "Cargando resumen de stock..."
                 );
                 
                 if (summaryResponse.success) {
+                    console.log("summaryResponse");
+                    console.log(summaryResponse);
                     setStockSummary(summaryResponse.data.content);
-                    setTotalElements(summaryResponse.data.content.length);
+                    setTotalElements(summaryResponse.data.total_elements);
+                    setPageElements(summaryResponse.data.number_of_elements);
+                    setTotalPages(summaryResponse.data.total_pages || 0);
                     setIsShowingSummary(true);
                 } else {
                     setError(summaryResponse.error || "Error al obtener el resumen de stock");
@@ -145,7 +153,7 @@ export default function StockView() {
                     setError(locationsResponse.error || "Error al obtener las ubicaciones");
                 }
 
-                setInitialLoadComplete(true);
+            
             } catch (err) {
                 setError("Error al conectar con el servidor: " + err);
             } finally {
@@ -154,7 +162,7 @@ export default function StockView() {
         };
 
         loadInitialData();
-    }, [isReady, initialLoadComplete]);
+    }, [isReady, page, pageSize, isShowingSummary]);
 
     const fetchProducts = async () => {
         try {
@@ -162,11 +170,11 @@ export default function StockView() {
                 apiService.get<ResponseItems<Producto>>('/products'),
                 "Cargando productos..."
             );
-            if (response.success && isMounted) {
+            if (response.success && isMounted.current) {
                 setProducts(response.data.content);
             }
         } catch (err) {
-            if (isMounted) {
+            if (isMounted.current) {
                 console.error('Error fetching products:', err);
             }
         }
@@ -174,26 +182,24 @@ export default function StockView() {
 
     useEffect(() => {
         if (!isReady) return;
-        
-        let isMounted = true;
-        
-
+        isMounted.current = true;
         fetchProducts();
         return () => {
-            isMounted = false;
+            isMounted.current = false;
         };
     }, [isReady]);
 
     const fetchData = async () => {
-        console.log("fetchData");
         try {
             setLoading(true);
 
             const queryParams = new URLSearchParams();
-            queryParams.append('location', actualLocation);
             queryParams.append('page', page.toString());
             queryParams.append('size', pageSize.toString());
             
+            if(activeSearchParams.actualLocation){
+                queryParams.append('location', activeSearchParams.actualLocation);
+            }
             if (activeSearchParams.productId) {
                 queryParams.append('product', activeSearchParams.productId);
             }
@@ -209,59 +215,50 @@ export default function StockView() {
                 queryParams.append('expiration_after', date.toISOString());
             }
             const response = await withLoading(
-                apiService.get<ResponseItems<Stock>>(`stock/summary?${queryParams.toString()}`),
+                apiService.get<ResponseItems<Stock>>(`stock?${queryParams.toString()}`),
                 "Cargando stock..."
             );
-            isMounted=true;
             fetchProducts();
-            isMounted=true;
-            if (response.success && isMounted) {
+            if (response.success && isMounted.current) {
+                console.log("stock response");
                 console.log(response);
                 const stock = response.data.content;
                 setStockFromServer(stock);
                 setTotalPages(response.data.total_pages || 0);
                 setTotalElements(response.data.total_elements || 0);
-            } else if (isMounted) {
+                setPageElements(response.data.number_of_elements);
+                setIsShowingSummary(false);
+            } else if (isMounted.current) {
                 setError(response.error || "Error al obtener el stock");
             }
         } catch (err) {
-            if (isMounted) {
+            if (isMounted.current) {
                 setError("Error al conectar con el servidor: " + err);
             }
         } finally {
-            if (isMounted) {
+            if (isMounted.current) {
                 setLoading(false);
             }
         }
     };
 
-    useEffect(() => {
-        console.log("useEffect triggered:", {
-            isReady,
-            actualLocation,
-            isShowingSummary,
-            page,
-            pageSize
-        });
-        
-       /*if (!isReady || !actualLocation || isShowingSummary) {
-            console.log("useEffect early return - conditions not met");
+    useEffect(() => {  
+       if (!isReady || isShowingSummary) {
             return;
-        }*/
+        }
         
-        console.log("Calling fetchData from useEffect");
-        isMounted = true;
+        isMounted.current = true;
         fetchData();
         
         return () => {
-            isMounted = false;
+            isMounted.current = false;
         };
-    }, [actualLocation, isReady, activeSearchParams, isShowingSummary, page, pageSize]);
+    }, [isReady, activeSearchParams, isShowingSummary, page, pageSize]);
 
     // Cuando se cambian los filtros o la ubicación, volver a la primera página
     useEffect(() => {
         setPage(0);
-    }, [actualLocation, activeSearchParams, isShowingSummary]);
+    }, [activeSearchParams, isShowingSummary]);
 
     const {
         items: stock,
@@ -298,8 +295,6 @@ export default function StockView() {
                         expiration_date: item.expiration_date ? new Date(item.expiration_date).toLocaleDateString() : ''
                     };
                 });
-                console.log("Stock from server:: ",stock);
-                console.log("Stock to display:: ",displayStock);
         }
 
         items = transformToItems(displayStock, "id", ["producto", "amount", "unit", "lot_number", "expiration_date"]).map((item) => {
@@ -333,7 +328,7 @@ export default function StockView() {
 
     const handleSearch = () => {
         // Si hay algún filtro aplicado, mostrar stock específico
-        const hasFilters = searchParams.productId || searchParams.lotNumber || searchParams.expirationAfter || searchParams.expirationBefore;
+        const hasFilters = searchParams.actualLocation || searchParams.productId || searchParams.lotNumber || searchParams.expirationAfter || searchParams.expirationBefore;
         
         if (hasFilters) {
             setActiveSearchParams(searchParams);
@@ -346,20 +341,20 @@ export default function StockView() {
 
     const handleShowSummary = () => {
         setIsShowingSummary(true);
-        setActiveSearchParams({
-            productId: "",
-            lotNumber: "",
-            expirationBefore: "",
-            expirationAfter: ""
-        });
         setSearchParams({
+            actualLocation: "",
             productId: "",
             lotNumber: "",
             expirationBefore: "",
             expirationAfter: ""
         });
-        // Limpiar también la selección de ubicación para mostrar resumen total
-        setActualLocation("");
+        setActiveSearchParams({
+            actualLocation: "",
+            productId: "",
+            lotNumber: "",
+            expirationBefore: "",
+            expirationAfter: ""
+        });
     };
 
     // Handler para cambio de página
@@ -411,7 +406,7 @@ export default function StockView() {
                             <Autocomplete
                                 disablePortal
                                 options={options}
-                                value={actualLocation ? options.find(option => option.label === locations.find(l => l.id === actualLocation)?.name) || null : null}
+                                value={searchParams.actualLocation ? options.find(option => option.label === locations.find(l => l.id === searchParams.actualLocation)?.name) || null : null}
                                 renderInput={(params) => (
                                     <TextField
                                         {...params}
@@ -420,18 +415,10 @@ export default function StockView() {
                                     />
                                 )}
                                 onChange={(e, newValue) => {
-                                    if (newValue) {
-                                        const selectedLocation = locations.find(l => l.name === newValue.label);
-                                        if (selectedLocation) {
-                                            setActualLocation(selectedLocation.id);
-                                            // Al cambiar ubicación, mostrar stock específico de esa ubicación
-                                            setIsShowingSummary(false);
-                                        }
-                                    } else {
-                                        // Si se limpia la selección, volver al resumen
-                                        setActualLocation("");
-                                        setIsShowingSummary(true);
-                                    }
+                                    setSearchParams(prev => ({
+                                        ...prev,
+                                        actualLocation: newValue ? locations.find(l => l.name === newValue.label)?.id || "" : ""
+                                    }));
                                 }}
                                 sx={{ width: '100%' }}
                             />
@@ -463,10 +450,12 @@ export default function StockView() {
                             <TextField
                                 label="Número de Lote"
                                 value={searchParams.lotNumber}
-                                onChange={(e) => setSearchParams(prev => ({
-                                    ...prev,
-                                    lotNumber: e.target.value
-                                }))}
+                                onChange={(e) => {
+                                    setSearchParams(prev => ({
+                                        ...prev,
+                                        lotNumber: e.target.value
+                                    }));
+                                }}
                                 sx={{...customInputSx, width: '100%'}}
                             />
                         </Grid>
@@ -475,10 +464,12 @@ export default function StockView() {
                                 label="Vencimiento Desde"
                                 type="date"
                                 value={searchParams.expirationAfter}
-                                onChange={(e) => setSearchParams(prev => ({
-                                    ...prev,
-                                    expirationAfter: e.target.value
-                                }))}
+                                onChange={(e) => {
+                                    setSearchParams(prev => ({
+                                        ...prev,
+                                        expirationAfter: e.target.value
+                                    }));
+                                }}
                                 InputLabelProps={{ shrink: true }}
                                 sx={{...customInputSx, width: '100%'}}
                             />
@@ -488,10 +479,12 @@ export default function StockView() {
                                 label="Vencimiento Hasta"
                                 type="date"
                                 value={searchParams.expirationBefore}
-                                onChange={(e) => setSearchParams(prev => ({
-                                    ...prev,
-                                    expirationBefore: e.target.value
-                                }))}
+                                onChange={(e) => {
+                                    setSearchParams(prev => ({
+                                        ...prev,
+                                        expirationBefore: e.target.value
+                                    }));
+                                }}
                                 InputLabelProps={{ shrink: true }}
                                 sx={{...customInputSx, width: '100%'}}
                             />
@@ -524,7 +517,7 @@ export default function StockView() {
                         <h3 className={styles.informationText}>
                             {isShowingSummary 
                                 ? "Stock total disponible" 
-                                : `Stock disponible en locación: ${locations.find(l => l.id === actualLocation)?.name}`
+                                : `Stock disponible en locación: ${locations.find(l => l.id === activeSearchParams.actualLocation)?.name}`
                             }
                         </h3>
                     </div>
@@ -538,7 +531,7 @@ export default function StockView() {
                         onSelectSingleItem={isShowingSummary ? handleSummaryItemClick : (isShowingSummary ? undefined : handleItemClick)}
                     />
                     {/* Paginación solo para stock específico */}
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
                         <Pagination
                             count={totalPages}
                             page={page + 1}
@@ -561,7 +554,7 @@ export default function StockView() {
                             </TextField>
                         </Box>
                         <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                            Mostrando {pageSize} de {totalElements} elementos
+                            Mostrando {pageElements} de {totalElements} elementos
                         </Typography>
                     </Box>
                     

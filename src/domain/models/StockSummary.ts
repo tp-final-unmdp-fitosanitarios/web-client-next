@@ -10,7 +10,7 @@ export interface StockSummary {
 
 type StockLineItem = {
     amount: number;
-    lotNumber: string;
-    locationName: string;
-    expirationDate: Date
+    lot_number: string;
+    location_name: string;
+    expiration_date: Date;
 }
