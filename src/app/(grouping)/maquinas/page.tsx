@@ -12,6 +12,7 @@ import { Maquina } from "@/domain/models/Maquina";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
+import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
 const buttons = [{ label: "Agregar", path: "/maquinas/agregar" }];
 
 export default function MaquinasView() {
@@ -22,16 +23,27 @@ export default function MaquinasView() {
   const [maquinasFromServer, setMaquinasFromServer] = useState<Maquina[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
+  const [page, setPage] = useState(0); // Página actual (0-indexed)
+  const [pageSize, setPageSize] = useState(10); // Tamaño de página
+  const [totalPages, setTotalPages] = useState(0);
+  const [totalElements, setTotalElements] = useState(0);
+  const [pageElements, setPageElements] = useState(0);
 
   useEffect(() => {
     const fetchMaquinas = async () => {
       try {
+        const queryParams = new URLSearchParams();
+        queryParams.append('page', page.toString());
+        queryParams.append('size', pageSize.toString());
         const response = await withLoading(
-          apiService.get<ResponseItems<Maquina>>('machines'),
+          apiService.get<ResponseItems<Maquina>>(`machines?${queryParams.toString()}`),
           "Cargando máquinas..."
         );
         if (response.success) {
           setMaquinasFromServer(response.data.content);
+          setTotalPages(response.data.total_pages || 0);
+          setTotalElements(response.data.total_elements || 0);
+          setPageElements(response.data.number_of_elements || 0);
         } else {
           setError(response.error || "Error al obtener las máquinas");
         }
@@ -42,7 +54,17 @@ export default function MaquinasView() {
       }
     };
     fetchMaquinas();
-  }, []);
+  }, [page, pageSize]);
+
+  // Handler para cambio de página
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value - 1); // MUI Pagination es 1-indexed
+  };
+  // Handler para cambio de tamaño de página
+  const handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const {
     items: maquinas,
@@ -108,15 +130,44 @@ export default function MaquinasView() {
       <h1 className={styles.title}>Máquinas</h1>
 
       {items.length > 0 ? (
-        <ItemList
-          items={items}
-          displayKeys={campos}
-          onSelect={toggleSelectItem}
-          selectedIds={selectedIds}
-          selectItems={true}
-          deleteItems={false}
-          selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
-        />
+        <>
+          <ItemList
+            items={items}
+            displayKeys={campos}
+            onSelect={toggleSelectItem}
+            selectedIds={selectedIds}
+            selectItems={true}
+            deleteItems={false}
+            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
+          />
+          {/* Paginación */}
+          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
+            <Pagination
+              count={totalPages}
+              page={page + 1}
+              onChange={handlePageChange}
+              color="primary"
+              size="large"
+            />
+            <Box sx={{ mt: 1 }}>
+              <TextField
+                select
+                label="Elementos por página"
+                value={pageSize}
+                onChange={handlePageSizeChange}
+                sx={{ width: 180 }}
+                size="small"
+              >
+                {[5, 10, 20, 50].map((size) => (
+                  <MenuItem key={size} value={size}>{size}</MenuItem>
+                ))}
+              </TextField>
+            </Box>
+            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+              Mostrando {pageElements} de {totalElements} elementos
+            </Typography>
+          </Box>
+        </>
       ) : (
         <p style={{textAlign: "center"}}>No hay máquinas disponibles</p>
       )}

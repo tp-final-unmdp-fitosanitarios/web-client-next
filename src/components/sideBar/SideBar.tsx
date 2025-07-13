@@ -84,7 +84,7 @@ export default function SideBar() {
       <Divider />
       <p className={styles.userData}>Navegacion </p>
       <List>
-        {['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadísticas'].map((text, index) => (
+        {['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadisticas'].map((text, index) => (
           <ListItem key={text} disablePadding>
             <NavigationLink href={`/${text.toLowerCase()}`} className={styles.link}>
               <ListItemButton className={styles.listItemButton}>

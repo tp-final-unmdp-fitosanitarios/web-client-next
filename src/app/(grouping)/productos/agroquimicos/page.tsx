@@ -14,6 +14,7 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { useRouter } from "next/navigation";
+import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
 
 
 const buttons = [{ label: "Agregar", path: "agroquimicos/agregar" }];
@@ -28,6 +29,23 @@ export default function AgroquimicosView() {
     const { withLoading } = useLoading();
     const apiService = getApiService();
     const router = useRouter();
+
+    // Estados de paginación
+    const [page, setPage] = useState(0); // Página actual (0-indexed)
+    const [pageSize, setPageSize] = useState(10); // Tamaño de página
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageElements, setPageElements] = useState(0);
+
+    // Handler para cambio de página
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value - 1); // MUI Pagination es 1-indexed
+    };
+    // Handler para cambio de tamaño de página
+    const handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setPageSize(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
     // Debounce search input
     useEffect(() => {
@@ -47,7 +65,8 @@ export default function AgroquimicosView() {
             try {
 
                 const queryParams = new URLSearchParams();
-                queryParams.append('size', '100');
+                queryParams.append('page', page.toString());
+                queryParams.append('size', pageSize.toString());
                 if (debouncedSearchName) {
                     queryParams.append('name', debouncedSearchName);
                 }
@@ -57,9 +76,15 @@ export default function AgroquimicosView() {
                 //     "Cargando productos..."
                 // ); // para implementar la busqueda de agroquimicos
 
-                const response = await apiService.get<ResponseItems<Agroquimico>>("/agrochemicals");
+                const response = await withLoading(
+                    apiService.get<ResponseItems<Agroquimico>>(`/agrochemicals?${queryParams.toString()}`),
+                    "Cargando agroquímicos..."
+                );
                 if (response.success && isMounted) {
                     setAgroquimicosFromServer(response.data.content);
+                    setTotalPages(response.data.total_pages || 0);
+                    setTotalElements(response.data.total_elements || 0);
+                    setPageElements(response.data.number_of_elements || 0);
                 } else if (isMounted) {
                     setError(response.error || "Error al obtener los agroquímicos");
                 }
@@ -78,7 +103,7 @@ export default function AgroquimicosView() {
         return () => {
             isMounted = false;
         };
-    }, [isReady]);
+    }, [isReady, page, pageSize]);
 
     const {
         items: agroquimicos,  
@@ -173,16 +198,44 @@ export default function AgroquimicosView() {
 
             
                 {items.length > 0 ? (
-                    <ItemList
-                        items={items}
-                        displayKeys={campos}
-                        onSelect={toggleSelectItem}
-                        selectedIds={selectedIds}
-                        selectItems={true}
-                        deleteItems={true}
-                        onDelete={handleDeleteSingleItem}
-                        selectSingleItem={false}
-                    />
+                    <>
+                        <ItemList
+                            items={items}
+                            displayKeys={campos}
+                            onSelect={toggleSelectItem}
+                            selectedIds={selectedIds}
+                            selectItems={true}
+                            deleteItems={false}
+                            selectSingleItem={false}
+                        />
+                        {/* Paginación */}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
+                            <Pagination
+                                count={totalPages}
+                                page={page + 1}
+                                onChange={handlePageChange}
+                                color="primary"
+                                size="large"
+                            />
+                            <Box sx={{ mt: 1 }}>
+                                <TextField
+                                    select
+                                    label="Elementos por página"
+                                    value={pageSize}
+                                    onChange={handlePageSizeChange}
+                                    sx={{ width: 180 }}
+                                    size="small"
+                                >
+                                    {[5, 10, 20, 50].map((size) => (
+                                        <MenuItem key={size} value={size}>{size}</MenuItem>
+                                    ))}
+                                </TextField>
+                            </Box>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                Mostrando {pageElements} de {totalElements} elementos
+                            </Typography>
+                        </Box>
+                    </>
                 ) : (
                     <p>No hay agroquímicos disponibles</p>
                 )}

@@ -12,6 +12,7 @@ import { useLoading } from "@/hooks/useLoading";
 import { Locacion } from '@/domain/models/Locacion';
 import { Producto } from '@/domain/models/Producto';
 import NavigationLink from '@/components/NavigationLink/NavigationLink';
+import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 
 export default function AplicacionesPage() {
     const { getApiService, isReady } = useAuth();
@@ -23,15 +24,29 @@ export default function AplicacionesPage() {
     const [productos,setProductos] = useState<Producto[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [error, setError] = useState<string>("");
+    const [status, setStatus] = useState<string>(EstadoAplicacion.Pendiente);
+    const [page, setPage] = useState(0); // Página actual (0-indexed)
+    const [pageSize, setPageSize] = useState(10); // Tamaño de página
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageElements, setPageElements] = useState(0);
 
     const fetchAplicaciones = async () => {
       try {
+          const queryParams = new URLSearchParams();
+          queryParams.append('status', status);
+          queryParams.append('page', page.toString());
+          queryParams.append('size', pageSize.toString());
           const response = await withLoading(
-            apiService.get<ResponseItems<Aplicacion>>('applications'),
+            apiService.get<ResponseItems<Aplicacion>>(`applications?${queryParams.toString()}`),
             "Cargando aplicaciones..."
           );
+          console.log(response);
           if (response.success) {
               setAplicaciones(response.data.content);
+              setTotalPages(response.data.total_pages || 0);
+              setTotalElements(response.data.total_elements || 0);
+              setPageElements(response.data.number_of_elements || 0);
           } else {
             setError(response.error || "Error al obtener las aplicaciones");
           }
@@ -90,8 +105,22 @@ export default function AplicacionesPage() {
   useEffect(() => {
       if (!isReady) return;
 
-      fetchData();
-  }, [isReady]);
+      if(locaciones.length>0 && productos.length>0 && aplicaciones.length>0)
+        fetchAplicaciones();
+      else
+        fetchData();
+
+  }, [isReady, page, pageSize,status]);
+
+  // Handler para cambio de página
+  const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+    setPage(value - 1); // MUI Pagination es 1-indexed
+  };
+  // Handler para cambio de tamaño de página
+  const handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+    setPageSize(parseInt(event.target.value, 10));
+    setPage(0);
+  };
 
   const buttons = [
     { label: "Crear", path: "/aplicaciones/crear" },
@@ -105,7 +134,19 @@ export default function AplicacionesPage() {
               <MenuBar showMenu={true} path="" />
               <h1 className={styles.title}>Aplicaciones</h1>
               <div className={styles.content}>
-                  <AplicacionesTabs aplicaciones={aplicaciones} productos={productos} locaciones={locaciones}/>
+                  <AplicacionesTabs
+                    aplicaciones={aplicaciones}
+                    productos={productos}
+                    locaciones={locaciones}
+                    page={page}
+                    pageSize={pageSize}
+                    totalPages={totalPages}
+                    totalElements={totalElements}
+                    pageElements={pageElements}
+                    onPageChange={handlePageChange}
+                    onPageSizeChange={handlePageSizeChange}
+                    changeStatus={setStatus}
+                  />
               </div>
               <div className={styles.buttonContainer}>
                 {buttons.map((button, index) => (

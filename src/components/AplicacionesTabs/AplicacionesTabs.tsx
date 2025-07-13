@@ -21,6 +21,7 @@ import VisibilityIcon from '@mui/icons-material/Visibility';
 import ApplicationDetailModal from './ApplicationDetailModal';
 import { useRouter } from 'next/navigation';
 import { useLoaderStore } from '@/contexts/loaderStore';
+import { Pagination, TextField, MenuItem, Box as MUIBox } from '@mui/material';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -99,9 +100,17 @@ interface AplicacionesTabsProps {
   aplicaciones: Aplicacion[];
   productos: Producto[];
   locaciones: Locacion[];
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  totalElements: number;
+  pageElements: number;
+  onPageChange: (event: React.ChangeEvent<unknown>, value: number) => void;
+  onPageSizeChange: (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
+  changeStatus: (status: string) => void;
 }
 
-export default function AplicacionesTabs({ aplicaciones, productos, locaciones }: AplicacionesTabsProps) {
+export default function AplicacionesTabs({ aplicaciones, productos, locaciones, page, pageSize, totalPages, totalElements, pageElements, onPageChange, onPageSizeChange, changeStatus }: AplicacionesTabsProps) {
   const router = useRouter();
   const [value, setValue] = React.useState(0);
   const { user, isLoading } = useUser();
@@ -122,6 +131,20 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
 
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
+    // Cambiar el estado según el tab seleccionado
+    switch (newValue) {
+      case 0:
+        changeStatus(EstadoAplicacion.Pendiente);
+        break;
+      case 1:
+        changeStatus(EstadoAplicacion.EnCurso);
+        break;
+      case 2:
+        changeStatus(EstadoAplicacion.Finalizada);
+        break;
+      default:
+        changeStatus(EstadoAplicacion.Pendiente);
+    }
   };
 
   const {
@@ -276,6 +299,33 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones }
         aplicacion={aplicacionesToDisplay.find(app => app.id.toString() === selectedAppId) || null}
         productos={productos}
       />
+      {/* Paginación */}
+      <MUIBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
+        <Pagination
+          count={totalPages}
+          page={page + 1}
+          onChange={onPageChange}
+          color="primary"
+          size="large"
+        />
+        <MUIBox sx={{ mt: 1 }}>
+          <TextField
+            select
+            label="Elementos por página"
+            value={pageSize}
+            onChange={onPageSizeChange}
+            sx={{ width: 180 }}
+            size="small"
+          >
+            {[5, 10, 20, 50].map((size) => (
+              <MenuItem key={size} value={size}>{size}</MenuItem>
+            ))}
+          </TextField>
+        </MUIBox>
+        <span style={{ marginTop: 8, color: '#666' }}>
+          Mostrando {pageElements} de {totalElements} elementos
+        </span>
+      </MUIBox>
     </Box>
   );
 } 
