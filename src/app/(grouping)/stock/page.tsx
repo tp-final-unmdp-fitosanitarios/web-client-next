@@ -284,7 +284,7 @@ export default function StockView() {
         // Procesar stock específico
         let displayStock: any[] = [];
         if (stock.length > 0) {
-            displayStock = stock
+            displayStock = stock.filter((item) => item.amount > 0)
                 .map((item) => {
                     return {
                         id: item.id,
