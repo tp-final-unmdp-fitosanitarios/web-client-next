@@ -5,7 +5,7 @@ import { transformToItems } from '@/utilities/transform';
 import styles from "./resumenOperacion.module.scss"
 import { useItemsManager } from '@/hooks/useItemsManager';
 
-const ResumenOperacion = ({open, setModalClose, handleFinish, products, locacion, remito}) => {
+const ResumenOperacion = ({ open, setModalClose, handleFinish, products, locacion, remito }) => {
     const handleSubmit = (e) => {
         handleFinish()
     }
@@ -33,8 +33,8 @@ const ResumenOperacion = ({open, setModalClose, handleFinish, products, locacion
     } = useItemsManager(products);
 
     return (
-        <Modal 
-            open={open} 
+        <Modal
+            open={open}
             onClose={setModalClose}
             aria-labelledby="resumen-operacion-modal"
         >
@@ -44,20 +44,22 @@ const ResumenOperacion = ({open, setModalClose, handleFinish, products, locacion
                     top: '50%',
                     left: '50%',
                     transform: 'translate(-50%, -50%)',
-                    width: { xs: '90%', sm: '500px' },
+                    width: '90vw',
+                    maxWidth: 600,        // Máximo ancho razonable para desktop
+                    minWidth: 300,         // Mínimo ancho para mobile
                     maxHeight: '90vh',
-                    bgcolor: "background.paper",
+                    bgcolor: 'background.paper',
                     boxShadow: 24,
                     p: { xs: 2, sm: 4 },
                     borderRadius: 2,
-                    overflow: 'auto'
+                    overflowY: 'auto',
                 }}
             >
                 <h3 className={styles.title}>Resumen de Operación</h3>
                 <p className={styles.message}>Agregará los siguientes productos y cantidades</p>
-                
+
                 {products.length > 0 ? (
-                    <div style={{ maxHeight: '300px', overflow: 'auto', marginBottom: '20px' }}>
+                    <div className={styles.itemListContainer}>
                         <ItemList
                             items={items}
                             displayKeys={campos}
@@ -83,14 +85,14 @@ const ResumenOperacion = ({open, setModalClose, handleFinish, products, locacion
                 </div>
 
                 <div className={styles.buttonContainer}>
-                    <button 
-                        className={`button ${styles.buttonCancel}`} 
+                    <button
+                        className={`button ${styles.buttonCancel}`}
                         onClick={setModalClose}
-                    > 
+                    >
                         Cancelar
                     </button>
-                    <button 
-                        className={`button ${styles.buttonFinish}`} 
+                    <button
+                        className={`button ${styles.buttonFinish}`}
                         onClick={handleSubmit}
                     >
                         Finalizar
