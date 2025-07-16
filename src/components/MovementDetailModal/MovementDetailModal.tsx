@@ -43,6 +43,10 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
                             <h4>Destino:</h4>
                             <h4>{movement.destination.name}</h4>
                         </div>
+                           <div className={styles.dataPresentation}>
+                            <h4>Fecha:</h4>
+                            <h4>{new Date(movement.created_at).toLocaleDateString()}</h4>
+                        </div>
                     </div>
 
                     <div className={styles.productContainer}>

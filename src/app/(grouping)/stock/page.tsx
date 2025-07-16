@@ -642,7 +642,7 @@ export default function StockView() {
                         ...(((selectedSummaryItem as any).sum || [])
                             .filter((lote: any) => lote.amount > 0)
                             .map((lote: any) =>
-                                `Lote: ${lote.lot_number} | Cantidad: ${lote.amount} ${selectedSummaryItem.unit} | Vencimiento: ${lote.expiration_date ? new Date(lote.expiration_date).toLocaleDateString() : "-"}`
+                                `Lote de producto: ${lote.lot_number} | Ubicacion: ${lote.location_name} | Cantidad: ${lote.amount} ${selectedSummaryItem.unit} | Vencimiento: ${lote.expiration_date ? new Date(lote.expiration_date).toLocaleDateString() : "-"  }`
                             ))
                     ].join('\n')}
                     buttonTitle="Cerrar"
