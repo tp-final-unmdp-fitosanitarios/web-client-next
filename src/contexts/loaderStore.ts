@@ -13,5 +13,5 @@ export const useLoaderStore = create<LoaderStore>((set) => ({
   isLoading: false,
   text: 'Cargando...',
   showLoader: (text = 'Cargando...') => set({ isLoading: true, text }),
-  hideLoader: () => set({ isLoading: false }),
-})); 
+  hideLoader: () => set({ isLoading: false, text: '' }),
+}));

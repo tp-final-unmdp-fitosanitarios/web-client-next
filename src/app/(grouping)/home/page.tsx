@@ -6,9 +6,18 @@ import HomepageJerarquico from "../../../components/homepageJerarquico/HomepageJ
 import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador";
 import { useUser } from "@/hooks/useUser";
 import Footer from "@/components/Footer/Footer";
+import { useLoading } from "@/hooks/useLoading";
+import { useEffect } from "react";
 
 export default function Home() {
   const { user, isLoading} = useUser();
+  const { hideLoader } = useLoading();
+
+useEffect(() => {
+  if (user && !isLoading) {
+    hideLoader(); // Apagar el loader cuando ya cargó todo
+  }
+}, [user, isLoading]);
 
   // Mostrar loader mientras se carga el usuario o si no está autenticado
   if(isLoading || !user)
