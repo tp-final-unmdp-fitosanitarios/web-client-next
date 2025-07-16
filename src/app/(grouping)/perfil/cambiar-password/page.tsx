@@ -13,7 +13,7 @@ import styles from './cambiarPassword.module.scss';
 export default function CambiarPasswordPage() {
   const title = 'Cambiar Contraseña';
   const router = useRouter();
-  const { getApiService, user } = useAuth();
+  const { getApiService } = useAuth();
   const apiService = getApiService();
   const [modalOpen, setModalOpen] = useState(false);
   const [modalError, setModalError] = useState(false);
@@ -26,13 +26,13 @@ export default function CambiarPasswordPage() {
 
   const handleFormSubmit = async (inputData: Record<string, string | string[]>) => {
     const payload = {
-      current_password: String(inputData.current_password),
-      new_password: String(inputData.new_password),
-      confirm_password: String(inputData.confirm_password)
+      currentPassword: String(inputData.current_password),
+      newPassword: String(inputData.new_password),
+      confirmPassword: String(inputData.confirm_password)
     };
 
     try {
-      const response = await apiService.update('/users/change-password', user?.id || '', payload);
+      const response = await apiService.updateDirect('/users/change-password', payload);
       console.log('Response:', response);
       if (response.success && response.status === 200) {
         handleOpenModal(false);

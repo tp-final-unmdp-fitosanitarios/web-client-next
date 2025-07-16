@@ -117,6 +117,14 @@ class ApiService {
     return this.request<T>({ endpoint, id, method: "PUT", data, ...options });
   }
 
+async updateDirect<T>(
+  endpoint: string,
+  data: any,
+  options: Partial<ApiOptions> = {}
+): Promise<ApiResponse<T>> {
+  return this.request<T>({ endpoint, method: "PUT", data, ...options });
+}
+
   async patch<T>(
     endpoint: string,
     id: number | string,
