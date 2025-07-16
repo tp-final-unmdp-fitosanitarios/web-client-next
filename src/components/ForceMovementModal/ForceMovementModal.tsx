@@ -4,6 +4,8 @@ import styles from "./ForceMovementModal.module.scss";
 
 interface Props {
     open: boolean;
+    origen: string|null;
+    destino: string|null;
     setModalClose: () => void;
     stockToMove: (Stock & {flag: string, cantidad: number})[];
     actualStock: Stock[];

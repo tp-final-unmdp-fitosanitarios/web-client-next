@@ -11,6 +11,7 @@ import styles from "./agregarStock.module.scss"
 import { Box, Modal, Step, StepLabel, Stepper } from '@mui/material';
 import VisibilityIcon from '@mui/icons-material/Visibility';
 import ClearIcon from '@mui/icons-material/Clear';
+import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import Link from 'next/link';
 import ItemList from '@/components/itemList/ItemList';
 import { transformToItems } from '@/utilities/transform';
@@ -24,7 +25,9 @@ import { ResponseItems } from '@/domain/models/ResponseItems';
 import { useAuth } from '@/components/Auth/AuthProvider';
 import Footer from '@/components/Footer/Footer';
 import GenericModal from '@/components/modal/GenericModal';
+import CameraCapture from '@/components/CameraCapture/CameraCapture';
 import Image from 'next/image';
+import { Proveedor } from '@/domain/models/Proveedor';
 
 type ProductoAAgregar = {
     id: string;
@@ -43,6 +46,7 @@ const AgregarStockPage: React.FC = () => {
     const [remito, setRemito] = useState<any>(null);
     const [productosExistentes, setProductosExistentes] = useState<Producto[]>([]);
     const [locations, setLocations] = useState<Locacion[]>([]);
+    const [providers, setProviders] = useState<Proveedor[]>([]);
     const [productosAAgregar, setProductosAAgregar] = useState<ProductoAAgregar[]>([]);
     const [addProductModalOpen, setAddProductModalOpen] = useState(false);
     const [finishModalOpen, setFinishModalOpen] = useState(false);
@@ -51,6 +55,7 @@ const AgregarStockPage: React.FC = () => {
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [fileBase64, setFileBase64] = useState<string | null>(null);
     const [isPreviewOpen, setIsPreviewOpen] = useState(false);
+    const [isCameraOpen, setIsCameraOpen] = useState(false);
     const [activeStep, setActiveStep] = useState(0);
 
     const { getApiService, isReady } = useAuth();
@@ -184,22 +189,38 @@ const AgregarStockPage: React.FC = () => {
         }
     }
 
+    const fetchProviders = async () => {
+      try {
+          const response = await apiService.get<ResponseItems<Proveedor>>("/providers");
+          const providers = response.data.content;
+          console.log("providers", providers);
+
+          return providers;
+      }
+      catch (e: any) {
+          console.log(e.message);
+          return []; //Aca puede caer por falta de conexion o forbbiden. Chequear como lo manejamos
+      }
+  }
+
     useEffect(() => {
         if (!isReady) return;
         const fetchData = async () => {
-            const [prods, locs] = await Promise.all([fetchProductos(), fetchLocations()]);
+            const [prods, locs, provs] = await Promise.all([fetchProductos(), fetchLocations(), fetchProviders()]);
             setProductosExistentes(prods);
             setLocations(locs);
+            setProviders(provs);
         };
         fetchData();
     }, [isReady])
 
-    const handleFormSubmit = (inputData: Record<string, string>) => {  //TODO: Cambiar logica para ver los campos del form en tiempo real
+    const handleFormSubmit = (inputData: Record<string, string>) => {
         setRemito({
             campo: String(inputData.campo),
             cantProductos: inputData.cantProductos,
             archivo: selectedFile?.name,
-            fecha: new Date()
+            fecha: new Date(),
+            provider: String(inputData.provider)
         });
         setActiveStep(1);
     };
@@ -207,7 +228,8 @@ const AgregarStockPage: React.FC = () => {
     const isFormValid = (formData: Record<string, string>) => {
         return formData.nroRemito && 
                formData.campo && 
-               formData.cantProductos && 
+               formData.cantProductos &&
+               formData.provider &&
                selectedFile !== null;
     };
 
@@ -220,7 +242,10 @@ const AgregarStockPage: React.FC = () => {
 
     const handleFinish = () => {
         const loc = locations?.find((l) => l.name === remito.campo)?.id;
+        const prov = providers?.find((p) => p.name === remito.provider)?.id;
+        
         if (!loc) throw new Error("No se encontro la ubicación");
+        if (!prov) throw new Error("No se encontro el proveedor");
 
         const addStockRequest = {
             company_id: 1,
@@ -265,8 +290,9 @@ const AgregarStockPage: React.FC = () => {
     const fields = useMemo<Field[]>(() => [
         { name: "nroRemito", label: "Numero de Remito", type: "text" },
         { name: "campo", label: "Ubicación", type: "select", options: locations ? Array.from(new Set(locations.map((l) => l.name))).sort() : [] },
+        { name: "provider", label: "Proveedor", type: "select", options: Array.isArray(providers) ? Array.from(new Set(providers.map((p) => p.name))).sort() : [] },
         { name: "cantProductos", label: "Cantidad de Productos", type: "number" },
-    ], [locations]);
+    ], [locations, providers]);
 
     const items = transformToItems(productosAAgregar, "id", ["name", "size", "unit", "amount_of_units", "total_amount"]).map((item) => {
         if (item.amount_of_units !== "null") {
@@ -284,14 +310,6 @@ const AgregarStockPage: React.FC = () => {
     });
 
     const campos = ["display"];
-
-    const buttons = [
-        { label: "Cancelar", path: "/stock" },
-        { label: "Mover", path: "/stock/mover" },
-        { label: "Retirar", path: "/stock/retirar" },
-        { label: "Ver Movimientos", path: "/stock/movimientos" },
-        { label: "Proveedores", path: "/stock/proveedores" },
-    ];
 
     const {
         selectedIds,
@@ -311,6 +329,23 @@ const AgregarStockPage: React.FC = () => {
         router.push("/stock");
     }
 
+    const handleCameraCapture = (base64Data: string, fileName: string) => {
+        // Create a File object from the base64 data
+        const byteCharacters = atob(base64Data);
+        const byteNumbers = new Array(byteCharacters.length);
+        for (let i = 0; i < byteCharacters.length; i++) {
+            byteNumbers[i] = byteCharacters.charCodeAt(i);
+        }
+        const byteArray = new Uint8Array(byteNumbers);
+        const blob = new Blob([byteArray], { type: 'image/jpeg' });
+        const file = new File([blob], fileName, { type: 'image/jpeg' });
+        
+        handleFileSelect(file);
+    };
+
+    const handleOpenCamera = () => {
+        setIsCameraOpen(true);
+    };
 
     return (
     <div className="page-container">
@@ -361,6 +396,13 @@ const AgregarStockPage: React.FC = () => {
                   >
                     {selectedFile ? "Cambiar" : "Seleccionar"}
                   </label>
+                  <button
+                    type="button"
+                    className={`${styles.button} ${styles.buttonCamera}`}
+                    onClick={handleOpenCamera}
+                  >
+                    <CameraAltIcon />
+                  </button>
                 </div>
               </div>
               {selectedFile && (
@@ -454,6 +496,12 @@ const AgregarStockPage: React.FC = () => {
         limite={remito?.cantProductos}
       />
     )}
+
+    <CameraCapture
+      isOpen={isCameraOpen}
+      onClose={() => setIsCameraOpen(false)}
+      onCapture={handleCameraCapture}
+    />
 
     <GenericModal
       isOpen={confirmationModalOpen}

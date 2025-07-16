@@ -72,25 +72,45 @@ export default function CultivosPage() {
       <div className="content-wrap">
         <MenuBar showMenu={true} showArrow={true} path="home" />
         <div className={styles.titleContainer}>
-          <Typography 
-            variant={isMobile ? "h5" : "h4"} 
+          <Typography
+            variant={isMobile ? "h5" : "h4"}
             className={styles.title}
           >
             Cultivos
           </Typography>
         </div>
+  
         {loading ? (
           <Box display="flex" justifyContent="center" alignItems="center" minHeight="400px">
             <CircularProgress />
           </Box>
+        ) : isMobile ? (
+          // Vista mobile como cards
+          <Box className={styles.cardsContainer}>
+            {crops
+              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+              .map((crop, index) => (
+                <Paper key={index} className={styles.card}>
+                  <Typography><strong>Cultivo:</strong> {crop.crop_name}</Typography>
+                  <Typography><strong>Nro:</strong> {crop.crop_number}</Typography>
+                  <Typography><strong>Fin de Siembra:</strong> {crop.end_of_sowing}</Typography>
+                  <Typography><strong>Lote:</strong> {crop.lot_name}</Typography>
+                  <Typography><strong>Campo:</strong> {crop.field_name}</Typography>
+                  <Typography><strong>Variedad:</strong> {crop.variety}</Typography>
+                  <Typography><strong>Superficie:</strong> {crop.surface}</Typography>
+                </Paper>
+              ))}
+          
+          </Box>
         ) : (
+          // Vista desktop como tabla
           <TableContainer component={Paper} className={styles.tableContainer}>
             <Table className={styles.table}>
               <TableHead className={styles.tableHead}>
                 <TableRow>
-                  <TableCell>Nombre del Cúltivo</TableCell>
-                  <TableCell>Fin de Siembra</TableCell>
+                  <TableCell>Nombre del Cultivo</TableCell>
                   <TableCell>Número de Cultivo</TableCell>
+                  <TableCell>Fin de Siembra</TableCell>
                   <TableCell>Nombre del Lote</TableCell>
                   <TableCell>Nombre del Campo</TableCell>
                   <TableCell>Variedad</TableCell>
@@ -103,8 +123,8 @@ export default function CultivosPage() {
                   .map((crop, index) => (
                     <TableRow key={index} className={styles.tableRow}>
                       <TableCell className={styles.tableCell}>{crop.crop_name}</TableCell>
-                      <TableCell className={styles.tableCell}>{crop.end_of_sowing}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.crop_number}</TableCell>
+                      <TableCell className={styles.tableCell}>{crop.end_of_sowing}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.lot_name}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.field_name}</TableCell>
                       <TableCell className={styles.tableCell}>{crop.variety}</TableCell>
@@ -128,4 +148,5 @@ export default function CultivosPage() {
       <Footer />
     </div>
   );
+  
 } 

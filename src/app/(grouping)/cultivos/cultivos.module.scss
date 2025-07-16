@@ -1,70 +1,118 @@
-@use '../../styles/variables' as *;
+  @use '../../styles/variables' as *;
 
-.titleContainer {
-  margin: 3rem 2rem 2rem 2rem;
-}
-
-.title {
-  font-size: 1.5rem;
-  font-weight: 600;
-  color: $dark-color;
-  text-align: center;
-}
-
-.tableContainer {
-  background-color: white;
-  border-radius: $border-radius;
-  box-shadow: $box-shadow;
-  overflow-x: auto;
-  width: 100%;
-  margin: 0 auto;
-  margin-bottom: 2rem;
-}
-
-.table {
-  width: 100%;
-  min-width: 650px;
-}
-
-.tableHead {
-  background-color: $primary-color;
-  
-  th {
-    color: white;
-    font-weight: 600;
-    white-space: nowrap;
-    padding: 0.75rem;
-  }
-}
-
-.tableRow {
-  &:hover {
-    background-color: rgba($primary-color, 0.05);
-  }
-}
-
-.tableCell {
-  padding: 0.75rem;
-  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
-  white-space: nowrap;
-}
-
-@media (min-width: 768px) {
   .titleContainer {
-    margin: 4rem 2rem 3rem 2rem;
+    margin: 3rem 2rem 2rem 2rem;
   }
 
   .title {
-    font-size: 2rem;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $dark-color;
+    text-align: center;
   }
 
   .tableContainer {
-    max-width: 1200px;
+    background-color: white;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    overflow-x: auto;
+    width: 100%;
     margin: 0 auto;
-    margin-bottom: 3rem;
+    margin-bottom: 2rem;
+  }
+
+  .table {
+    width: 100%;
+    min-width: 650px;
+  }
+
+  .tableHead {
+    background-color: $primary-color;
+    
+    th {
+      color: white;
+      font-weight: 600;
+      white-space: nowrap;
+      padding: 0.75rem;
+    }
+  }
+
+  .tableRow {
+    &:hover {
+      background-color: rgba($primary-color, 0.05);
+    }
   }
 
   .tableCell {
-    padding: 1rem;
+    padding: 0.75rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    white-space: nowrap;
   }
-} 
+
+  @media (min-width: 768px) {
+    .titleContainer {
+      margin: 4rem 2rem 3rem 2rem;
+    }
+
+    .title {
+      font-size: 2rem;
+    }
+
+    .tableContainer {
+      max-width: 1200px;
+      margin: 0 auto;
+      margin-bottom: 3rem;
+    }
+
+    .tableCell {
+      padding: 1rem;
+    }
+  } 
+
+  @media (max-width: 600px) {
+    .tableCell {
+      font-size: 0.80rem;
+      padding: 0.35rem 0.5rem;
+      min-width: 90px;
+      max-width: 120px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+  
+    .table {
+      min-width: 540px;
+      width: 100%;
+    }
+
+    .tableContainer {
+      padding: 0.25rem;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      max-width: 100vw;
+    }
+
+    .scroll-message {
+      text-align: center;
+      font-size: 0.8rem;
+      color: #888;
+      margin-bottom: 0.5rem;
+      display: block;
+    }
+  }
+
+  .cardsContainer {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    margin: 1rem;
+  }
+  
+  .card {
+    padding: 1rem;
+    border-radius: $border-radius;
+    box-shadow: $box-shadow;
+    background-color: white;
+    border-left: 4px solid $primary-color;
+  }
+  

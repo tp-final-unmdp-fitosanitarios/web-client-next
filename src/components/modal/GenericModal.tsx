@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import styles from "./GenericModal.module.scss";
 
 export interface ModalProps {
@@ -8,6 +9,7 @@ export interface ModalProps {
   buttonTitle: string;
   showSecondButton?: boolean;
   secondButtonTitle?: string;
+  autoCloseTime?: number;
 }
 
 export default function GenericModal({
@@ -18,9 +20,19 @@ export default function GenericModal({
   buttonTitle,
   showSecondButton,
   secondButtonTitle,
+  autoCloseTime,
 }: ModalProps) {
-  if (!isOpen) return null;
+  useEffect(() => {
+    if (isOpen && autoCloseTime) {
+      const timer = setTimeout(() => {
+        onClose();
+      }, autoCloseTime);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen, autoCloseTime, onClose]);
 
+  if (!isOpen) return null;
 
   const lines = modalText.split("\n");
   const header = lines[0];

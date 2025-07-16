@@ -34,9 +34,16 @@ interface FormularioProps {
 }
 
 export default function Formulario({ fields, onSubmit, onCancel, buttonName, children, equalButtonWidth, isSubmitDisabled }: FormularioProps) {
-  const [formData, setFormData] = useState<Record<string, string>>({});
+  // Initialize formData with proper default values immediately
+  const [formData, setFormData] = useState<Record<string, string>>(() => {
+    return fields.reduce((acc, field) => {
+      const defaultValue = field.defaultValue !== undefined ? String(field.defaultValue) : "";
+      return { ...acc, [field.name]: defaultValue };
+    }, {});
+  });
   const [errors, setErrors] = useState<Record<string, string>>({});
 
+  // Update formData when fields change
   useEffect(() => {
     const initialState: Record<string, string> = fields.reduce((acc, field) => {
       const defaultValue = field.defaultValue !== undefined ? String(field.defaultValue) : "";
@@ -65,7 +72,7 @@ export default function Formulario({ fields, onSubmit, onCancel, buttonName, chi
     const newErrors: Record<string, string> = {};
 
     fields.forEach((field) => {
-      if (!formData[field.name]) {
+      if (!formData[field.name] && field.required) {
         newErrors[field.name] = `El campo "${field.label}" es obligatorio`;
         valid = false;
       }

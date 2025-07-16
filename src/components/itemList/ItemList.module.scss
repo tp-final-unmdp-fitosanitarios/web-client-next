@@ -1,3 +1,4 @@
+@use 'sass:color';
 @use './../../app/styles/variables' as *;
 
 .container {
@@ -6,7 +7,7 @@
   gap: $spacing-small;
   padding: $spacing-medium;
   max-width: 40rem;  /* 600px / 16 = 37.5rem */
-  min-width: 40rem; /* 800px / 16 = 50rem */
+  width: 100%;
   margin: 0 auto;
   background-color: $background-color; // gris claro
   border: 4px solid $dark-color;
@@ -17,7 +18,6 @@
 
 .card {
   display: flex;
-  justify-content:space-between;
   align-items: center;
   background-color: transparent;
   color: $dark-color;
@@ -27,22 +27,21 @@
   cursor: pointer;
   transition: all 0.2s ease-in-out;
   font-size: 18px;
-
-  &:hover {
-    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
-    transform: scale(1.01);
-  }
 }
 
 .selected {
   border: 3px solid $primary-color;
-  background-color: lighten($primary-color, 30%);
+  background-color: color.adjust($primary-color, $lightness: 30%);
 }
 
 .cardContent {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   gap: $spacing-small;
+  flex-grow: 1;
+  min-width: 0;
+  justify-content: flex-start;
+  align-items: center;
 }
 
 .itemField {
@@ -64,6 +63,15 @@
   display: flex;
   align-items: center;
   gap: $spacing-small;
+  justify-content: flex-end;
+  flex-shrink: 0;
+  margin-left: auto;
+}
+
+.dash {
+  margin: 0 8px;
+  color: #444d5e;
+  font-weight: 600;
 }
 
 // Ocultar checkbox si existe en algún remanente
@@ -71,14 +79,81 @@
   display: none;
 }
 
-@media (max-width: 1000px) {
+// Media query específica para centrar elementos entre 450px y 1000px
+@media (min-width: 450px) and (max-width: 800px) {
+  .container {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-small;
+    padding: $spacing-medium;
+    width: 100%;
+    max-width: 90%;
+    margin: 0 auto;
+    background-color: $background-color;
+    border: 4px solid $dark-color;
+    border-radius: 8px;
+    font-family: $font-family-primary; 
+    font-weight: 700;
+    align-items: center;
+  }
 
+  .card {
+    display: flex;
+    background-color: transparent;
+    color: $dark-color;
+    border: 3px solid #999;
+    border-radius: $border-radius;
+    padding: $spacing-small;
+    cursor: pointer;
+    transition: all 0.2s ease-in-out;
+    font-size: 16px;
+    width: 100%;
+    max-width: 400px;
+    text-align: center;
+
+    &:hover {
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+      transform: scale(1.01);
+    }
+  }
+
+  .cardContent {
+    display: flex;
+    flex-direction: column;
+    gap: $spacing-small;
+    align-items: center;
+    text-align: center;
+  }
+
+  .itemField {
+    display: flex;
+    justify-content: center;
+    gap: $spacing-small;
+    text-align: center;
+  }
+
+  .cardActions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: $spacing-small;
+    margin-top: $spacing-small;
+  }
+
+  .selected {
+    border: 3px solid $primary-color;
+    background-color: color.adjust($primary-color, $lightness: 30%);
+  }
+}
+
+@media (max-width: 1000px) {
   .container {
     display: flex;
     flex-direction: column;
     gap: $spacing-small;
     padding: $spacing-small;
-    max-width: 300px;
+    width: 100%;
+    max-width:80%;
     margin: 0 auto;
     background-color: $background-color; // gris claro
     border: 4px solid $dark-color;
@@ -92,12 +167,29 @@
     background-color: lighten($primary-color, 30%);
   }
   
-  .card {
+  .cardContent {
     flex-direction: column;
-    font-size: 16px;
+    align-items: flex-start;
+    text-align: left;
+  }
+
+  .dash {
+    display: none;
   }
 
   .cardActions {
     margin-top: $spacing-small;
+  }
+}
+
+// Extra: para pantallas muy chicas (iPhone SE, etc)
+@media (max-width: 500px) {
+  .container {
+    padding: $spacing-small;
+    max-width: 80%;
+  }
+  .card {
+    font-size: 15px;
+    padding: $spacing-small;
   }
 }

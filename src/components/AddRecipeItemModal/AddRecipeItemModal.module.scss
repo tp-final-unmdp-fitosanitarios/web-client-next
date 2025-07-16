@@ -1,0 +1,91 @@
+@use '../../app/styles/variables' as *;
+
+.title {
+    color: $dark-color;
+    display: flex;
+    justify-content: center;
+    font-size: 1.3rem;
+    margin-bottom: $spacing-medium;
+}
+
+.button {
+    min-width: 30%;
+    max-width: 80%;
+    padding: $spacing-small $spacing-medium;
+    border: none;
+    border-radius: $border-radius;
+    font-weight: $button-font-weight;
+    cursor: pointer;
+    color: $dark-color;
+    margin-top: $spacing-large;
+    font-size: 1rem;
+}
+
+.buttonPrimary {
+    margin-right: $spacing-large;
+    background-color: $primary-color;
+}
+
+.buttonContainer{
+    display: flex;
+    justify-content: center;
+    margin-top: $spacing-large;
+    gap: $spacing-medium;
+}
+
+.buttonCancel{
+    margin-right: $spacing-medium;
+  }
+
+.buttonFinish{
+    margin-left: $spacing-medium;
+  }
+
+.message{
+  text-align: center;
+}
+
+.radioContainer{
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-top: $spacing-large;
+
+  label {
+      font-family: $font-family-primary;
+      font-weight: 700;
+
+  }
+}
+
+.text{
+  text-align: center;
+  font-size: 1rem;
+}
+
+@media (max-width: 600px) {
+  .title {
+    font-size: 1.1rem;
+    margin-bottom: $spacing-small;
+  }
+  .buttonContainer {
+    flex-direction: column;
+    align-items: stretch;
+    gap: $spacing-small;
+  }
+  .button, .buttonCancel, .buttonFinish {
+    min-width: 90%;
+    max-width: 100%;
+    margin: 0 auto;
+    margin-top: $spacing-small;
+    font-size: 1rem;
+  }
+  .text {
+    font-size: 0.95rem;
+    margin-bottom: $spacing-small;
+  }
+  .radioContainer {
+    flex-direction: column;
+    gap: $spacing-small;
+  }
+}

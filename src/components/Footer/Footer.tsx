@@ -11,10 +11,6 @@ const Footer: React.FC = () => {
           © {currentYear} PampaGrow. Todos los derechos reservados.
         </p>
         <div className={styles.footerLinks}>
-          <a href="/about">Acerca de</a>
-          <a href="/privacy">Privacidad</a>
-          <a href="/terms">Términos</a>
-          <a href="/contact">Contacto</a>
         </div>
       </div>
     </footer>

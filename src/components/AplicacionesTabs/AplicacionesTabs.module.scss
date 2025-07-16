@@ -1,0 +1,72 @@
+@use '../../app/styles/variables' as *;
+
+.container {
+    width: 100%;
+    margin: 0 auto;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.tabs {
+    min-height: 48px;
+}
+
+.tab {
+    color: #404e5c;
+    font-weight: 600;
+    font-size: 1rem;
+    text-transform: none;
+    min-height: 48px;
+    padding: 12px 16px;
+
+    &:hover {
+        color: $primary-color;
+        opacity: 0.8;
+    }
+
+    &.Mui-selected {
+        color: $primary-color;
+        font-weight: 700;
+    }
+}
+
+.tabPanel {
+    padding: 24px;
+}
+
+.tabContent {
+    padding: 16px;
+}
+
+.tabText {
+    color: #404e5c;
+    font-size: 1rem;
+    line-height: 1.5;
+}
+
+@media (max-width: 768px) {
+    .container {
+        margin: 0;
+        border-radius: 0;
+        box-shadow: none;
+    }
+
+    .tab {
+        font-size: 0.875rem;
+        padding: 8px;
+        min-height: 40px;
+    }
+
+    .tabPanel {
+        padding: 12px;
+    }
+
+    .tabContent {
+        padding: 8px;
+    }
+
+    .tabText {
+        font-size: 0.875rem;
+    }
+} 

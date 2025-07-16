@@ -19,11 +19,11 @@ import LogoutIcon from '@mui/icons-material/Logout';
 import NavigationLink from '@/components/NavigationLink/NavigationLink';
 import styles from "./sideBar.module.scss";
 import { useAuth } from '../Auth/AuthProvider';
+import { useUser } from '@/hooks/useUser';
 import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
 import EmailIcon from '@mui/icons-material/Email';
 import SettingsIcon from '@mui/icons-material/Settings';
-import { useUserStore } from '@/contexts/userStore';
 
 const userDataIcons = [
   <PersonIcon />,
@@ -39,26 +39,25 @@ const icons = [
   <BarChartIcon />,
 ];
 
-
-
 export default function SideBar() {
   const [open, setOpen] = React.useState(false);
   const { logout } = useAuth();
+  const { user } = useUser();
+  
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
 
-const user = useUserStore(state => state.user)
-
-const userData = {
-  name: user?.first_name + " " + user?.last_name,
-  role: user?.roles[0] || 'Sin rol asignado',
-  email: user?.email || 'Sin email'
-}
+  // Si está cargando o no hay usuario, mostrar datos por defecto
+  const userData = {
+    name: user ? `${user.first_name} ${user.last_name}` : 'Cargando...',
+    role: user?.roles?.[0] || 'Sin rol asignado',
+    email: user?.email || 'Sin email'
+  }
 
   const DrawerList = (
     <Box className={styles.drawerContainer} role="presentation" onClick={toggleDrawer(false)}>
-<p className={styles.userData}>Datos de usuario</p>
+    <p className={styles.userData}>Datos de usuario</p>
       <List>
         {[userData.name, userData.role, userData.email].map((text, index) => (
           <ListItem key={text} disablePadding>
@@ -71,12 +70,12 @@ const userData = {
           </ListItem>
         ))}
         <ListItem disablePadding>
-          <NavigationLink href="/configuracion" className={styles.link}>
+          <NavigationLink href="/perfil" className={styles.link}>
             <ListItemButton className={styles.listItemButton}>
               <ListItemIcon className={styles.icon}>
                 <SettingsIcon />
               </ListItemIcon>
-              <ListItemText primary="Configuración" />
+              <ListItemText primary="Mi Perfil" />
             </ListItemButton>
           </NavigationLink>
         </ListItem>
@@ -85,7 +84,7 @@ const userData = {
       <Divider />
       <p className={styles.userData}>Navegacion </p>
       <List>
-        {['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadísticas'].map((text, index) => (
+        {['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadisticas'].map((text, index) => (
           <ListItem key={text} disablePadding>
             <NavigationLink href={`/${text.toLowerCase()}`} className={styles.link}>
               <ListItemButton className={styles.listItemButton}>

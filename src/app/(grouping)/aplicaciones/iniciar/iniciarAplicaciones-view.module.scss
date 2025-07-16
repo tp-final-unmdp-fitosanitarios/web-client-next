@@ -1,0 +1,89 @@
+@use '../../../styles/variables' as *;
+@use 'sass:color';
+
+.iniciarAplicacionContainer {
+ // max-width: 400px;
+  margin: 0 auto;
+  background: $background-color-2;
+  border-radius: $border-radius;
+  box-shadow: $box-shadow;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.iniciarHeader {
+  font-family: $font-family-primary;
+  font-weight: 700;
+  font-size: 1.5rem;
+  color: $dark-color;
+  margin-bottom: $spacing-large;
+  text-align: center;
+}
+
+.iniciarInfo {
+  font-family: $font-family-primary;
+  font-size: 1rem;
+  color: $dark-color;
+  text-align: center;
+  font-weight: 600;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 5px;
+}
+.iniciarInfo div {
+  margin-bottom: $spacing-small;
+}
+
+.productTitle{
+    display: flex;
+    text-align: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    font-weight: 600;
+    color: $dark-color;
+    margin-bottom: $spacing-large;
+}
+
+.container {
+  flex: 1;
+  overflow-y: auto;
+  margin-bottom: $spacing-large;
+  background: $background-color;
+  border-radius: $border-radius;
+  padding: $spacing-medium;
+  box-shadow: $box-shadow;
+  width: 100%;
+}
+
+.iniciarConfirmButton {
+  width: 100%;
+  padding: $spacing-medium 0;
+  background: $primary-color;
+  color: $dark-color;
+  border: none;
+  border-radius: $border-radius;
+  font-size: 1.1rem;
+  font-family: $font-family-primary;
+  font-weight: $button-font-weight;
+  cursor: pointer;
+  transition: background 0.2s;
+  margin-top: $spacing-small;
+  box-shadow: $box-shadow;
+}
+.iniciarConfirmButton:hover {
+  background: color.adjust($primary-color, $lightness: -10%);
+}
+
+.button{
+  margin: 10px auto;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  padding: 0 20px;
+}

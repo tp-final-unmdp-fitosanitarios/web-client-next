@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /**
  * Ordena un array de strings de forma alfabética
  * @param array Array de strings a ordenar

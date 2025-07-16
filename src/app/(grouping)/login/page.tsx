@@ -12,12 +12,14 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import { useRouter } from 'next/navigation';
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
+import { User } from "@/domain/models/User";
 
 // Forzar que esta página sea dinámica y no se prerenderice en el servidor
 export const dynamic = "force-dynamic";
 
 export default function Login() {
   const [errorReq, setErrorReq] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
   const { getApiService, login } = useAuth();
   const { withLoading, showLoader } = useLoading();
   const fields: Field[] = [
@@ -38,21 +40,46 @@ export default function Login() {
         apiService.create("/auth/login", body),
         "Iniciando sesión..."
       );
-      
-      const { token, user_id } = res.data as { token: string, user_id: string };
-      login(token, user_id);
-      setErrorReq(false);
-      
-      // Mantener el loader durante la navegación
-      showLoader("Cargando página principal...");
-      router.push("/home");
+      if (!res.success) {
+        if (res.status === 401) {
+          setErrorReq(true);
+          setErrorMessage("Credenciales inválidas. Por favor verifica tu email y contraseña.");
+        } else {
+          setErrorReq(true);
+          setErrorMessage("Ocurrió un error. Por favor intenta nuevamente.");
+        }
+        return;
+      }
+      else{
+        const { token, user_id } = res.data as { token: string, user_id: string };
+        
+        // Obtener los datos del usuario inmediatamente después del login
+        try {
+          const userResponse = await apiService.get<User>(`/users/${user_id}`);
+          if (userResponse.success) {
+            console.log("Login successful with user data:", userResponse.data);
+            login(token, user_id, userResponse.data);
+          } else {
+            // Si no se puede obtener el usuario, hacer login solo con token y userId
+            console.log("Login successful without user data");
+            login(token, user_id);
+          }
+        } catch (userError) {
+          console.error("Error obteniendo datos del usuario:", userError);
+          // Continuar con el login aunque falle la obtención del usuario
+          login(token, user_id);
+        }
+        
+        setErrorReq(false);
+        
+        // Pequeño delay para asegurar que los estados se actualicen
+        await new Promise(resolve => setTimeout(resolve, 100));
+        
+        router.push("/home");
+      }
     } catch (e: any) {
-      if (e.response?.status === 401) { 
-        setErrorReq(true);
-      } else {
         console.error("Error en el login:", e);
       }
-    }
   };
 
   return (
@@ -65,7 +92,7 @@ export default function Login() {
             <div className={styles.formContainer}>
               <Formulario fields={fields} onSubmit={log_in} buttonName="Ingresar" />
               {errorReq && (
-                <p className={styles.error}>Usuario y/o contraseña incorrectos.</p>
+                <p className={styles.error}>{errorMessage}</p>
               )}
               <Link className={styles.forgot} href="/forgot">
                 <span>Olvidaste tu contraseña</span>

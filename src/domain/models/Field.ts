@@ -6,5 +6,6 @@ export interface Field {
     onFocus?: () => void; 
     defaultValue?: string | number;
     multiple?: boolean;
+    required?: boolean;
 }
   

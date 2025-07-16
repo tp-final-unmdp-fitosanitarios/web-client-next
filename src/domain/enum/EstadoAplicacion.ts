@@ -1,5 +1,5 @@
 export enum EstadoAplicacion {
-    Pendiente = "Pendiente",
-    EnCurso = "En Curso",
-    Finalizada = "Finalizada"
+    Pendiente = "PENDING",
+    EnCurso = "IN_PROGRESS",
+    Finalizada = "FINISHED"
   }

@@ -1,0 +1,188 @@
+@use '../../app/styles/variables' as *;
+
+.modalContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.modalContent {
+  background-color: #fff;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid #e0e0e0;
+  background-color: #f8f9fa;
+}
+
+.title {
+  color: $dark-color;
+  font-weight: 600;
+  margin: 0;
+}
+
+.closeButton {
+  color: $dark-color;
+  
+  &:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+  }
+}
+
+.cameraContainer {
+  position: relative;
+  width: 100%;
+  height: 300px;
+  background-color: #000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.cameraPlaceholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  
+  .cameraIcon {
+    font-size: 3rem;
+    margin-bottom: 1rem;
+    opacity: 0.7;
+  }
+}
+
+.errorContainer {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
+  text-align: center;
+  padding: 2rem;
+  
+  .errorText {
+    color: #ff6b6b;
+    margin-bottom: 1rem;
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+}
+
+.retryButton {
+  background-color: $primary-color !important;
+  color: $dark-color !important;
+  font-weight: 600 !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 8px !important;
+  font-size: 0.9rem !important;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%) !important;
+  }
+}
+
+.capturedImage {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  background-color: #000;
+}
+
+.buttonContainer {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1.5rem;
+  background-color: #f8f9fa;
+}
+
+.captureButton {
+  background-color: $primary-color !important;
+  color: $dark-color !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 8px !important;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%) !important;
+  }
+  
+  &:disabled {
+    background-color: #ccc !important;
+    color: #666 !important;
+  }
+}
+
+.retakeButton {
+  border: 2px solid $dark-color !important;
+  color: $dark-color !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 8px !important;
+  
+  &:hover {
+    background-color: rgba(64, 78, 92, 0.1) !important;
+  }
+}
+
+.confirmButton {
+  background-color: $primary-color !important;
+  color: $dark-color !important;
+  font-weight: 600 !important;
+  padding: 0.75rem 1.5rem !important;
+  border-radius: 8px !important;
+  
+  &:hover {
+    background-color: darken($primary-color, 10%) !important;
+  }
+}
+
+@media (max-width: 600px) {
+  .modalContent {
+    width: 95%;
+    max-height: 95vh;
+  }
+  
+  .cameraContainer {
+    height: 250px;
+  }
+  
+  .buttonContainer {
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .captureButton,
+  .retakeButton,
+  .confirmButton {
+    width: 100% !important;
+  }
+} 

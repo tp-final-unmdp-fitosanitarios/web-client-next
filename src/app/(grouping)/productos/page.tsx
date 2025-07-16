@@ -14,7 +14,11 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { useRouter } from "next/navigation";
-const buttons = [{ label: "Agregar", path: "/productos/agregar" }];
+import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
+const buttons = [
+    { label: "Agregar", path: "/productos/agregar" },
+    { label: "Agroquímicos", path: "/productos/agroquimicos" },
+];
 
 export default function ProductosView() {
      const [productosFromServer, setProductosFromServer] = useState<Producto[]>([]);
@@ -22,6 +26,11 @@ export default function ProductosView() {
      const [error, setError] = useState<string>("");
      const [searchName, setSearchName] = useState<string>("");
      const [debouncedSearchName, setDebouncedSearchName] = useState<string>("");
+     const [page, setPage] = useState(0); // Página actual (0-indexed)
+     const [pageSize, setPageSize] = useState(10); // Tamaño de página
+     const [totalPages, setTotalPages] = useState(0);
+     const [totalElements, setTotalElements] = useState(0);
+     const [pageElements, setPageElements] = useState(0);
      const { getApiService } = useAuth();
      const { withLoading } = useLoading();
      const apiService = getApiService();
@@ -41,7 +50,8 @@ export default function ProductosView() {
         const fetchProductos = async () => {
             try {
                 const queryParams = new URLSearchParams();
-                queryParams.append('size', '100');
+                queryParams.append('page', page.toString());
+                queryParams.append('size', pageSize.toString());
                 if (debouncedSearchName) {
                     queryParams.append('name', debouncedSearchName);
                 }
@@ -52,6 +62,9 @@ export default function ProductosView() {
                 );
                 if (response.success && isMounted) {
                     setProductosFromServer(response.data.content);
+                    setTotalPages(response.data.total_pages || 0);
+                    setTotalElements(response.data.total_elements || 0);
+                    setPageElements(response.data.number_of_elements || 0);
                 } else if (isMounted) {
                     setError(response.error || "Error al obtener los productos");
                 }
@@ -70,8 +83,22 @@ export default function ProductosView() {
         return () => {
             isMounted = false;
         };
+    }, [debouncedSearchName, page, pageSize]);
+
+    // Cuando se cambian los filtros, volver a la primera página
+    useEffect(() => {
+        setPage(0);
     }, [debouncedSearchName]);
 
+    // Handler para cambio de página
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value - 1); // MUI Pagination es 1-indexed
+    };
+    // Handler para cambio de tamaño de página
+    const handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setPageSize(parseInt(event.target.value, 10));
+        setPage(0);
+    };
 
 
     const {
@@ -146,7 +173,6 @@ export default function ProductosView() {
             <div className="content-wrap">
             <MenuBar showMenu={true} path="" />
             <h1 className={styles.title}>Productos</h1>
-
             <div className={styles.filterContainer}>
                 <input
                     type="text"
@@ -156,13 +182,42 @@ export default function ProductosView() {
                     className={styles.searchInput}
                 />
             </div>
-
+        
             {items.length > 0 ? (
-                <ItemList
-                    items={items}
-                    displayKeys={campos}
-                    onSelect={toggleSelectItem}
-                    selectedIds={selectedIds} selectItems={true} deleteItems={false}  selectSingleItem={false}  />
+                <>
+                    <ItemList
+                        items={items}
+                        displayKeys={campos}
+                        onSelect={toggleSelectItem}
+                        selectedIds={selectedIds} selectItems={true} deleteItems={false}  selectSingleItem={false}  />
+                    {/* Paginación */}
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
+                        <Pagination
+                            count={totalPages}
+                            page={page + 1}
+                            onChange={handlePageChange}
+                            color="primary"
+                            size="large"
+                        />
+                        <Box sx={{ mt: 1 }}>
+                            <TextField
+                                select
+                                label="Elementos por página"
+                                value={pageSize}
+                                onChange={handlePageSizeChange}
+                                sx={{ width: 180 }}
+                                size="small"
+                            >
+                                {[5, 10, 20, 50].map((size) => (
+                                    <MenuItem key={size} value={size}>{size}</MenuItem>
+                                ))}
+                            </TextField>
+                        </Box>
+                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                            Mostrando {pageElements} de {totalElements} elementos
+                        </Typography>
+                    </Box>
+                </>
             ) : (
                 <p>No hay productos disponibles</p>
             )}

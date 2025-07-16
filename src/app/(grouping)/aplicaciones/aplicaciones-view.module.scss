@@ -1,0 +1,65 @@
+@use '../../styles/variables' as *;
+
+.page-container {
+    display: flex;
+    justify-content: center;
+    flex-direction: column;
+    align-items: center;
+    margin: 0;
+    width: 100%;
+    min-height: 100vh;
+}
+
+.title {
+    font-size: 2rem;
+    font-weight: 600;
+    margin: 2rem 0;
+    text-align: center;
+    width: 100%;
+}
+
+.content {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    flex: 1;
+}
+
+@media (max-width: 768px) {
+    .title {
+        font-size: 1.25rem;
+        margin: 1rem 0;
+    }
+
+    .content {
+        padding: 0;
+        width: 100%;
+    }
+} 
+
+.buttonContainer {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px 10px;
+    width: 40%;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 10px;
+    justify-items: center;
+}
+
+@media (max-width: 1000px) {
+    .buttonContainer {
+        margin-top: 0px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 0;
+    }
+
+     .buttonHome {
+         margin-top: 15px;
+     }
+}

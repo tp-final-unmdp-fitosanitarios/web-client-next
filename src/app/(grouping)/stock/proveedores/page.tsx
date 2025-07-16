@@ -14,6 +14,7 @@ import { Producto } from "@/domain/models/Producto";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import ModalConfirmacionEliminacion from "@/components/ModalConfimacionEliminacion/ModalConfirmacionEliminacion";
+import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
 
 const ProvidersPage = () => {
     const { getApiService, isReady } = useAuth();
@@ -28,6 +29,12 @@ const ProvidersPage = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [isDeletingProvider, setIsDeletingProvider] = useState(false);
     const [entityToDelete, setEntityToDelete] = useState<any>({});
+    const [page, setPage] = useState(0); // Página actual (0-indexed)
+    const [pageSize, setPageSize] = useState(5); // Tamaño de página
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageElements, setPageElements] = useState(0);
+    const [addProviderModalOpen, setAddProviderModalOpen] = useState(false); // Nuevo estado para modal de alta
 
     useEffect(() => {
         if (!isReady) return;
@@ -35,18 +42,31 @@ const ProvidersPage = () => {
         let isMounted = true;
         const fetchProviders = async () => {
             try {
+                const queryParams = new URLSearchParams();
+                queryParams.append('page', page.toString());
+                queryParams.append('size', pageSize.toString());
                 const response = await withLoading(
-                    apiService.get<ResponseItems<Proveedor>>("/providers"),
+                    apiService.get<ResponseItems<Proveedor>>(`/providers?${queryParams.toString()}`),
                     "Cargando proveedores..."
                 );
                 if (response.success && isMounted) {
+                    console.log(response.data.content);
                     setProviders(response.data.content);
-                    setSelectedProviderProducts(response.data.content[0].products || []);
-                    setFormData({
-                        name: response.data.content[0].name,
-                        description: response.data.content[0].description,
-                    });
-                    setSelectedId(response.data.content[0].id);
+                    setTotalPages(response.data.total_pages || 0);
+                    setTotalElements(response.data.total_elements || 0);
+                    setPageElements(response.data.number_of_elements || 0);
+                    if (response.data.content.length > 0) {
+                        setSelectedProviderProducts(response.data.content[0].products || []);
+                        setFormData({
+                            name: response.data.content[0].name,
+                            description: response.data.content[0].description,
+                        });
+                        setSelectedId(response.data.content[0].id);
+                    } else {
+                        setSelectedProviderProducts([]);
+                        setFormData({ name: "", description: "" });
+                        setSelectedId("");
+                    }
                 }
             } catch (error) {
                 if (isMounted) {
@@ -59,7 +79,22 @@ const ProvidersPage = () => {
         return () => {
             isMounted = false;
         };
-    }, [isReady]);
+    }, [isReady, page, pageSize]);
+
+    // Cuando se cambian los filtros, volver a la primera página (no hay filtros, pero si se agregan en el futuro)
+    // useEffect(() => {
+    //     setPage(0);
+    // }, [algúnFiltro]);
+
+    // Handler para cambio de página
+    const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
+        setPage(value - 1); // MUI Pagination es 1-indexed
+    };
+    // Handler para cambio de tamaño de página
+    const handlePageSizeChange = (event: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        setPageSize(parseInt(event.target.value, 10));
+        setPage(0);
+    };
     
     const handleSelectSingleItem = (id: string) => {
         const provider = providers.find(provider => provider.id === id);
@@ -92,7 +127,7 @@ const ProvidersPage = () => {
         
         if(addProviderResponse.success){
             const newProvider = addProviderResponse.data
-            setConfirmationModalOpen(true);
+            setAddProviderModalOpen(true); // Mostrar modal de alta
             setProviders([...providers, newProvider]);
         }
     }
@@ -101,11 +136,7 @@ const ProvidersPage = () => {
         setShowAddProvider(true);
     }
 
-    const handleDeleteProduct = (id: string) => {
-        setIsDeletingProvider(false);
-        setEntityToDelete(selectedProviderProducts.find(p => p.id===id));
-        setShowDeleteModal(true);
-    }
+   
 
     const handleConfirmDeleteProduct= () => {
         setShowDeleteModal(false);
@@ -150,15 +181,6 @@ const ProvidersPage = () => {
         setConfirmationModalOpen(false);
     }
 
-    const productItems = transformToItems(selectedProviderProducts, "id", ["name", "unit","amount"]).map((item) => {
-        return {
-            ...item,
-            display: `${item.name} x ${item.amount}${item.unit}`,
-        }; 
-    });
-
-    const productCampos = ["display"];
-
     return (
         <div className="page-container">
             <div className="content-wrap">
@@ -176,6 +198,33 @@ const ProvidersPage = () => {
                             selectSingleItem={true}
                             onSelectSingleItem={handleSelectSingleItem}
                         />
+                        {/* Paginación */}
+                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
+                            <Pagination
+                                count={totalPages}
+                                page={page + 1}
+                                onChange={handlePageChange}
+                                color="primary"
+                                size="large"
+                            />
+                            <Box sx={{ mt: 1 }}>
+                                <TextField
+                                    select
+                                    label="Elementos por página"
+                                    value={pageSize}
+                                    onChange={handlePageSizeChange}
+                                    sx={{ width: 180 }}
+                                    size="small"
+                                >
+                                    {[5, 10, 20, 50].map((size) => (
+                                        <MenuItem key={size} value={size}>{size}</MenuItem>
+                                    ))}
+                                </TextField>
+                            </Box>
+                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
+                                Mostrando {pageElements} de {totalElements} elementos
+                            </Typography>
+                        </Box>
                     </div>
                     <div className={styles.formContainer}>
                         <h2 className={styles.subtitle}>Detalle del Proveedor</h2>
@@ -208,21 +257,6 @@ const ProvidersPage = () => {
                                 <button className={`button button-secondary `} type="submit">
                                     Modificar 
                                 </button>
-                                <div className={styles.productList}>
-                                    <h3 className={styles.productListTitle}>Productos Asociados</h3>
-                                    {productItems.length > 0 ? (
-                                        <ItemList
-                                            items={productItems}
-                                            displayKeys={productCampos}
-                                            selectItems={false}
-                                            deleteItems={true}
-                                            onDelete={handleDeleteProduct}
-                                            selectSingleItem={false}
-                                        />
-                                    ) : (
-                                        <p className={styles.noProducts}>El proveedor no tiene productos asociados</p>
-                                    )}
-                                </div>
                             </div>
                         </form>           
                     </div>
@@ -260,6 +294,15 @@ const ProvidersPage = () => {
                     onClose={handleCloseConfirmationModal}
                     title="Proveedor Modificado"
                     modalText="Se modificó el proveedor correctamente"
+                    buttonTitle="Cerrar"
+                    showSecondButton={false}
+                />
+                {/* Modal para alta de proveedor */}
+                <GenericModal
+                    isOpen={addProviderModalOpen}
+                    onClose={() => setAddProviderModalOpen(false)}
+                    title="Proveedor Creado"
+                    modalText="Se creó el proveedor correctamente."
                     buttonTitle="Cerrar"
                     showSecondButton={false}
                 />

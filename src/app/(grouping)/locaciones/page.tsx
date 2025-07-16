@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import styles from "./locaciones-view.module.scss";
 import Link from "next/link";
@@ -56,7 +57,7 @@ export default function LocacionesView() {
                     "Cargando locaciones..."
                 );
                 if (response.success && isMounted) {
-                    setLocacionesFromServer(response.data);
+                    setLocacionesFromServer(response.data.content);
                     setError("");
                 } else if (isMounted) {
                     setError(response.error || "Error al obtener las locaciones");
