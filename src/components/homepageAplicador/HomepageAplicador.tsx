@@ -29,7 +29,6 @@ export default function HomepageAplicador({user,buttons}:homePageProps) {
             <MenuBar showMenu={true}/>
             <h1>Bienvenido/a</h1>
             <h1>{userName}</h1>
-            {/* <ContenedorDeAplicaciones pestañaActual={pestañaActual}/> */}
             <div className={styles.buttonContainer}>
           {allButtons.map((button, index) => (
             <NavigationLink key={index} href={button.path}>

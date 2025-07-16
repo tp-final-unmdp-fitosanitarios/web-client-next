@@ -4,7 +4,6 @@ import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
 import Tab from '@mui/material/Tab';
-import Typography from '@mui/material/Typography';
 import Box from '@mui/material/Box';
 import styles from './AplicacionesTabs.module.scss';
 import ItemList from '../itemList/ItemList';
@@ -14,7 +13,6 @@ import { transformToItems } from "@/utilities/transform";
 import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
-import { useAuth } from '../Auth/AuthProvider';
 import { useUser } from '@/hooks/useUser';
 import { Roles } from '@/domain/enum/Roles';
 import VisibilityIcon from '@mui/icons-material/Visibility';
@@ -300,7 +298,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
         productos={productos}
       />
       {/* Paginación */}
-      <MUIBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
+      <MUIBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 ,gap: "10px"}}>
         <Pagination
           count={totalPages}
           page={page + 1}

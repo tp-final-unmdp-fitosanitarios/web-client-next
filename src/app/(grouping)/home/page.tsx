@@ -1,17 +1,14 @@
 "use client"; // Indicamos que el componente se ejecuta en el cliente
 
-import { useEffect, useState } from "react";
-import { User } from "@/domain/models/User";
+
 import { Roles } from "@/domain/enum/Roles";
 import HomepageJerarquico from "../../../components/homepageJerarquico/HomepageJerarquico";
 import HomepageAplicador from "@/components/homepageAplicador/HomepageAplicador";
-import { useAuth } from "@/components/Auth/AuthProvider";
 import { useUser } from "@/hooks/useUser";
 import Footer from "@/components/Footer/Footer";
 
 export default function Home() {
-  const { user, isLoading, isReady, isAuthenticated} = useUser();
-  const { getApiService } = useAuth();
+  const { user, isLoading} = useUser();
 
   // Mostrar loader mientras se carga el usuario o si no está autenticado
   if(isLoading || !user)

@@ -7,11 +7,7 @@ import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 
 
-
-interface Props {
-}
-
-const AgregarStockStepper: React.FC<Props> = () => {
+const AgregarStockStepper: React.FC = () => {
 
   const steps = ["Cargar Remito","Agregar Productos", "Confirmar"];
   const [activeStep, setActiveStep] = React.useState(0);

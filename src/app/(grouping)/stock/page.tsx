@@ -284,7 +284,7 @@ export default function StockView() {
         // Procesar stock específico
         let displayStock: any[] = [];
         if (stock.length > 0) {
-            displayStock = stock.filter((item) => item.amount > 0)
+            displayStock = stock
                 .map((item) => {
                     return {
                         id: item.id,
@@ -531,7 +531,7 @@ export default function StockView() {
                         onSelectSingleItem={isShowingSummary ? handleSummaryItemClick : (isShowingSummary ? undefined : handleItemClick)}
                     />
                     {/* Paginación solo para stock específico */}
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
+                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 ,gap: "10px"}}>
                         <Pagination
                             count={totalPages}
                             page={page + 1}

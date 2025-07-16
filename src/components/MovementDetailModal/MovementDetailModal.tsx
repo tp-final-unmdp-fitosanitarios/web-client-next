@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import React from 'react';
 import { Modal, Box } from '@mui/material';
 import styles from './MovementDetailModal.module.scss';

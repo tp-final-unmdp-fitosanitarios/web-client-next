@@ -42,7 +42,7 @@ const icons = [
 export default function SideBar() {
   const [open, setOpen] = React.useState(false);
   const { logout } = useAuth();
-  const { user, isLoading } = useUser();
+  const { user } = useUser();
   
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);

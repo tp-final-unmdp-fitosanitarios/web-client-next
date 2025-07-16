@@ -17,12 +17,6 @@ interface UpdateUserResponse {
   user: User;
 }
 
-const roles = [
-  { value: 'ADMIN', label: 'Administrador' },
-  { value: 'ENGINEER', label: 'Encargado' },
-  { value: 'APPLICATOR', label: 'Aplicador' },
-];
-
 export default function PerfilPage() {
   const title = 'Mi Perfil';
   const router = useRouter();
@@ -136,7 +130,8 @@ export default function PerfilPage() {
     );
   }
 
-  var rol = currentUser?.roles?.[0] || 'Sin rol asignado';
+  let rol = currentUser?.roles?.[0] || 'Sin rol asignado';
+  
   if(rol === Roles.Encargado)
     rol = "Encargado";
   else if(rol === Roles.Aplicador)

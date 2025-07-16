@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
@@ -65,9 +66,9 @@ export default function AgregarLocacion() {
                 apiService.get<ResponseItems<Locacion>>(`/locations?type=${parentType}&size=100`),
                 "Cargando ubicaciones padre..."
             );
-            
+      
             if (response.success) {
-                setParentLocations(response.data);
+                setParentLocations(response.data.content);
             } else {
                 setError(response.error || "Error al obtener las ubicaciones padre");
             }

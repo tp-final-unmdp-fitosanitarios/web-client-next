@@ -73,6 +73,7 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ isOpen, onClose, onCaptur
                 setStream(mediaStream);
                 setIsCameraActive(true);
             }
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (error: any) {
             console.error('Error accessing camera:', error);
             

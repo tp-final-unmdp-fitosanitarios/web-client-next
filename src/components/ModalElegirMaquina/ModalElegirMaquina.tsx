@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Modal, Box, TextField, MenuItem, CircularProgress } from '@mui/material';
+import { Modal, Box, TextField, MenuItem } from '@mui/material';
 import styles from "./ModalElegirMaquina.module.scss";
 import { Maquina } from '@/domain/models/Maquina';
 

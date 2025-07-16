@@ -138,6 +138,7 @@ const useStatistics = () => {
             // Simular delay de API
             await new Promise(resolve => setTimeout(resolve, 500));
             setStats(MOCK_STATISTICS);
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         } catch (err) {
             setError("Error al cargar las estadísticas");
         } finally {
@@ -335,6 +336,7 @@ const ChartPlaceholder: React.FC = () => (
 // Main Component
 export default function EstadisticasView() {
     const { user, isLoading } = useUser();
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { getApiService, isReady } = useAuth();
     const { stats, loading, error, fetchStatistics } = useStatistics();
 

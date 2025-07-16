@@ -136,11 +136,7 @@ const ProvidersPage = () => {
         setShowAddProvider(true);
     }
 
-    const handleDeleteProduct = (id: string) => {
-        setIsDeletingProvider(false);
-        setEntityToDelete(selectedProviderProducts.find(p => p.id===id));
-        setShowDeleteModal(true);
-    }
+   
 
     const handleConfirmDeleteProduct= () => {
         setShowDeleteModal(false);
@@ -184,15 +180,6 @@ const ProvidersPage = () => {
     const handleCloseConfirmationModal = () => {
         setConfirmationModalOpen(false);
     }
-
-    const productItems = transformToItems(selectedProviderProducts, "id", ["name", "unit","amount"]).map((item) => {
-        return {
-            ...item,
-            display: `${item.name} x ${item.amount}${item.unit}`,
-        }; 
-    });
-
-    const productCampos = ["display"];
 
     return (
         <div className="page-container">

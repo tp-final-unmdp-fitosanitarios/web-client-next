@@ -15,7 +15,7 @@ interface Props {
 }
 
 const ModalResumenOperacion: React.FC<Props> = ({open, setModalClose, stock, origen, destino, handleFinish, withdraw}) => {
-    const handleSubmit = (e: React.MouseEvent) => {
+    const handleSubmit = () => {
         handleFinish();
     }
     

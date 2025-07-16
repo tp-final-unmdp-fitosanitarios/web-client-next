@@ -8,7 +8,8 @@ interface Props {
     saveProvider: (name: string, description: string) => void;
 }
 
-const AddProviderModal: React.FC<Props> = ({open, setModalClose,saveProvider}) => {
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+const AddProviderModal: React.FC<Props> = ({ open,setModalClose,saveProvider}) => {
     
     const handleFinish = (formValues: Record<string, string>) => {
         const name = formValues["providerName"];

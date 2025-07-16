@@ -1,6 +1,5 @@
 import { EstadoAplicacion } from "../enum/EstadoAplicacion";
 import { Locacion } from "./Locacion";
-import { Producto } from "./Producto";
 import { Unidad } from "../enum/Unidad";
 import { Recipe } from "./Recipe";
 
