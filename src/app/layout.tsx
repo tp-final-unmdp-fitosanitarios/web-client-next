@@ -1,25 +1,29 @@
-import type { Metadata } from "next";
-import "./styles/globals.scss"
+"use client";
+
+import "./styles/globals.scss";
+import { usePathname } from "next/navigation";
 import { AuthProvider } from "@/components/Auth/AuthProvider";
 import LoaderProvider from "@/components/Loader/LoaderProvider";
-
-export const metadata: Metadata = {
-  title: "EPP gestion",
-  description: "EPP sistema de gestion fitosanitarios y stock ",
-};
+import { ProtectedRoute } from "@/components/Auth/ProtectedRoute"; // Asegurate que esté bien el path
 
 export default function RootLayout({
   children,
-}: Readonly<{
+}: {
   children: React.ReactNode;
-}>) {
+}) {
+  const pathname = usePathname();
+  const isPublicRoute = pathname === "/login";
 
   return (
     <html lang="en">
       <body>
         <AuthProvider>
           <LoaderProvider>
-            {children}
+            {isPublicRoute ? (
+              children
+            ) : (
+              <ProtectedRoute>{children}</ProtectedRoute>
+            )}
           </LoaderProvider>
         </AuthProvider>
       </body>

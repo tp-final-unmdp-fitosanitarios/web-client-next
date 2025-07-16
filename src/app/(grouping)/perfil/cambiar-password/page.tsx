@@ -33,7 +33,7 @@ export default function CambiarPasswordPage() {
 
     try {
       const response = await apiService.update('/users/change-password', user?.id || '', payload);
-      
+      console.log('Response:', response);
       if (response.success && response.status === 200) {
         handleOpenModal(false);
         setTimeout(() => {
@@ -96,7 +96,7 @@ export default function CambiarPasswordPage() {
                 fields={fields}
                 onSubmit={handleFormSubmit}
                 onCancel={handleCancel}
-                buttonName="Cambiar Contraseña"
+                buttonName="Confirmar"
                 equalButtonWidth={true}
                 isSubmitDisabled={(formData) => !isFormValid(formData)}
             />
