@@ -3,13 +3,12 @@
 .page-container {
   display: flex;
   justify-content: center;
-  flex-direction: column;
   align-items: center;
-  margin: 0;
+  flex-direction: column;
   width: 100%;
   min-height: 100vh;
+  padding: 1rem 0; // Evita que se pegue a los bordes
 }
-
 .title {
   font-size: 2rem;
   font-weight: 600;
@@ -35,6 +34,13 @@
   padding: 2rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 2rem;
+  @media(max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    max-width: 280px;
+  }
+  margin: 0 auto 2rem auto; // centrado horizontal
+
 }
 
 .avatar {
@@ -82,8 +88,12 @@
 .editSection {
   width: 100%;
   padding: 0 1rem;
-}
 
+  @media (max-width: 768px) {
+    max-width: 320px;
+    padding: 0;
+  }
+}
 .sectionTitle {
   font-size: 1.3rem;
   font-weight: 600;
@@ -97,8 +107,12 @@
   max-width: 600px;
   margin: 2rem 0;
   padding: 0 1rem;
-}
 
+  @media (max-width: 768px) {
+    max-width: 320px;
+    padding: 0;
+  }
+}
 .passwordCard {
   display: flex;
   align-items: center;
@@ -108,6 +122,12 @@
   border-radius: 15px;
   padding: 1.5rem;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    @media(max-width: 768px) {
+    flex-direction: column;
+    text-align: center;
+    max-width: 280px;
+    gap: 1rem;
+  }
 }
 
 .passwordInfo {
@@ -170,23 +190,22 @@
     font-size: 1.3rem;
   }
 
-  .passwordCard {
-    flex-direction: column;
-    text-align: center;
-    gap: 1rem;
-  }
-
+ 
   .passwordButton {
     width: 100%;
     max-width: 200px;
   }
 } 
 
-.content{
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    align-items: center;
-    width: 100%;
-    padding: 0 1rem;
+.content {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 0 1rem;
+
+  @media (max-width: 768px) {
+    padding: 0 0.5rem;
+  }
 }
