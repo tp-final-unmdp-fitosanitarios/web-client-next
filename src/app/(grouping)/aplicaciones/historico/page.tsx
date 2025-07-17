@@ -535,7 +535,7 @@ export default function HistoricoAplicacionesPage() {
                                         <Collapse in={aplicacionExpandida === aplicacion.id} timeout="auto" unmountOnExit>
                                             <Box mt={2}>
                                                 <Typography variant="body2" fontWeight="bold">Productos:</Typography>
-                                                {aplicacion.recipe?.recipe_items?.map((item, idx) => (
+                                                {(aplicacion.actual_application || aplicacion.recipe)?.recipe_items?.map((item, idx) => (
                                                     <Typography key={idx} variant="body2" sx={{ ml: 1 }}>
                                                         {item.name || 'N/A'} -
                                                         • {item.amount} {item.unit}{' '}

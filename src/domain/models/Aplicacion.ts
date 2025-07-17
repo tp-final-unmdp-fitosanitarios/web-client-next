@@ -15,7 +15,7 @@ export interface Aplicacion {
     applicator_id: string;
     engineer_id: string;
     recipe: Recipe;
-    actual_application: Aplicacion;
+    actual_application: Recipe;
     type: string;
     location: Locacion;
     application_date: Date;
