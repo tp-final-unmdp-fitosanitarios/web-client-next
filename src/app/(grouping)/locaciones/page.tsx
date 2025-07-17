@@ -53,11 +53,11 @@ export default function LocacionesView() {
                 queryParams.append('size', '100');
 
                 const response = await withLoading(
-                    apiService.get<ResponseItems<Locacion>>(`/locations?${queryParams.toString()}`),
+                    apiService.get<Locacion[]>(`/locations?${queryParams.toString()}`),
                     "Cargando locaciones..."
                 );
                 if (response.success && isMounted) {
-                    setLocacionesFromServer(response.data.content);
+                    setLocacionesFromServer(response.data);
                     setError("");
                 } else if (isMounted) {
                     setError(response.error || "Error al obtener las locaciones");
