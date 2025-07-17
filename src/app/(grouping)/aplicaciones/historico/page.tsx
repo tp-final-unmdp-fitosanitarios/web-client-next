@@ -328,6 +328,17 @@ export default function HistoricoAplicacionesPage() {
         }
     };
 
+    const getTipoAplicacion = (tipo: string) => {
+        switch (tipo) {
+            case "INSTANT":
+                return "Aplicación Instantánea";
+            case "REGULAR":
+                return "Aplicación Normal";
+            default:
+                return tipo;
+        }
+    }
+
     const formatDate = (date: Date | string) => {
         return dayjs(date).format('DD/MM/YYYY HH:mm');
     };
@@ -526,6 +537,7 @@ export default function HistoricoAplicacionesPage() {
                                                 <Typography variant="body2" fontWeight="bold">Productos:</Typography>
                                                 {aplicacion.recipe?.recipe_items?.map((item, idx) => (
                                                     <Typography key={idx} variant="body2" sx={{ ml: 1 }}>
+                                                        {item.name || 'N/A'} -
                                                         • {item.amount} {item.unit}{' '}
                                                         {item.dose_type === 'SURFACE' ? '/Ha' : ' en total'}
                                                     </Typography>
@@ -614,13 +626,28 @@ export default function HistoricoAplicacionesPage() {
                                                                 <Grid container spacing={2}>
                                                                     <Grid item xs={12} md={6}>
                                                                         <Typography variant="body2">
-                                                                            <strong>ID:</strong> {aplicacion.id}
-                                                                        </Typography>
-                                                                        <Typography variant="body2">
                                                                             <strong>Ubicación:</strong> {aplicacion.location?.name}
                                                                         </Typography>
                                                                         <Typography variant="body2">
                                                                             <strong>Superficie:</strong> {aplicacion.surface} Ha
+                                                                        </Typography>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Fecha de aplicación:</strong> {aplicacion.application_date ? formatDate(aplicacion.application_date) : 'N/A'}
+                                                                        </Typography>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Fecha de creación:</strong> {aplicacion.created_at ? formatDate(aplicacion.created_at) : 'N/A'}
+                                                                        </Typography>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Estado:</strong> {getEstadoLabel(aplicacion.status)}
+                                                                        </Typography>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Ingeniero:</strong> {aplicacion.engineer_name || 'N/A'}
+                                                                        </Typography>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Aplicador:</strong> {aplicacion.applicator_name || 'N/A'}
+                                                                        </Typography>
+                                                                        <Typography variant="body2">
+                                                                            <strong>Tipo de aplicación:</strong> {getTipoAplicacion(aplicacion.type)}
                                                                         </Typography>
                                                                     </Grid>
                                                                     <Grid item xs={12} md={6}>
@@ -629,7 +656,7 @@ export default function HistoricoAplicacionesPage() {
                                                                         </Typography>
                                                                         {aplicacion.recipe?.recipe_items?.map((item, index) => (
                                                                             <Typography key={index} variant="body2" sx={{ ml: 2 }}>
-                                                                                • {item.amount} {item.unit}
+                                                                                {item.name || 'N/A'} • {item.amount} {item.unit}
                                                                                 {item.dose_type === 'SURFACE' ? '/Ha' : ' en total'}
                                                                             </Typography>
                                                                         ))}
