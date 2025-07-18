@@ -1,11 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders } from "axios";
-import { openDB } from "idb";
+import {
+  getOfflineAplicaciones,
+  getOfflineProductos,
+  getOfflineLocaciones,
+} from './offline-service'
 
 interface ApiOptions {
   baseUrl?: string;
   endpoint: string;
   id?: number | string;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data?: any;
   method?: "GET" | "POST" | "PUT" | "PATCH" | "DELETE";
   headers?: Record<string, string>;
@@ -16,12 +21,6 @@ interface ApiResponse<T> {
   status: number;
   success: boolean;
   error?: string;
-}
-
-interface PendingRequest {
-  id?: number;
-  options: ApiOptions;
-  timestamp: number;
 }
 
 class ApiService {
@@ -66,32 +65,28 @@ class ApiService {
     );
   }
 
-  /**
-   * Inicializa o abre IndexedDB para almacenar peticiones pendientes
-   */
-  private async getDB() {
-    return await openDB("api-offline-db", 1, {
-      upgrade(db) {
-        db.createObjectStore("pending", { keyPath: "id", autoIncrement: true });
-      },
-    });
-  }
+  private async handleOfflineGET<T>(endpoint: string): Promise<ApiResponse<T>> {
+    if (endpoint.includes("/aplicaciones")) {
+      const data = await getOfflineAplicaciones();
+      return { data: data as any, status: 200, success: true };
+    }
+    if (endpoint.includes("/productos")) {
+      const data = await getOfflineProductos();
+      return { data: data as any, status: 200, success: true };
+    }
+    if (endpoint.includes("/locaciones")) {
+      const data = await getOfflineLocaciones();
+      return { data: data as any, status: 200, success: true };
+    }
 
-  /**
-   * Agrega una petición a la cola offline
-   */
-  private async queueRequest(options: ApiOptions) {
-    const db = await this.getDB();
-    const req: PendingRequest = {
-      options,
-      timestamp: Date.now(),
+    return {
+      data: null as any,
+      status: 503,
+      success: false,
+      error: "Sin conexión: ruta no soportada offline.",
     };
-    await db.add("pending", req);
   }
 
-  /**
-   * Método central de request
-   */
   private async request<T>(options: ApiOptions): Promise<ApiResponse<T>> {
     const { baseUrl = this.defaultBaseUrl, endpoint, id, data, method, headers } = options;
     const url = id ? `${endpoint}/${id}` : endpoint;
@@ -105,13 +100,17 @@ class ApiService {
     };
 
     if (!navigator.onLine) {
-      console.warn("Sin conexión, guardando en cola offline:", options);
-      await this.queueRequest(options);
+      console.warn("🔌 Sin conexión, modo offline activado:", options);
+
+      if (method === "GET") {
+        return await this.handleOfflineGET<T>(url);
+      }
+
       return {
         data: null as any,
         status: 503,
         success: false,
-        error: "Sin conexión: petición guardada para sincronizar.",
+        error: "Sin conexión: petición guardada para sincronizar (ver offlineService).",
       };
     }
 
@@ -119,9 +118,8 @@ class ApiService {
       const response = await this.axiosInstance(config);
       return { data: response.data, status: response.status, success: true };
     } catch (error: any) {
-      if (error.response?.status === 401) {
-        this.logout();
-      }
+      if (error.response?.status === 401) this.logout();
+
       return {
         data: null as any,
         status: error.response?.status || 500,
@@ -131,33 +129,6 @@ class ApiService {
     }
   }
 
-  /**
-   * Sincroniza peticiones pendientes cuando hay conexión
-   */
-  async syncPending(): Promise<void> {
-    if (!navigator.onLine) return;
-
-    const db = await this.getDB();
-    const all = await db.getAll("pending");
-    for (const pending of all) {
-      const { id, options } = pending;
-      console.log("Sincronizando petición pendiente:", options);
-      try {
-        const result = await this.request(options);
-        if (result.success) {
-          await db.delete("pending", id!);
-        } else {
-          console.warn("Falló la sincronización, se mantiene en cola:", options);
-        }
-      } catch {
-        console.warn("Error al sincronizar, se mantiene en cola:", options);
-      }
-    }
-  }
-
-  /**
-   * Métodos públicos
-   */
   async create<T>(endpoint: string, data: any, options: Partial<ApiOptions> = {}): Promise<ApiResponse<T>> {
     return this.request<T>({ endpoint, method: "POST", data, ...options });
   }
@@ -166,21 +137,11 @@ class ApiService {
     return this.request<T>({ endpoint, id, method: "GET", ...options });
   }
 
-  async update<T>(
-    endpoint: string,
-    id: number | string,
-    data: any,
-    options: Partial<ApiOptions> = {}
-  ): Promise<ApiResponse<T>> {
+  async update<T>(endpoint: string, id: number | string, data: any, options: Partial<ApiOptions> = {}): Promise<ApiResponse<T>> {
     return this.request<T>({ endpoint, id, method: "PUT", data, ...options });
   }
 
-  async patch<T>(
-    endpoint: string,
-    id: number | string,
-    data: any,
-    options: Partial<ApiOptions> = {}
-  ): Promise<ApiResponse<T>> {
+  async patch<T>(endpoint: string, id: number | string, data: any, options: Partial<ApiOptions> = {}): Promise<ApiResponse<T>> {
     return this.request<T>({ endpoint, id, method: "PATCH", data, ...options });
   }
 
