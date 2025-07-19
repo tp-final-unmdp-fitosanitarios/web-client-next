@@ -11,6 +11,13 @@ import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
 import { useLoading } from "@/hooks/useLoading";
 import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
+import { DatePicker } from '@mui/x-date-pickers/DatePicker';
+import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
+import ExpandLessIcon from '@mui/icons-material/ExpandLess';
+import { IconButton, Collapse, Paper, Grid, Button } from '@mui/material';
+import dayjs, { Dayjs } from 'dayjs';
 
 interface Movement {
     id: string;
@@ -32,6 +39,9 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [pageElements, setPageElements] = useState(0);
+    const [filtersExpanded, setFiltersExpanded] = useState(false);
+    const [dateFrom, setDateFrom] = useState<Dayjs | null>(null);
+    const [dateTo, setDateTo] = useState<Dayjs | null>(null);
     const { getApiService, isReady } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
@@ -46,6 +56,9 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                 const queryParams = new URLSearchParams();
                 queryParams.append('page', page.toString());
                 queryParams.append('size', pageSize.toString());
+                queryParams.append('sort', 'createdAt,desc')
+                if (dateFrom) queryParams.append('from', dateFrom.toISOString());
+                if (dateTo) queryParams.append('to', dateTo.toISOString());
                 const response = await withLoading(
                     apiService.get<ResponseItems<Movement>>(`/stock/movement?${queryParams.toString()}`),
                     "Cargando movimientos..."
@@ -69,7 +82,7 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
         return () => {
             isMounted = false;
         };
-    }, [isReady, page, pageSize]);
+    }, [isReady, page, pageSize, dateFrom, dateTo]);
 
     // Handler para cambio de página
     const handlePageChange = (event: React.ChangeEvent<unknown>, value: number) => {
@@ -97,6 +110,116 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
             <div className="content-wrap">
             <MenuBar showMenu={false} showArrow={true} path="/stock" />
             <h1 className={styles.title}>Movimientos de stock</h1>
+            {/* Filtros */}
+            <Paper elevation={3} sx={{ p: 3, mb: 3, mx: { xs: 1, sm: 4, md: 8 } }}>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
+                    <Typography variant="h6" color="#404e5c">
+                        Filtros de búsqueda
+                    </Typography>
+                    <IconButton
+                        onClick={() => setFiltersExpanded(!filtersExpanded)}
+                        size="small"
+                    >
+                        {filtersExpanded ? <ExpandLessIcon /> : <ExpandMoreIcon />}
+                    </IconButton>
+                </Box>
+                <Collapse in={filtersExpanded}>
+                    <Grid container spacing={2}>
+                        <Grid item xs={12} md={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    label="Desde"
+                                    value={dateFrom}
+                                    onChange={setDateFrom}
+                                    format="DD/MM/YYYY"
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            sx: {
+                                                '& .MuiInputBase-root': {
+                                                    borderRadius: '10px',
+                                                    backgroundColor: '#e6ebea',
+                                                    paddingX: 1,
+                                                    fontWeight: 'bold',
+                                                },
+                                                '& .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#404e5c',
+                                                    borderWidth: '2px',
+                                                },
+                                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#404e5c',
+                                                },
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#404e5c',
+                                                },
+                                                '& .MuiInputLabel-root': {
+                                                    fontWeight: 'bold',
+                                                    color: '#404e5c',
+                                                },
+                                                '&.Mui-focused .MuiInputLabel-root': {
+                                                    color: '#404e5c',
+                                                },
+                                            }
+                                        }
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={12} md={6}>
+                            <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                <DatePicker
+                                    label="Hasta"
+                                    value={dateTo}
+                                    onChange={setDateTo}
+                                    format="DD/MM/YYYY"
+                                    slotProps={{
+                                        textField: {
+                                            fullWidth: true,
+                                            sx: {
+                                                '& .MuiInputBase-root': {
+                                                    borderRadius: '10px',
+                                                    backgroundColor: '#e6ebea',
+                                                    paddingX: 1,
+                                                    fontWeight: 'bold',
+                                                },
+                                                '& .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#404e5c',
+                                                    borderWidth: '2px',
+                                                },
+                                                '&:hover .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#404e5c',
+                                                },
+                                                '&.Mui-focused .MuiOutlinedInput-notchedOutline': {
+                                                    borderColor: '#404e5c',
+                                                },
+                                                '& .MuiInputLabel-root': {
+                                                    fontWeight: 'bold',
+                                                    color: '#404e5c',
+                                                },
+                                                '&.Mui-focused .MuiInputLabel-root': {
+                                                    color: '#404e5c',
+                                                },
+                                            }
+                                        }
+                                    }}
+                                />
+                            </LocalizationProvider>
+                        </Grid>
+                        <Grid item xs={12}>
+                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-start' }}>
+                                <Button
+                                    variant="outlined"
+                                    onClick={() => { setDateFrom(null); setDateTo(null); setPage(0); }}
+                                    className="button button-secondary"
+                                >
+                                    Limpiar Filtros
+                                </Button>
+                            </Box>
+                        </Grid>
+                    </Grid>
+                </Collapse>
+            </Paper>
+            {/* Fin Filtros */}
             <div className={styles.container}>
                 <div className={styles.movementList}>
                 {

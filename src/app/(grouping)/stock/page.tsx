@@ -387,7 +387,7 @@ export default function StockView() {
             <h1 className={styles.title}>Gestión de Stock</h1>
 
             {/* Filtros */}
-            <Paper elevation={3} sx={{ p: 3, mb: 3 }}>
+            <Paper elevation={3} sx={{ p: 3, mb: 3, mx: { xs: 1, sm: 4, md: 8 } }}>
                 <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 2 }}>
                     <Typography variant="h6" color="#404e5c">
                         Filtros de búsqueda
@@ -490,7 +490,7 @@ export default function StockView() {
                             />
                         </Grid>
                         <Grid item xs={12}>
-                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                            <Box sx={{ display: 'flex', gap: 2, justifyContent: 'flex-start' }}>
                                 <button 
                                     className={`button button-primary ${styles.searchButton}`}
                                     onClick={handleSearch}
