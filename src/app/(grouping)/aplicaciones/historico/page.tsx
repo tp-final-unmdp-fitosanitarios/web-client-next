@@ -307,6 +307,7 @@ export default function HistoricoAplicacionesPage() {
             case EstadoAplicacion.Finalizada:
                 return "success";
             case EstadoAplicacion.EnCurso:
+            case EstadoAplicacion.NecesitaRevision:
                 return "warning";
             case EstadoAplicacion.Pendiente:
                 return "info";
@@ -321,6 +322,8 @@ export default function HistoricoAplicacionesPage() {
                 return "Finalizada";
             case EstadoAplicacion.EnCurso:
                 return "En Curso";
+            case EstadoAplicacion.NecesitaRevision:
+                return "Necesita Atencion";
             case EstadoAplicacion.Pendiente:
                 return "Pendiente";
             default:
