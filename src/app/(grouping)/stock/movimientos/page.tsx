@@ -17,7 +17,7 @@ import { DatePicker } from '@mui/x-date-pickers/DatePicker';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { IconButton, Collapse, Paper, Grid, Button } from '@mui/material';
-import dayjs, { Dayjs } from 'dayjs';
+import  { Dayjs } from 'dayjs';
 
 interface Movement {
     id: string;

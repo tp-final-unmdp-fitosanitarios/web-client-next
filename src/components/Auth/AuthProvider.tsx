@@ -14,7 +14,7 @@ interface AuthContextType {
   getUserId: () => string | null;
   setUserId: (id: string) => void;
   user: User | null;
-  isLoadingUser: boolean; // Nuevo estado para indicar si se está cargando el usuario
+  isLoadingUser: boolean; // / Nuevo estado para indicar si se está cargando el usuario
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
