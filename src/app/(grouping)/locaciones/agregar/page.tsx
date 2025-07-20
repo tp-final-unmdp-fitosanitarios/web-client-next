@@ -63,12 +63,12 @@ export default function AgregarLocacion() {
             }
 
             const response = await withLoading(
-                apiService.get<ResponseItems<Locacion>>(`/locations?type=${parentType}&size=100`),
+                apiService.get<Locacion[]>(`/locations?type=${parentType}&size=100`),
                 "Cargando ubicaciones padre..."
             );
       
             if (response.success) {
-                setParentLocations(response.data.content);
+                setParentLocations(response.data);
             } else {
                 setError(response.error || "Error al obtener las ubicaciones padre");
             }
@@ -177,7 +177,7 @@ export default function AgregarLocacion() {
                             </select>
                         </div>
 
-                        {(formData.type === "WAREHOUSE" || formData.type === "FIELD" || formData.type === "LOT" || formData.type === "CROP") && (
+                        {["WAREHOUSE", "FIELD", "CROP", "LOT"].includes(formData.type) && (
                             <div className={styles.formGroup}>
                                 <label htmlFor="parent_location_id">Ubicación Padre *</label>
                                 <select
