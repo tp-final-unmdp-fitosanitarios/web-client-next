@@ -108,12 +108,14 @@ export default function AgregarLocacion() {
             return;
         }
 
+        // Transform formData: replace empty strings with null
+        const payload = Object.fromEntries(
+            Object.entries(formData).map(([key, value]) => [key, value === "" ? null : value])
+        );
+
         try {
             const response = await withLoading(
-                apiService.create("/locations", {
-                    ...formData,
-                    area: formData.area || undefined
-                }),
+                apiService.create("/locations", payload),
                 "Creando locación..."
             );
 
