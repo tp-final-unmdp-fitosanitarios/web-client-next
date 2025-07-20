@@ -4,6 +4,7 @@ import {
   getOfflineAplicaciones,
   getOfflineProductos,
   getOfflineLocaciones,
+  getOfflineRecipeByAplicacionId,
 } from './offline-service'
 
 interface ApiOptions {
@@ -64,29 +65,38 @@ class ApiService {
       (error) => Promise.reject(error)
     );
   }
-
-  private async handleOfflineGET<T>(endpoint: string): Promise<ApiResponse<T>> {
-    if (endpoint.includes("/aplicaciones")) {
-      const data = await getOfflineAplicaciones();
-      return { data: data as any, status: 200, success: true };
-    }
-    if (endpoint.includes("/productos")) {
-      const data = await getOfflineProductos();
-      return { data: data as any, status: 200, success: true };
-    }
-    if (endpoint.includes("/locaciones")) {
-      const data = await getOfflineLocaciones();
-      return { data: data as any, status: 200, success: true };
-    }
-
-    return {
-      data: null as any,
-      status: 503,
-      success: false,
-      error: "Sin conexión: ruta no soportada offline.",
-    };
+private async handleOfflineGET<T>(endpoint: string): Promise<ApiResponse<T>> {
+  if (endpoint.includes("/applications")) {
+    const apps = await getOfflineAplicaciones();
+    const merged = await Promise.all(
+      apps.map(async (app) => {
+        const receta = await getOfflineRecipeByAplicacionId(app.id);
+        return {
+          ...app,
+          recipe: receta ?? { type: 'SIN_TIPO', recipe_items: [] }
+        };
+      })
+    );
+    return { data: merged as any, status: 200, success: true };
   }
 
+  if (endpoint.includes("/products")) {
+    const data = await getOfflineProductos();
+    return { data: data as any, status: 200, success: true };
+  }
+
+  if (endpoint.includes("/locations")) {
+    const data = await getOfflineLocaciones();
+    return { data: data as any, status: 200, success: true };
+  }
+
+  return {
+    data: null as any,
+    status: 503,
+    success: false,
+    error: "Sin conexión: ruta no soportada offline.",
+  };
+}
   private async request<T>(options: ApiOptions): Promise<ApiResponse<T>> {
     const { baseUrl = this.defaultBaseUrl, endpoint, id, data, method, headers } = options;
     const url = id ? `${endpoint}/${id}` : endpoint;
