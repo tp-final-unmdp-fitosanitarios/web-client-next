@@ -1,6 +1,6 @@
 "use client";
 import MenuBar from '@/components/menuBar/MenuBar';
-import styles from './movementsPage.module.scss'; // Importar estilos
+import styles from './movementsPage.module.scss'; /// Importar estilos
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useAuth } from "@/components/Auth/AuthProvider";
