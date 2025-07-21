@@ -66,7 +66,7 @@ step4ButtonContainer .button {
   border-radius: $border-radius;
   font-weight: $button-font-weight;
   cursor: pointer;
-  color: $dark-color;
+  color: white;
 
   &:disabled {
     opacity: 0.5;
@@ -92,7 +92,7 @@ step4ButtonContainer .button {
 
 .buttonSelect {
   border: 2px solid $dark-color;
-  background-color: $light-color;
+  background-color: $primary-color;
   width: 80px;
   padding: $spacing-small;
   font-size: 14px;
@@ -109,7 +109,7 @@ step4ButtonContainer .button {
 
 .buttonChange {
   border: 2px solid $dark-color;
-  background-color: $light-color;
+  background-color: $primary-color;
   width: 80px;
   padding: $spacing-small;
   font-size: 14px;
@@ -241,7 +241,7 @@ step4ButtonContainer .button {
 
 .button-primary {
   background-color: $primary-color;
-  color: $dark-color;
+  color: white;
 }
 
 .button-secondary {

@@ -4,6 +4,8 @@ import styles from "./MenuBar.module.scss"
 import Image from "next/image"
 import SideBar from "../sideBar/SideBar"
 import pampaGrowLogo from "../../../public/PampaGrow.png"
+import eppLogo from "../../../public/Logotipo_verde.png"
+import eppMarca from "../../../public/Marca_Verde.png"
 import { useRouter } from 'next/navigation';
 import { IoArrowBack } from 'react-icons/io5';
 import { useLoading } from '@/hooks/useLoading';
@@ -43,7 +45,7 @@ export default function MenuBar({ showMenu, showArrow, path}: MenuBarProps) {
                 )
             )}
             </div>
-            <Image className={styles.homeLogo} src={pampaGrowLogo} alt="Home Logo" />
+            <Image className={styles.homeLogo} src={eppMarca} alt="Home Logo" />
             <h4 className={styles.homeDate}>{dateWithoutTime}</h4>
         </div>
         <hr className={styles.homeDivision}></hr>

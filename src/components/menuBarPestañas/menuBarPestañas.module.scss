@@ -16,7 +16,7 @@ height: auto;
 
 .homeDivision {
 width: 100%;
-background-color: $dark-color;
+background-color: $primary-color;
 border: 2px solid $secondary-color; 
 border-radius: $border-radius;
 }
@@ -31,7 +31,7 @@ border-radius: $border-radius;
 
 .pestañaActual{
     font-size: 18px;
-    border-bottom: 4px solid $dark-color;
+    border-bottom: 4px solid $primary-color;
     border-radius: 0;
 }
 

@@ -25,6 +25,7 @@ body {
   flex-direction: row;
   justify-content: center;
   gap: $spacing-medium;
+  
 
   @media (min-width: 1000px) {
     align-items: center;
@@ -43,13 +44,14 @@ body {
   font-weight: $button-font-weight;
   font-family: $font-family-primary; // Open Sans
   cursor: pointer;
-  color: $dark-color;
   text-align: center;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   box-shadow: $box-shadow;
   transition: all 0.2s ease-in-out;
+  color: white;
+  font-weight: bold;
 
   &:hover {
     transform: translateY(-1px);
