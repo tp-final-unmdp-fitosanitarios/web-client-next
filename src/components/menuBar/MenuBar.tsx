@@ -3,8 +3,6 @@
 import styles from "./MenuBar.module.scss"
 import Image from "next/image"
 import SideBar from "../sideBar/SideBar"
-import pampaGrowLogo from "../../../public/PampaGrow.png"
-import eppLogo from "../../../public/Logotipo_verde.png"
 import eppMarca from "../../../public/Marca_Verde.png"
 import { useRouter } from 'next/navigation';
 import { IoArrowBack } from 'react-icons/io5';

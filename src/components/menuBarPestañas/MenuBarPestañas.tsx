@@ -1,9 +1,7 @@
 import styles from "./menuBarPestañas.module.scss" 
 import Image from "next/image"
 import SideBar from "../sideBar/SideBar"
-import pampaGrowLogo from "../../../public/PampaGrow.png"
 import eppMarca from "../../../public/Marca_Verde.png"
-import eppLogo from "../../../public/Logotipo_verde.png"
 
 interface MenuBarPestañasProps{
     pestañaActual: string
