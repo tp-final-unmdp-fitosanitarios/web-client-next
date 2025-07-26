@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import Formulario from "@/components/formulario/formulario";
 import GenericModal from "@/components/modal/GenericModal";
 import MenuBar from "@/components/menuBar/MenuBar";
+import AgrochemicalSelector from "@/components/AgrochemicalSelector/AgrochemicalSelector";
 import { Unidad } from "@/domain/enum/Unidad";
 import { Field } from "@/domain/models/Field";
 import { Producto } from "@/domain/models/Producto";
@@ -20,8 +21,16 @@ interface CreateProductPayload {
   unit: string;
   amount: number;
   brand: string;
-  created_at: string;
-  agrochemical_id: string;
+  agrochemicals: {
+    agrochemical_id: string;
+    percentage: number;
+  }[];
+}
+
+interface AgrochemicalSelection {
+  id: string;
+  active_principle: string;
+  percentage: number;
 }
 
 
@@ -38,20 +47,16 @@ export default function AgregarProductos() {
     unit: Unidad.Litros,
     amount: 0,
     brand: "",
-    agrochemical_id: "",
     created_at: new Date().toISOString(),
-    agrochemical: {
-      id: "",
-      active_principle: "",
-      description: "",
-      company_id: "",
-      category: "HERBICIDE",
-      created_at: new Date().toISOString(),
-      updated_at: new Date().toISOString(),
-    },
+    agrochemicals: [],
   });
 
   const [agroquimicos, setAgroquimicos] = useState<Agroquimico[]>([]);
+  const [selectedAgrochemicals, setSelectedAgrochemicals] = useState<AgrochemicalSelection[]>([{
+    id: "",
+    active_principle: "",
+    percentage: 0
+  }]);
 
 
   useEffect(() => {
@@ -83,36 +88,36 @@ export default function AgregarProductos() {
   }, []);
 
   const handleFormSubmit = (inputData: Record<string, string | number>) => {
-    const agroquimicoSeleccionado = agroquimicos.find(
-      (a) => a.active_principle === inputData.agroquimico
-    );
-
-
-
-    if (!agroquimicoSeleccionado) {
-      console.error("Agroquímico no encontrado");
+    if (selectedAgrochemicals.length === 0) {
+      console.error("Debe seleccionar al menos un agroquímico");
       return;
     }
-   
+
     const payload: CreateProductPayload = {
       name: String(inputData.nombre),
       unit: inputData.unidad as string,
       amount: Number(inputData.cantidad),
       brand: String(inputData.marca),
-      agrochemical_id: agroquimicoSeleccionado!.id,
-      created_at: new Date().toISOString(),
+      agrochemicals: selectedAgrochemicals.map(agro => ({
+        agrochemical_id: agro.id,
+        percentage: agro.percentage
+      }))
     };
   
     createProduct(payload);
   }
 
-  const isFormValid = (formData: Record<string, string>) => {
-    return formData.nombre && 
+  const isFormValid = useCallback((formData: Record<string, string>) => {
+    const basicFieldsValid = formData.nombre && 
            formData.cantidad && 
            formData.unidad && 
-           formData.marca && 
-           formData.agroquimico
-  };
+           formData.marca;
+    
+    const agrochemicalsValid = selectedAgrochemicals.length > 0 && 
+                              selectedAgrochemicals.every(agro => agro.id && agro.percentage > 0);
+    
+    return basicFieldsValid && agrochemicalsValid;
+  }, [selectedAgrochemicals]);
 
   const createProduct = async (payload:CreateProductPayload) => {
     try {
@@ -135,7 +140,7 @@ export default function AgregarProductos() {
     router.push("/productos");
   };
 
-  const fields: Field[] = [
+  const fields: Field[] = useMemo(() => [
     {
       name: "nombre",
       label: "Nombre",
@@ -149,13 +154,7 @@ export default function AgregarProductos() {
       options: Array.from(new Set(Object.values(Unidad))).sort(),
     },
     { name: "marca", label: "Marca", type: "text" },
-    {
-      name: "agroquimico",
-      label: "Agroquímico",
-      type: "select",
-      options: Array.from(new Set(agroquimicos.map((a) => a.active_principle))).sort(),
-    },
-  ];
+  ], []);
 
   return (
     <div className="page-container">
@@ -170,7 +169,13 @@ export default function AgregarProductos() {
         buttonName="Continuar"
         equalButtonWidth={true}
         isSubmitDisabled={(formData) => !isFormValid(formData)}
-      />
+      >
+        <AgrochemicalSelector
+          agroquimicos={agroquimicos}
+          selectedAgrochemicals={selectedAgrochemicals}
+          onChange={setSelectedAgrochemicals}
+        />
+      </Formulario>
      
       </div>
       

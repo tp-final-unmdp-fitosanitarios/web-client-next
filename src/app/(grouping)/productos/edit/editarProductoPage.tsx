@@ -1,11 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useMemo } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Formulario from "@/components/formulario/formulario";
 import GenericModal from "@/components/modal/GenericModal";
 import MenuBar from "@/components/menuBar/MenuBar";
+import AgrochemicalSelector from "@/components/AgrochemicalSelector/AgrochemicalSelector";
 import { Unidad } from "@/domain/enum/Unidad";
 import { Field } from "@/domain/models/Field";
 import { Producto } from "@/domain/models/Producto";
@@ -20,8 +21,16 @@ interface EditProductPayload {
   unit: string;
   amount: number;
   brand: string;
-  created_at: string;
-  agrochemical_id: string;
+  agrochemicals: {
+    agrochemical_id: string;
+    percentage: number;
+  }[];
+}
+
+interface AgrochemicalSelection {
+  id: string;
+  active_principle: string;
+  percentage: number;
 }
 
 
@@ -37,6 +46,11 @@ const EditarProducto = () => {
   const [product, setProduct] = useState<Producto | null>(null);
 
   const [agroquimicos, setAgroquimicos] = useState<Agroquimico[]>([]);
+  const [selectedAgrochemicals, setSelectedAgrochemicals] = useState<AgrochemicalSelection[]>([{
+    id: "",
+    active_principle: "",
+    percentage: 0
+  }]);
 
   useEffect(() => {
     if (!isReady) return;
@@ -67,6 +81,24 @@ const EditarProducto = () => {
         const response = await apiService.get<Producto>(`/products/${productId}`);
         if (response.success) {
           setProduct(response.data);
+          
+          // Convert product agrochemicals to AgrochemicalSelection format
+          if (response.data.agrochemicals && response.data.agrochemicals.length > 0) {
+            const selections: AgrochemicalSelection[] = response.data.agrochemicals.map(agro => ({
+              id: agro.agrochemical_id,
+              active_principle: agro.agrochemical.active_principle,
+              percentage: agro.percentage
+            }));
+            setSelectedAgrochemicals(selections);
+          } else if (response.data.agrochemical_id && response.data.agrochemical) {
+            // Handle legacy single agrochemical format - use reasonable default percentage
+            const selection: AgrochemicalSelection = {
+              id: response.data.agrochemical_id,
+              active_principle: response.data.agrochemical.active_principle,
+              percentage: 50 // Default percentage for legacy products
+            };
+            setSelectedAgrochemicals([selection]);
+          }
         } else {
           console.error("Error al obtener el producto:", response.error);
           router.push("/productos");
@@ -88,30 +120,22 @@ const EditarProducto = () => {
   }, []);
 
   const handleFormSubmit = (inputData: Record<string, string | number>) => {
-    const agroquimicoSeleccionado = agroquimicos.find(
-      (a) => a.active_principle === inputData.agroquimico
-    );
-
-
-    if (!agroquimicoSeleccionado) {
-      console.error("Agroquímico no encontrado");
+    if (selectedAgrochemicals.length === 0) {
+      console.error("Debe seleccionar al menos un agroquímico");
       return;
     }
 
-  
-   
     const payload: EditProductPayload = {
       name: String(inputData.nombre),
       unit: inputData.unidad as string,
       amount: Number(inputData.cantidad),
       brand: String(inputData.marca),
-      agrochemical_id: agroquimicoSeleccionado.id,
-      created_at: product?.created_at || "",
-
+      agrochemicals: selectedAgrochemicals.map(agro => ({
+        agrochemical_id: agro.id,
+        percentage: agro.percentage
+      }))
     };
 
-    //console.log(payload);
-  
     updateProduct(payload);
   }
 
@@ -132,19 +156,23 @@ const EditarProducto = () => {
     }
   };
 
-  const isFormValid = (formData: Record<string, string>) => {
-    return formData.nombre && 
+  const isFormValid = useCallback((formData: Record<string, string>) => {
+    const basicFieldsValid = formData.nombre && 
            formData.cantidad && 
            formData.unidad && 
-           formData.marca && 
-           formData.agroquimico   
-  };
+           formData.marca;
+    
+    const agrochemicalsValid = selectedAgrochemicals.length > 0 && 
+                              selectedAgrochemicals.every(agro => agro.id && agro.percentage > 0);
+    
+    return basicFieldsValid && agrochemicalsValid;   
+  }, [selectedAgrochemicals]);
 
   const handleCancel = () => {
     router.push("/productos");
   };
 
-  const fields: Field[] = [
+  const fields: Field[] = useMemo(() => [
     {
       name: "nombre",
       label: "Nombre",
@@ -169,16 +197,8 @@ const EditarProducto = () => {
       label: "Marca", 
       type: "text",
       defaultValue: product?.brand || ""
-    },
-    {
-      name: "agroquimico",
-      label: "Agroquímico",
-      type: "select",
-      options: Array.from(new Set(agroquimicos.map((a) => a.active_principle))).sort(),
-      defaultValue: product?.agrochemical?.active_principle || "",
-      multiple: false
     }
-  ];
+  ], [product]);
 
   return (
     <div className="page-container">
@@ -193,7 +213,13 @@ const EditarProducto = () => {
         buttonName="Continuar"
         equalButtonWidth={true}
         isSubmitDisabled={(formData) => !isFormValid(formData)}
-      />
+      >
+        <AgrochemicalSelector
+          agroquimicos={agroquimicos}
+          selectedAgrochemicals={selectedAgrochemicals}
+          onChange={setSelectedAgrochemicals}
+        />
+      </Formulario>
       </div>
       <Footer />
       <GenericModal

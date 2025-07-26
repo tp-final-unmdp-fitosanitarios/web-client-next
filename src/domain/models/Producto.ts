@@ -2,6 +2,13 @@ import { Unidad } from "../enum/Unidad";
 import { Agroquimico } from "./Agroquimico";
 import { Proveedor } from "./Proveedor";
 
+export interface ProductoAgrochemical {
+  agrochemical_id: string;
+  agrochemical: Agroquimico;
+  percentage: number;
+  created_at: string;
+}
+
 export interface Producto {
   id: string; 
   name: string;
@@ -9,7 +16,9 @@ export interface Producto {
   amount: number; // BigDecimal mapped to number
   brand: string;
   created_at: string; // ZonedDateTime serialized as ISO string
-  agrochemical_id: string;
-  agrochemical: Agroquimico;
+  agrochemicals: ProductoAgrochemical[];
   providers?: Proveedor[]; // Optional
+  // Legacy fields for backward compatibility
+  agrochemical_id?: string;
+  agrochemical?: Agroquimico;
 }
