@@ -1,0 +1,25 @@
+{
+    "name": "EPP Gestión",
+    "short_name": "EPP",
+    "description": "Sistema de gestión de fitosanitarios y stock",
+    "start_url": "/",
+    "display": "standalone",
+    "background_color": "#ffffff",
+    "theme_color": "#1976d2",
+    "orientation": "portrait",
+    "icons": [
+      {
+        "src": "./Logotipo_verde.png",
+        "sizes": "192x192",
+        "type": "image/png",
+        "purpose": "any"
+      },
+      {
+        "src": "./Logotipo_verde.png",
+        "sizes": "512x512",
+        "type": "image/png",
+        "purpose": "any"
+      }
+    ]
+  }
+  

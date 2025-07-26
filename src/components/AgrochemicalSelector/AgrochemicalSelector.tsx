@@ -67,10 +67,6 @@ export default function AgrochemicalSelector({
     return localSelections.reduce((sum, selection) => sum + (selection.percentage || 0), 0);
   };
 
-  const isValid = () => {
-    return localSelections.every(s => s.id && s.percentage > 0);
-  };
-
   return (
     <div className={styles.container}>
       <label className={styles.label}>Agroquímicos y Concentraciones</label>
