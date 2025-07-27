@@ -359,7 +359,7 @@ export default function EstadisticasView() {
         );
     }
 
-    if (error) {
+    if (error && error !== "Network Error") {
         return (
             <div className="page-container">
                 <MenuBar showMenu={true} path="" />

@@ -7,7 +7,6 @@ export const metadata: Metadata = {
   title: "EPP Gestión",
   description: "EPP sistema de gestión fitosanitarios y stock",
   manifest: "/manifest.json",
-  themeColor: "#ffffff",
   icons: {
     icon: "/Logotipo_verde.png",
   },

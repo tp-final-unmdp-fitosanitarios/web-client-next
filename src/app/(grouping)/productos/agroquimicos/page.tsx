@@ -171,7 +171,7 @@ export default function AgroquimicosView() {
         );
     }
     
-    if (error) {
+    if (error && error !== "Network Error") {
         return (
             <div className="page-container">
                 <MenuBar showMenu={true} path="" />

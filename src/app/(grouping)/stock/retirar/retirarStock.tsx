@@ -249,7 +249,7 @@ const fetchStock = async () => {
 const campos = ["display"];
 
 if (loading) return <div>Cargando...</div>;
-if (error) return <div>Error: {error}</div>;
+if (error && error !== "Network Error") return <div>Error: {error}</div>;
 
 return (
     <div className="page-container">

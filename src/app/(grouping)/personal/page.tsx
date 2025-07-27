@@ -130,14 +130,14 @@ export default function PersonalPage() {
         );
     }
 
-    if (error) {
+    /*if (error) {
         return (
             <div className="page-container">
                 <MenuBar showMenu={true} path="" />
                 <div>Error: {error}</div>
             </div>
         );
-    }
+    }*/
 
     return (
         <div className="page-container">

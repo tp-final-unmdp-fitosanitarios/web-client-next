@@ -367,7 +367,7 @@ export default function StockView() {
         setPage(0);
     };
 
-    if (error) {
+    if (error && error !== "Network Error") {
         return (
             <div className="page-container">
                 <MenuBar showMenu={true} path="" />

@@ -114,7 +114,7 @@ export default function MaquinasView() {
     );
   }
 
-  if (error) {
+  if (error && error !== "Network Error") {
     return (
       <div className="page-container">
         <MenuBar showMenu={false} path="home" />
