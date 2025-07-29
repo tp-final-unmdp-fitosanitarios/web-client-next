@@ -10,9 +10,11 @@ import Footer from '@/components/Footer/Footer';
 import styles from './personal.module.scss';
 import ItemList from '@/components/itemList/ItemList';
 import { transformToItems } from '@/utilities/transform';
-import Link from 'next/link';
 import { useItemsManager } from '@/hooks/useItemsManager';
 import GenericModal from '@/components/modal/GenericModal';
+import { useRouter } from '../../../../node_modules/next/navigation';
+import Link from '../../../../node_modules/next/link';
+
 
 interface UsersResponse {
     users: User[];
@@ -33,6 +35,7 @@ export default function PersonalPage() {
     const { getApiService } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
+    const router = useRouter();
 
     const {
         items: usuarios,
@@ -92,9 +95,9 @@ export default function PersonalPage() {
                     return response.success;
                 })
             );
-    
+
             const allDeleted = deleteResults.every((success) => success);
-    
+
             if (allDeleted) {
                 quitarItems(); // Esto actualiza los usuarios visibles y muestra la modal
             } else {
@@ -104,6 +107,17 @@ export default function PersonalPage() {
             alert("Error al conectar con el servidor");
         }
     };
+
+
+    const handleModificarUsuario = () => {
+        if (selectedIds.length !== 1) {
+          alert("Debe seleccionar un único usuario para modificar.");
+          return;
+        }
+        const id = selectedIds[0];
+        router.push(`/personal/modificar?Id=${id}`);
+      };
+
 
     const items = usuarios && usuarios.length > 0
         ? transformToItems(usuarios, "id", ["first_name", "last_name", "email", "roles"]).map((item) => {
@@ -189,6 +203,12 @@ export default function PersonalPage() {
                                 Agregar
                             </button>
                         </Link>
+                        <button
+                            className="button button-primary"
+                            onClick={handleModificarUsuario}
+                        >
+                            Modificar
+                        </button>
                     </div>
                 </div>
             </div>
