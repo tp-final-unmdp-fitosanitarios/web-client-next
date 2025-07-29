@@ -127,6 +127,12 @@
     width: 90%;
   }
 
+  .disabledButton {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+  
   .buttonHome {
     margin: 15px auto;
     width: 100%;

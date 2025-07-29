@@ -15,26 +15,27 @@ import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { useRouter } from "next/navigation";
 import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
+import PaginationControls from "@/components/PaginationControls/paginationControls";
 const buttons = [
     { label: "Agregar", path: "/productos/agregar" },
     { label: "Agroquímicos", path: "/productos/agroquimicos" },
 ];
 
 export default function ProductosView() {
-     const [productosFromServer, setProductosFromServer] = useState<Producto[]>([]);
-     const [loading, setLoading] = useState<boolean>(true);
-     const [error, setError] = useState<string>("");
-     const [searchName, setSearchName] = useState<string>("");
-     const [debouncedSearchName, setDebouncedSearchName] = useState<string>("");
-     const [page, setPage] = useState(0); // Página actual (0-indexed)
-     const [pageSize, setPageSize] = useState(10); // Tamaño de página
-     const [totalPages, setTotalPages] = useState(0);
-     const [totalElements, setTotalElements] = useState(0);
-     const [pageElements, setPageElements] = useState(0);
-     const { getApiService } = useAuth();
-     const { withLoading } = useLoading();
-     const apiService = getApiService();
-     const router = useRouter();
+    const [productosFromServer, setProductosFromServer] = useState<Producto[]>([]);
+    const [loading, setLoading] = useState<boolean>(true);
+    const [error, setError] = useState<string>("");
+    const [searchName, setSearchName] = useState<string>("");
+    const [debouncedSearchName, setDebouncedSearchName] = useState<string>("");
+    const [page, setPage] = useState(0); // Página actual (0-indexed)
+    const [pageSize, setPageSize] = useState(10); // Tamaño de página
+    const [totalPages, setTotalPages] = useState(0);
+    const [totalElements, setTotalElements] = useState(0);
+    const [pageElements, setPageElements] = useState(0);
+    const { getApiService } = useAuth();
+    const { withLoading } = useLoading();
+    const apiService = getApiService();
+    const router = useRouter();
 
     // Debounce search input
     useEffect(() => {
@@ -55,7 +56,7 @@ export default function ProductosView() {
                 if (debouncedSearchName) {
                     queryParams.append('name', debouncedSearchName);
                 }
-                
+
                 const response = await withLoading(
                     apiService.get<ResponseItems<Producto>>(`/products?${queryParams.toString()}`),
                     "Cargando productos..."
@@ -102,20 +103,20 @@ export default function ProductosView() {
 
 
     const {
-        items: productos,  
+        items: productos,
         selectedIds,
         deletedItems,
         isModalOpen,
         toggleSelectItem,
         quitarItems,
         closeModal,
-    } = useItemsManager<Producto>(productosFromServer); 
+    } = useItemsManager<Producto>(productosFromServer);
 
     console.log("productos", productos);
 
     const items = transformToItems(productos, "id", ["name"]);
     const campos = ["name"];
-    
+
     const handleQuitarItems = async () => {
         try {
             const deleteResults = await Promise.all(
@@ -124,9 +125,9 @@ export default function ProductosView() {
                     return response.success;
                 })
             );
-    
+
             const allDeleted = deleteResults.every((success) => success);
-    
+
             if (allDeleted) {
                 quitarItems(); // Esto actualiza los productos visibles y muestra la modal
             } else {
@@ -136,117 +137,100 @@ export default function ProductosView() {
             alert("Error al conectar con el servidor");
         }
     };
-    
+
     const handleModificarItems = async () => {
-        console.log("Se modificara el item: "+selectedIds[0]);
+        console.log("Se modificara el item: " + selectedIds[0]);
         //const prodToModify = apiService.get("products",selectedIds[0]);
         //Aca deberia tirar alert si selectedIds.length > 1
         router.push(`productos/edit?Id=${selectedIds[0]}`);
     };
-    
+
     const modalText =
         deletedItems.length > 0
             ? `Se han eliminado los siguientes productos:\n${deletedItems.map((p) => p.name).join("\n")}`
             : "";
 
     // Para backend: agregar manejo de loading y error
-     if (loading) {
-         return (
-             <div className="page-container">
-                 <MenuBar showMenu={true} path="" />
-                 <div>Cargando...</div>
-             </div>
-         );
-     }
-    
-     if (error) {
-         return (
-             <div className="page-container">
-                 <MenuBar showMenu={true} path="" />
-                 <div>Error: {error}</div>
-             </div>
-         );
-     }
+    if (loading) {
+        return (
+            <div className="page-container">
+                <MenuBar showMenu={true} path="" />
+                <div>Cargando...</div>
+            </div>
+        );
+    }
+
+    if (error) {
+        return (
+            <div className="page-container">
+                <MenuBar showMenu={true} path="" />
+                <div>Error: {error}</div>
+            </div>
+        );
+    }
 
     return (
         <div className="page-container">
             <div className="content-wrap">
-            <MenuBar showMenu={true} path="" />
-            <h1 className={styles.title}>Productos</h1>
-            <div className={styles.filterContainer}>
-                <input
-                    type="text"
-                    placeholder="Buscar por nombre..."
-                    value={searchName}
-                    onChange={(e) => setSearchName(e.target.value)}
-                    className={styles.searchInput}
-                />
-            </div>
-        
-            {items.length > 0 ? (
-                <>
-                    <ItemList
-                        items={items}
-                        displayKeys={campos}
-                        onSelect={toggleSelectItem}
-                        selectedIds={selectedIds} selectItems={true} deleteItems={false}  selectSingleItem={false}  />
-                    {/* Paginación */}
-                    <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
-                        <Pagination
-                            count={totalPages}
-                            page={page + 1}
-                            onChange={handlePageChange}
-                            color="primary"
-                            size="large"
-                        />
-                        <Box sx={{ mt: 1 }}>
-                            <TextField
-                                select
-                                label="Elementos por página"
-                                value={pageSize}
-                                onChange={handlePageSizeChange}
-                                sx={{ width: 180 }}
-                                size="small"
-                            >
-                                {[5, 10, 20, 50].map((size) => (
-                                    <MenuItem key={size} value={size}>{size}</MenuItem>
-                                ))}
-                            </TextField>
-                        </Box>
-                        <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                            Mostrando {pageElements} de {totalElements} elementos
-                        </Typography>
-                    </Box>
-                </>
-            ) : (
-                <p>No hay productos disponibles</p>
-            )}
+                <MenuBar showMenu={true} path="" />
+                <h1 className={styles.title}>Productos</h1>
+                <div className={styles.filterContainer}>
+                    <input
+                        type="text"
+                        placeholder="Buscar por nombre..."
+                        value={searchName}
+                        onChange={(e) => setSearchName(e.target.value)}
+                        className={styles.searchInput}
+                    />
+                </div>
 
-            <div className={styles.buttonContainer}>
-                <>
-                    <button
-                        className={`button button-secondary ${styles.buttonHome}`}
-                        onClick={handleQuitarItems}
-                        disabled={selectedIds.length !== 1}
-                    >
-                        Quitar
-                    </button>
-                    <button
-                        className={`button button-secondary `}
-                        onClick={handleModificarItems}
-                        disabled={selectedIds.length !== 1}
-                    >
-                        Modificar
-                    </button>
-                </>
-                {buttons.map((button, index) => (
-                    <Link key={index} href={button.path}>
-                        <button className={`button button-primary ${styles.buttonHome}`}>
-                            {button.label}
+                {items.length > 0 ? (
+                    <>
+                        <ItemList
+                            items={items}
+                            displayKeys={campos}
+                            onSelect={toggleSelectItem}
+                            selectedIds={selectedIds} selectItems={true} deleteItems={false} selectSingleItem={false} />
+                        {/* Paginación */}
+                        <PaginationControls
+                            page={page}
+                            pageSize={pageSize}
+                            totalPages={totalPages}
+                            totalElements={totalElements}
+                            pageElements={pageElements}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                        />
+                    </>
+                ) : (
+                    <p>No hay productos disponibles</p>
+                )}
+
+                <div className={styles.buttonContainer}>
+                    <>
+                        <button
+                            className={`button button-secondary ${styles.buttonHome}`}
+                            onClick={handleQuitarItems}
+                            disabled={selectedIds.length !== 1}
+                        >
+                            Quitar
                         </button>
-                    </Link>
-                ))}
-            </div>
+                        <button
+                            className={`button button-secondary `}
+                            onClick={handleModificarItems}
+                            disabled={selectedIds.length !== 1}
+                        >
+                            Modificar
+                        </button>
+                    </>
+                    {buttons.map((button, index) => (
+                        <Link key={index} href={button.path}>
+                            <button className={`button button-primary ${styles.buttonHome}`}>
+                                {button.label}
+                            </button>
+                        </Link>
+                    ))}
+                </div>
             </div>
             <Footer />
             <GenericModal

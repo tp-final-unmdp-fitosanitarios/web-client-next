@@ -14,7 +14,7 @@ import { Producto } from "@/domain/models/Producto";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import ModalConfirmacionEliminacion from "@/components/ModalConfimacionEliminacion/ModalConfirmacionEliminacion";
-import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
+import PaginationControls from "@/components/PaginationControls/paginationControls";
 
 const ProvidersPage = () => {
     const { getApiService, isReady } = useAuth();
@@ -199,32 +199,15 @@ const ProvidersPage = () => {
                             onSelectSingleItem={handleSelectSingleItem}
                         />
                         {/* Paginación */}
-                        <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
-                            <Pagination
-                                count={totalPages}
-                                page={page + 1}
-                                onChange={handlePageChange}
-                                color="primary"
-                                size="large"
-                            />
-                            <Box sx={{ mt: 1 }}>
-                                <TextField
-                                    select
-                                    label="Elementos por página"
-                                    value={pageSize}
-                                    onChange={handlePageSizeChange}
-                                    sx={{ width: 180 }}
-                                    size="small"
-                                >
-                                    {[5, 10, 20, 50].map((size) => (
-                                        <MenuItem key={size} value={size}>{size}</MenuItem>
-                                    ))}
-                                </TextField>
-                            </Box>
-                            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                                Mostrando {pageElements} de {totalElements} elementos
-                            </Typography>
-                        </Box>
+                        <PaginationControls
+                            page={page}
+                            pageSize={pageSize}
+                            totalPages={totalPages}
+                            totalElements={totalElements}
+                            pageElements={pageElements}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                        />
                     </div>
                     <div className={styles.formContainer}>
                         <h2 className={styles.subtitle}>Detalle del Proveedor</h2>

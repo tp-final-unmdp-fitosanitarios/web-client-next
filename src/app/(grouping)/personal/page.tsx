@@ -111,12 +111,12 @@ export default function PersonalPage() {
 
     const handleModificarUsuario = () => {
         if (selectedIds.length !== 1) {
-          alert("Debe seleccionar un único usuario para modificar.");
-          return;
+            alert("Debe seleccionar un único usuario para modificar.");
+            return;
         }
         const id = selectedIds[0];
         router.push(`/personal/modificar?Id=${id}`);
-      };
+    };
 
 
     const items = usuarios && usuarios.length > 0
@@ -185,6 +185,7 @@ export default function PersonalPage() {
                             deleteItems={true}
                             selectSingleItem={false}
                         />
+    // TO DO agregar paginacion:
                     ) : (
                         <p>No hay usuarios disponibles</p>
                     )}
@@ -204,8 +205,9 @@ export default function PersonalPage() {
                             </button>
                         </Link>
                         <button
-                            className="button button-primary"
+                            className={`button button-primary ${selectedIds.length !== 1 ? styles.disabledButton : ''}`}
                             onClick={handleModificarUsuario}
+                            disabled={selectedIds.length !== 1}
                         >
                             Modificar
                         </button>

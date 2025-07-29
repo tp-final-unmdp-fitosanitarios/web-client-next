@@ -10,7 +10,7 @@ import Footer from '@/components/Footer/Footer';
 import { Producto } from '@/domain/models/Producto';
 import { Locacion } from '@/domain/models/Locacion';
 import { useLoading } from "@/hooks/useLoading";
-import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
+import {  Box, Typography } from "@mui/material";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DatePicker } from '@mui/x-date-pickers/DatePicker';
@@ -18,6 +18,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ExpandLessIcon from '@mui/icons-material/ExpandLess';
 import { IconButton, Collapse, Paper, Grid, Button } from '@mui/material';
 import  { Dayjs } from 'dayjs';
+import PaginationControls from '@/components/PaginationControls/paginationControls';
 
 interface Movement {
     id: string;
@@ -256,32 +257,15 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                 })}
                 </div>
                 {/* Paginación */}
-                <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
-                    <Pagination
-                        count={totalPages}
-                        page={page + 1}
-                        onChange={handlePageChange}
-                        color="primary"
-                        size="large"
-                    />
-                    <Box sx={{ mt: 1 }}>
-                        <TextField
-                            select
-                            label="Elementos por página"
-                            value={pageSize}
-                            onChange={handlePageSizeChange}
-                            sx={{ width: 180 }}
-                            size="small"
-                        >
-                            {[5, 10, 20, 50].map((size) => (
-                                <MenuItem key={size} value={size}>{size}</MenuItem>
-                            ))}
-                        </TextField>
-                    </Box>
-                    <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-                        Mostrando {pageElements} de {totalElements} elementos
-                    </Typography>
-                </Box>
+                <PaginationControls
+                            page={page}
+                            pageSize={pageSize}
+                            totalPages={totalPages}
+                            totalElements={totalElements}
+                            pageElements={pageElements}
+                            onPageChange={handlePageChange}
+                            onPageSizeChange={handlePageSizeChange}
+                        />
             </div>
             { showDetailModal && (
                 <MovementDetailModal open={showDetailModal} setModalClose={handleDetailModalClose} movement={selectedMovement} />
