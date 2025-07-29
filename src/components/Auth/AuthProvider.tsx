@@ -3,6 +3,7 @@ import ApiService from "@/services/api-service";
 import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User } from "@/domain/models/User";
+import { preloadDataAfterLogin } from "../../utilities/cacheInitialData";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -99,7 +100,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     fetchUser();
   }, [isReady, userId]); // Removí 'user' de las dependencias para evitar loops
 
-  const login = (updatedToken: string, userId: string, userData?: User) => {
+  const login = async (updatedToken: string, userId: string, userData?: User) => {
     console.log("Login called with:", { updatedToken, userId, userData });
     
     localStorage.setItem("token", updatedToken);
@@ -113,6 +114,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       console.log("Setting user data:", userData);
       setUser(userData);
       localStorage.setItem("userData", JSON.stringify(userData));
+      
+      // Crear ApiService con el nuevo token para preloadDataAfterLogin
+      const apiServiceWithNewToken = new ApiService(updatedToken, logout);
+      await preloadDataAfterLogin(apiServiceWithNewToken);
     }
   };
 

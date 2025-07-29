@@ -159,14 +159,14 @@ export default function ProductosView() {
          );
      }
     
-    /*if (error) {
+    if (error && error !== "Network Error") {
          return (
              <div className="page-container">
                  <MenuBar showMenu={true} path="" />
                  <div>Error: {error}</div>
              </div>
          );
-     }*/
+     }
 
     return (
         <div className="page-container">

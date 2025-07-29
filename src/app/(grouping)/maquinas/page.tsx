@@ -35,6 +35,7 @@ export default function MaquinasView() {
         const queryParams = new URLSearchParams();
         queryParams.append('page', page.toString());
         queryParams.append('size', pageSize.toString());
+        console.log(`machines?${queryParams.toString()}`);
         const response = await withLoading(
           apiService.get<ResponseItems<Maquina>>(`machines?${queryParams.toString()}`),
           "Cargando máquinas..."

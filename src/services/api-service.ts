@@ -1,7 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import axios, { AxiosInstance, AxiosRequestConfig, AxiosRequestHeaders } from "axios";
-//import useToken from "./tokenService";
-
+import { getItem, setItem } from "@/utilities/indexedDB";
 
 interface ApiOptions {
   baseUrl?: string;
@@ -25,7 +24,6 @@ class ApiService {
   private token: string | null = null;
   private logout: () => void;
 
-  
   constructor(token: string | null, logout: () => void) {
     this.logout = logout;
     this.axiosInstance = axios.create({
@@ -34,14 +32,14 @@ class ApiService {
         "Content-Type": "application/json",
         ...(token ? { Authorization: `Bearer ${token}` } : {}),
       },
-    })
+    });
 
     this.axiosInstance.interceptors.response.use(
       (response) => response,
       (error) => {
         console.log("Error response:", error.response);
         if (error.response?.status === 401) {
-          console.log("Fallo de autorizacion")
+          console.log("Fallo de autorizacion");
           this.logout();
         }
         return Promise.reject(error);
@@ -54,7 +52,6 @@ class ApiService {
           config.headers = {} as AxiosRequestHeaders;
         }
         if (this.token) {
-          // Aseguramos compatibilidad con tipos AxiosHeaderValue
           (config.headers as AxiosRequestHeaders).Authorization = `Bearer ${this.token}`;
         }
         return config;
@@ -63,36 +60,51 @@ class ApiService {
     );
   }
 
-
   private async request<T>(options: ApiOptions): Promise<ApiResponse<T>> {
     const { baseUrl = this.defaultBaseUrl, endpoint, id, data, method, headers } = options;
-    const url = id ? `${endpoint}/${id}` : endpoint;
-
+    const path = id ? `${endpoint}/${id}` : endpoint;
+    const url = new URL(path, baseUrl);
+  
     const config: AxiosRequestConfig = {
       method,
-      url,
+      url: url.toString(), // Esto incluye query params si endpoint los tiene
       data,
       headers: { ...this.axiosInstance.defaults.headers.common, ...headers },
-      baseURL: baseUrl,
+      baseURL: undefined, // Ya está incluido en el `url` completo
     };
-    
+  
     try {
       const response = await this.axiosInstance(config);
+    
+      // Guardar en cache si es GET y exitoso
+      if (method === "GET" && response?.data) {
+        await setItem<T>(endpoint, response.data);
+      }
+    
       return { data: response.data, status: response.status, success: true };
     } catch (error: any) {
       if (error.response?.status === 401) {
-        console.log("Fallo de autorizacion")
+        console.log("Fallo de autorizacion");
         this.logout();
       }
       if (error.response?.status === 403) {
-        console.log("Acceso denegado")
+        console.log("Acceso denegado");
       }
       if (error.response?.status === 500) {
         console.error("API Error:", error.response || error);
       }
-
+    
+      // Fallback al cache si es GET
+      if (method === "GET") {
+        const cachedData = await getItem<T>(endpoint);
+        if (cachedData) {
+          console.warn(`[CACHE] Respuesta offline desde cache para ${url.toString()}`);
+          return { data: cachedData as T, status: 200, success: true };
+        }
+      }
+    
       return {
-        data: null as any,
+        data: null as T,
         status: error.response?.status || 500,
         success: false,
         error: error.response?.data?.message || error.message || "Error en la petición",
@@ -117,13 +129,13 @@ class ApiService {
     return this.request<T>({ endpoint, id, method: "PUT", data, ...options });
   }
 
-async updateDirect<T>(
-  endpoint: string,
-  data: any,
-  options: Partial<ApiOptions> = {}
-): Promise<ApiResponse<T>> {
-  return this.request<T>({ endpoint, method: "PUT", data, ...options });
-}
+  async updateDirect<T>(
+    endpoint: string,
+    data: any,
+    options: Partial<ApiOptions> = {}
+  ): Promise<ApiResponse<T>> {
+    return this.request<T>({ endpoint, method: "PUT", data, ...options });
+  }
 
   async patch<T>(
     endpoint: string,
@@ -137,7 +149,6 @@ async updateDirect<T>(
   async delete<T>(endpoint: string, id: number | string, options: Partial<ApiOptions> = {}): Promise<ApiResponse<T>> {
     return this.request<T>({ endpoint, id, method: "DELETE", ...options });
   }
-
 }
 
 export default ApiService;

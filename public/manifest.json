@@ -9,13 +9,7 @@
     "orientation": "portrait",
     "icons": [
       {
-        "src": "./Logotipo_verde.png",
-        "sizes": "192x192",
-        "type": "image/png",
-        "purpose": "any"
-      },
-      {
-        "src": "./Logotipo_verde.png",
+        "src": "/Marca_Verde512x512.png",
         "sizes": "512x512",
         "type": "image/png",
         "purpose": "any"

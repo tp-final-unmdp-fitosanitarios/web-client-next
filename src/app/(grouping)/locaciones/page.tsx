@@ -174,7 +174,7 @@ export default function LocacionesView() {
         );
     }
 
-    if (error) {
+    /*if (error) {
         return (
             <div className="page-container">
                 <MenuBar showMenu={true} path="" />
@@ -182,7 +182,7 @@ export default function LocacionesView() {
                 <Footer />
             </div>
         );
-    }
+    }*/
 
     return (
         <div className="page-container">

@@ -10,6 +10,7 @@ const withSerwist = withSerwistInit({
   swDest: "./public/sw.js",
   additionalPrecacheEntries: [
     "/",
+    "/manifest.json",
     "/aplicaciones",
     "/aplicaciones/confirmar",
     "/aplicaciones/consolidado",
