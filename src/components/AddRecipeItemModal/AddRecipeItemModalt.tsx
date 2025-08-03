@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useState } from 'react';
 import { Modal, Box, TextField, MenuItem } from '@mui/material';
 import styles from "./AddRecipeItemModal.module.scss"

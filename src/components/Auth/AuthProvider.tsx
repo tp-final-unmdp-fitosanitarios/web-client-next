@@ -10,7 +10,7 @@ interface AuthContextType {
   token: string | null;
   login: (updatedToken: string, userId: string, userData?: User) => void;
   logout: () => void;
-  getApiService: () => ApiService;
+  getApiService: (newToken?: string) => ApiService;
   isReady: boolean; // Agregado para indicar si el contexto está listo
   getUserId: () => string | null;
   setUserId: (id: string) => void;
@@ -126,7 +126,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     set_UserId(id);
   };
   
-  const getApiService = () => new ApiService(token, logout);
+  const getApiService = (newToken?: string) =>{
+    if(newToken){
+      return new ApiService(newToken, logout);
+    }
+    else{
+      return new ApiService(token, logout);
+    }
+  } 
 
   return (
     <AuthContext.Provider value={{ 
@@ -139,7 +146,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       getUserId, 
       setUserId, 
       user,
-      isLoadingUser 
+      isLoadingUser
     }}>
       {children}
     </AuthContext.Provider>

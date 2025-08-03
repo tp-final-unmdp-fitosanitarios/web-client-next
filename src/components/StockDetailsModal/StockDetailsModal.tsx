@@ -1,3 +1,5 @@
+"use client";
+
 import { Modal, Box, Typography, Button } from "@mui/material";
 import { Stock } from "@/domain/models/Stock";
 

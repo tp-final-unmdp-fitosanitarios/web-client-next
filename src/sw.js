@@ -49,27 +49,31 @@ const serwist = new Serwist({
   runtimeCaching: [
     ...defaultCache,
 
-    // 🌐 DOCUMENT requests (HTML routes)
+    
     {
-      urlPattern: ({ request, url }) =>
-        request.mode === 'navigate' || url.searchParams.has('__flight__') || url.searchParams.has('_rsc'),
+      matcher({ request, url }) {
+        return request.mode === "navigate" || url.searchParams.has("__flight__") || url.searchParams.has("_rsc");
+      },
       handler: new NetworkFirst(),
-    },
-
-    // ⬆️ POST y PUT offline con background sync
-    {
-      urlPattern: ({ request }) => request.method === 'POST',
-      handler: new NetworkOnly({
-        plugins: [bgSyncPlugin],
-      }),
-    },
-    {
-      urlPattern: ({ request }) => request.method === 'PUT',
-      handler: new NetworkOnly({
-        plugins: [bgSyncPlugin],
-      }),
     },
   ],
 });
+
+serwist.registerCapture(
+  /.*/,
+  new NetworkOnly({
+    plugins: [bgSyncPlugin],
+  }),
+  "POST"
+);
+
+serwist.registerCapture(
+  /.*/,
+  new NetworkOnly({
+    plugins: [bgSyncPlugin],
+  }),
+  "PUT"
+);
+
 
 serwist.addEventListeners();

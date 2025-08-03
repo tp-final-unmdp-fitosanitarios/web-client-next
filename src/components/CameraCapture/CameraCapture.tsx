@@ -1,3 +1,5 @@
+"use client";
+
 import React, { useRef, useEffect, useState } from 'react';
 import { Box, Button, Modal, Typography, IconButton } from '@mui/material';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';

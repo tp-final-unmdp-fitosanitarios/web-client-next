@@ -1,7 +1,7 @@
 import { setItem } from "./indexedDB";
 import ApiService from "@/services/api-service";
 
-export const    preloadDataAfterLogin = async (apiService: ApiService) => {
+export const preloadDataAfterLogin = async (apiService: ApiService) => {
   try {
     const endpoints = [
       "/users",
@@ -10,11 +10,15 @@ export const    preloadDataAfterLogin = async (apiService: ApiService) => {
       "/locations",
       "/stock/summary?page=0&size=10",
       "/locations?type=WAREHOUSE&type=FIELD",
+      "locations?type=CROP",
       "/products?size=100",
+      "/applications?status=PENDING&page=0&size=10",
       "/applications?status=IN_PROGRESS&page=0&size=10",
       "/applications?status=FINISHED&page=0&size=10",
       "/products?size=100",
-      "/locations/crop-dashboard"
+      "/locations/crop-dashboard",
+      "/products?page=0&size=10",
+      "/agrochemicals?page=0&size=10"
     ];
 
     await Promise.all(

@@ -1,3 +1,5 @@
+"use client";
+
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/no-unused-vars */
 "use client";
@@ -52,10 +54,10 @@ export default function Login() {
       }
       else{
         const { token, user_id } = res.data as { token: string, user_id: string };
-        
+        const api = getApiService(token);
         // Obtener los datos del usuario inmediatamente después del login
         try {
-          const userResponse = await apiService.get<User>(`/users/${user_id}`);
+          const userResponse = await api.get<User>(`/users/${user_id}`);
           if (userResponse.success) {
             console.log("Login successful with user data:", userResponse.data);
             login(token, user_id, userResponse.data);

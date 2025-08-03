@@ -1,3 +1,5 @@
+"use client";
+
 import { Modal, Box } from "@mui/material";
 import styles from "./LocationDetailsModal.module.scss";
 import { Locacion } from "@/domain/models/Locacion";
