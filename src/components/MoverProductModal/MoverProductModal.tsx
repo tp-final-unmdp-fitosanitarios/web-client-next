@@ -1,3 +1,5 @@
+"use client";
+
 import { Box, Modal, TextField } from "@mui/material";
 import { useState } from "react";
 import styles from "./MoverProductModal.module.scss";

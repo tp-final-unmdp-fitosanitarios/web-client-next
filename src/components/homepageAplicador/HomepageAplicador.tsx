@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./homepageAplicador.module.scss"
 import { User } from "@/domain/models/User"
 import NavigationLink from "../NavigationLink/NavigationLink"

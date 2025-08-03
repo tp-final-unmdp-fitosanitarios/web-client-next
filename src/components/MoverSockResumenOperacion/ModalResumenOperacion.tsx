@@ -1,3 +1,5 @@
+"use client";
+
 import { Stock } from "@/domain/models/Stock";
 import { transformToItems } from "@/utilities/transform";
 import { Modal, Box } from "@mui/material";

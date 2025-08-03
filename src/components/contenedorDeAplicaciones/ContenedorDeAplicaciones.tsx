@@ -1,3 +1,5 @@
+"use client";
+
 // import { Aplicacion } from "@/domain/models/Aplicacion"
 // import { useEffect, useState } from "react"
 // import { Producto } from "@/domain/models/Producto"

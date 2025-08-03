@@ -1,3 +1,5 @@
+"use client";
+
 import GenericForm from '@/components/formulario/formulario';
 import styles from "./AddProviderModal.module.scss";
 import { Field } from "@/domain/models/Field";
