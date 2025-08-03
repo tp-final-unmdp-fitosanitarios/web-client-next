@@ -1,3 +1,5 @@
+"use client";
+
 import styles from "./menuBarPestañas.module.scss" 
 import Image from "next/image"
 import SideBar from "../sideBar/SideBar"

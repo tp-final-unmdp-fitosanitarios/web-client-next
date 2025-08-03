@@ -1,3 +1,5 @@
+"use client";
+
 import MenuBar from "@/components/menuBar/MenuBar";
 import Footer from "@/components/Footer/Footer";
 const NotFound = () => {
