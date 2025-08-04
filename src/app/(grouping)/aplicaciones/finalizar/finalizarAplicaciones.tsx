@@ -27,6 +27,7 @@ import ClearIcon from '@mui/icons-material/Clear';
 import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CameraCapture from '@/components/CameraCapture/CameraCapture';
 import { useLoaderStore } from '@/contexts/loaderStore';
+import { useWarmupAlertStore } from "@/contexts/warmupAlertStore";
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -41,7 +42,7 @@ type ProductoExistente = Producto & {
 export default function FinalizarAplicacion() {
     const searchParams = useSearchParams();
     const applicationId = searchParams.get("id");
-    const { getApiService} = useAuth();
+    const { getApiService } = useAuth();
     const apiService = getApiService();
     const router = useRouter();
     const { withLoading } = useLoading();
@@ -191,7 +192,7 @@ export default function FinalizarAplicacion() {
 
         console.log(finishAplicationReq);
         try {
-                const response = await withLoading(
+            const response = await withLoading(
                 apiService.create(`applications/${aplicacion?.id}/finish`, finishAplicationReq),
                 "Finalizando aplicación..."
             );
@@ -200,13 +201,37 @@ export default function FinalizarAplicacion() {
                 setAddRecipeModalOpen(false);
                 setProductosAAgregar([]);
             } else {
+                // Si hay error de red (sin conexión)
+                if (!navigator.onLine || (response.error && response.error.toString().includes("Network"))) {
+                    useWarmupAlertStore.getState().show(
+                        "Solicitud procesada: se sincronizará al recuperar conexión."
+                    );
+                    setTimeout(() => {
+                        useWarmupAlertStore.getState().hide();
+                    router.push("/aplicaciones");
+
+                    }, 4000);
+
+                }
                 console.error("Error al crear la aplicacion:", response.error);
             }
-        } catch (error) {
+        } catch (error: any) {
+            // Esto captura errores de red reales (desconexión, etc)
+            if (!navigator.onLine || (error?.message && error.message.includes("Network"))) {
+                useWarmupAlertStore.getState().show(
+                    "Solicitud procesada: se sincronizará al recuperar conexión."
+                );
+                setTimeout(() => {
+                    useWarmupAlertStore.getState().hide();
+                router.push("/aplicaciones");
+
+                }, 4000);
+
+            }
             console.error("Error al crear la aplicacion:", error);
         }
         setActiveStep(0);
-    }
+    };
 
     const fetchData = async () => {
         // Simula un fetch con mock
@@ -757,12 +782,14 @@ export default function FinalizarAplicacion() {
                                 mt: 3
                             }}>
                                 <button
-                                    className={`button button-outlined ${styles.button}`}
+                                    className={`button button-primary ${styles.button}`}
                                     onClick={() => setAddRecipeModalOpen(true)}
                                     style={{
                                         minWidth: 'auto',
                                         width: '100%',
-                                        maxWidth: '300px'
+                                        maxWidth: '300px',
+                                        backgroundColor: "#144733",
+                                        color: "white"
                                     }}
                                 >
                                     Agregar Producto

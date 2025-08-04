@@ -21,26 +21,12 @@ const serwist = new Serwist({
     "/aplicaciones/iniciar",
     "/aplicaciones/modificar",
     "/cultivos",
-    "/estadisticas",
     "/home",
     "/locaciones",
-    "/locaciones/agregar",
     "/login",
     "/maquinas",
-    "/maquinas/agregar",
-    "/perfil",
-    "/perfil/cambiar-password",
-    "/personal",
-    "/personal/agregar",
-    "/productos",
-    "/productos/agregar",
-    "/productos/agroquimicos",
-    "/productos/agroquimicos/agregar",
-    "/productos/edit",
     "/stock",
     "/stock/mover",
-    "/stock/movimientos",
-    "/stock/proveedores",
     "/stock/retirar"
   ],
   skipWaiting: true,
@@ -49,13 +35,13 @@ const serwist = new Serwist({
   runtimeCaching: [
     ...defaultCache,
 
-    
+
     {
       matcher({ request, url }) {
         return request.mode === "navigate" || url.searchParams.has("__flight__") || url.searchParams.has("_rsc");
       },
-      handler: new NetworkFirst(),
-    },
+      handler: new NetworkFirst(),}
+  
   ],
 });
 

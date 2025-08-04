@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 import { AuthProvider } from "@/components/Auth/AuthProvider";
 import LoaderProvider from "@/components/Loader/LoaderProvider";
 import { ProtectedRoute } from "@/components/Auth/ProtectedRoute";
+import ClientSideSetup from "@/components/ClientSideSetup/ClientSideSetup";
+import WarmupAlert from "@/components/WarmUpAlert/WarmUpAlert";
 
 export default function ProviderWrapper({
   children,
@@ -16,6 +18,8 @@ export default function ProviderWrapper({
   return (
     <AuthProvider>
       <LoaderProvider>
+          <WarmupAlert />
+          <ClientSideSetup />
         {isPublicRoute ? (
           children
         ) : (

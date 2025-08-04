@@ -1,5 +1,5 @@
 "use client";
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { styled } from '@mui/material/styles';
 import AppBar from '@mui/material/AppBar';
 import Tabs from '@mui/material/Tabs';
@@ -20,6 +20,7 @@ import ApplicationDetailModal from './ApplicationDetailModal';
 import { useRouter } from 'next/navigation';
 import { useLoaderStore } from '@/contexts/loaderStore';
 import { Pagination, TextField, MenuItem, Box as MUIBox } from '@mui/material';
+import { getPendingFinishAppIds } from "@/utilities/offlineQueue";
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -113,6 +114,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
   const [value, setValue] = React.useState(0);
   const { user, isLoading } = useUser();
   const { showLoader } = useLoaderStore();
+  const [pendingFinishIds, setPendingFinishIds] = useState<string[]>([]);
 
   // Estado para el modal de detalles
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -145,6 +147,16 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
     }
   };
 
+  useEffect(() => {
+    if (value === 1) {
+      (async () => {
+        const ids = await getPendingFinishAppIds();
+        setPendingFinishIds(Array.isArray(ids) ? ids : []);
+        console.log("IDS pendientes de sync:", ids);
+      })();
+    }
+  }, [value]);
+
   const {
     items: aplicacionesToDisplay,
     selectedIds,
@@ -152,9 +164,9 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
 
   const parsedAplicaciones = aplicacionesToDisplay
     .filter((item) =>
-      (value === 0 && item.status === EstadoAplicacion.Pendiente) || 
+      (value === 0 && item.status === EstadoAplicacion.Pendiente) ||
       (value === 1 && item.status === EstadoAplicacion.EnCurso) ||
-      (value === 2 && item.status === EstadoAplicacion.Finalizada && item.type==="INSTANT")
+      (value === 2 && item.status === EstadoAplicacion.Finalizada && item.type === "INSTANT")
     )
     .map((item) => ({
       id: item.id.toString(),
@@ -165,12 +177,28 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
 
   const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
     return {
-        ...item,
-        cultivo: item.cultivo,
-        fecha: item.fecha,
+      ...item,
+      cultivo: item.cultivo,
+      fecha: item.fecha,
     };
   });
 
+const itemsEnCurso = useMemo(() =>
+  transformToItems(
+    parsedAplicaciones
+      .filter((item) => value === 1 && item.estado === EstadoAplicacion.EnCurso)
+      .map(item => ({
+        ...item,
+        pendienteSync: pendingFinishIds.includes(item.id) // SOLO los que matchean
+      })),
+    "id",
+    ["cultivo", "fecha", "pendienteSync"]
+  ), [parsedAplicaciones, pendingFinishIds, value]
+);
+
+if(value===1){
+  console.log("Items en curso:", itemsEnCurso);
+}
   const campos = ["cultivo", "fecha"];
 
   const startApplication = (id: string) => {
@@ -178,10 +206,10 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
       console.warn('Usuario no disponible aún');
       return;
     }
-    
+
     const roles = user.roles;
     console.log(user);
-    if(roles?.includes(Roles.Encargado))
+    if (roles?.includes(Roles.Encargado))
       router.push(`aplicaciones/modificar?id=${id}`);
     else
       router.push(`aplicaciones/iniciar?id=${id}`);
@@ -193,7 +221,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
   }
 
   const confirmApplication = (id: string) => {
-      showLoader('Cargando aplicación...');
+    showLoader('Cargando aplicación...');
     router.push(`aplicaciones/confirmar?id=${id}`);
   }
 
@@ -219,7 +247,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
         </StyledTabs>
       </StyledAppBar>
       <TabPanel value={value} index={0}>
-      {items.length > 0 ? (
+        {items.length > 0 ? (
           <ItemList
             items={items}
             displayKeys={campos}
@@ -239,13 +267,13 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
             )}
           />
         ) : (
-          <div style={{textAlign: "center"}}>No hay aplicaciones pendientes</div>
+          <div style={{ textAlign: "center" }}>No hay aplicaciones pendientes</div>
         )}
       </TabPanel>
       <TabPanel value={value} index={1}>
-        {items.length > 0 ? (
+        {itemsEnCurso.length > 0 ? (
           <ItemList
-            items={items}
+            items={itemsEnCurso}
             displayKeys={campos}
             selectedIds={selectedIds}
             selectItems={false}
@@ -253,21 +281,41 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
             selectSingleItem={true}
             onSelectSingleItem={finishApplication}
             actions={(item) => (
-              <VisibilityIcon
-                style={{ cursor: 'pointer', color: '#404e5c' }}
-                onClick={e => {
-                  e.stopPropagation();
-                  handleOpenModal(item.id);
-                }}
-              />
+              <span style={{ display: "flex", alignItems: "center" }}>
+                <VisibilityIcon
+                  style={{ cursor: 'pointer', color: '#404e5c' }}
+                  onClick={e => {
+                    e.stopPropagation();
+                    handleOpenModal(item.id);
+                  }}
+                />
+                {item.pendienteSync && item.pendienteSync !== "false"  && (
+                  
+                  <span
+                    style={{
+                      marginTop: 0,
+                      marginLeft: 8,
+                      color: "#ffd666",
+                      fontSize: "0.7em",
+                      background: "#fffbe6",
+                      borderRadius: 8,
+                      padding: "2px 6px",
+                      border: "1px solid #ffd666"
+                    }}
+                    title="Esta aplicación está pendiente de sincronización offline."
+                  >
+                    ⏳ Sin sincronizar
+                  </span>
+                )}
+              </span>
             )}
           />
         ) : (
-          <div style={{textAlign: "center"}}>No hay aplicaciones en curso</div>
+          <div style={{ textAlign: "center" }}>No hay aplicaciones en curso</div>
         )}
       </TabPanel>
       <TabPanel value={value} index={2}>
-      {items.length > 0 ? (
+        {items.length > 0 ? (
           <ItemList
             items={items}
             displayKeys={campos}
@@ -287,7 +335,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
             )}
           />
         ) : (
-          <div style={{textAlign: "center"}}>No hay aplicaciones a confirmar</div>
+          <div style={{ textAlign: "center" }}>No hay aplicaciones a confirmar</div>
         )}
       </TabPanel>
       {/* Modal de detalles de aplicación */}
@@ -298,7 +346,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
         productos={productos}
       />
       {/* Paginación */}
-      <MUIBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 ,gap: "10px"}}>
+      <MUIBox sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2, gap: "10px" }}>
         <Pagination
           count={totalPages}
           page={page + 1}

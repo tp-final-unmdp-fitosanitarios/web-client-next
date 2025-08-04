@@ -72,8 +72,11 @@ export default function IniciarAplicacion() {
         router.push("/aplicaciones");
     }
 
-    const handleConfirm = async () => {
-            const req = {
+    const handleConfirm = async () => { /*Luego de confirmar la aplicación, se cambia el estado a IN_PROGRESS 
+    
+        Llamara al utils poolForUpdatedList.ts para que se actualice la lista de aplicaciones en curso
+        */    
+        const req = {
                 "status":"IN_PROGRESS"
             }
             try {
