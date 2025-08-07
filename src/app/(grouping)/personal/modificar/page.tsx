@@ -31,11 +31,16 @@ const roles = [
 export default function EditarUsuario() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { getApiService, isReady } = useAuth();
+  const { getApiService, isReady, user: currentUser } = useAuth();
   const apiService = getApiService();
 
   const [modalOpen, setModalOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
+  const [passwordSectionOpen, setPasswordSectionOpen] = useState(false);
+  const [newPassword, setNewPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [passwordModalOpen, setPasswordModalOpen] = useState(false);
+  const [passwordError, setPasswordError] = useState('');
 
   useEffect(() => {
     if (!isReady) return;
@@ -97,6 +102,40 @@ export default function EditarUsuario() {
     router.push('/personal');
   };
 
+  const handlePasswordChange = async () => {
+    if (!newPassword || newPassword !== confirmPassword) {
+      setPasswordError('Las contraseñas no coinciden o están vacías');
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setPasswordError('La contraseña debe tener al menos 6 caracteres');
+      return;
+    }
+
+    try {
+      const response = await apiService.update(`/users/${user?.id}/change-password`, '', {
+        newPassword: newPassword,
+        confirmPassword: confirmPassword
+      });
+
+      if (response.success) {
+        setPasswordModalOpen(true);
+        setNewPassword('');
+        setConfirmPassword('');
+        setPasswordError('');
+        setPasswordSectionOpen(false);
+      } else {
+        setPasswordError('Error al cambiar la contraseña');
+      }
+    } catch (error: any) {
+      console.error('Error al cambiar la contraseña:', error.message);
+      setPasswordError('Error al cambiar la contraseña');
+    }
+  };
+
+  const isAdminUser = currentUser?.roles?.includes('ADMIN');
+
   const isFormValid = useCallback((formData: Record<string, string>) => {
     return (
       formData.nombre &&
@@ -153,7 +192,62 @@ export default function EditarUsuario() {
           buttonName="Guardar"
           equalButtonWidth={true}
           isSubmitDisabled={(formData) => !isFormValid(formData)}
-        />
+        >
+          {isAdminUser && (
+            <div className={styles.passwordSection}>
+              <div 
+                className={styles.passwordToggle}
+                onClick={() => setPasswordSectionOpen(!passwordSectionOpen)}
+              >
+                <h3>🔒 Cambiar Contraseña {passwordSectionOpen ? '▼' : '▶'}</h3>
+              </div>
+              
+              {passwordSectionOpen && (
+                <div className={styles.passwordContent}>
+                  <div className={styles.warning}>
+                    ⚠️ <strong>Atención:</strong> Esta es una acción sensible. Cambiar la contraseña afectará el acceso del usuario al sistema.
+                  </div>
+                  
+                  <div className={styles.passwordFields}>
+                    <div className={styles.field}>
+                      <label htmlFor="newPassword">Nueva Contraseña:</label>
+                      <input
+                        type="password"
+                        id="newPassword"
+                        value={newPassword}
+                        onChange={(e) => setNewPassword(e.target.value)}
+                        placeholder="Ingrese la nueva contraseña"
+                      />
+                    </div>
+                    
+                    <div className={styles.field}>
+                      <label htmlFor="confirmPassword">Confirmar Contraseña:</label>
+                      <input
+                        type="password"
+                        id="confirmPassword"
+                        value={confirmPassword}
+                        onChange={(e) => setConfirmPassword(e.target.value)}
+                        placeholder="Confirme la nueva contraseña"
+                      />
+                    </div>
+                    
+                    {passwordError && (
+                      <div className={styles.error}>{passwordError}</div>
+                    )}
+                    
+                    <button 
+                      className={styles.passwordButton}
+                      onClick={handlePasswordChange}
+                      disabled={!newPassword || !confirmPassword}
+                    >
+                      Cambiar Contraseña
+                    </button>
+                  </div>
+                </div>
+              )}
+            </div>
+          )}
+        </Formulario>
       </div>
 
       <Footer />
@@ -162,6 +256,15 @@ export default function EditarUsuario() {
         onClose={handleCloseModal}
         title="Usuario modificado"
         modalText={`Se modificó el usuario: ${user?.first_name} ${user?.last_name}`}
+        buttonTitle="Cerrar"
+        showSecondButton={false}
+      />
+      
+      <GenericModal
+        isOpen={passwordModalOpen}
+        onClose={() => setPasswordModalOpen(false)}
+        title="Contraseña actualizada"
+        modalText={`Se cambió la contraseña del usuario: ${user?.first_name} ${user?.last_name}`}
         buttonTitle="Cerrar"
         showSecondButton={false}
       />
