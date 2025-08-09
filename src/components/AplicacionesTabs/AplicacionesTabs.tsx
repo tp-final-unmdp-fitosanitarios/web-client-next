@@ -162,17 +162,34 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
     selectedIds,
   } = useItemsManager<Aplicacion>(aplicaciones);
 
+  const isApplicatorUser = useMemo(() => {
+    const roles = user?.roles || [];
+    return roles.includes(Roles.Aplicador) || roles.includes('APPLICATOR');
+  }, [user]);
+
   const parsedAplicaciones = aplicacionesToDisplay
-    .filter((item) =>
-      (value === 0 && item.status === EstadoAplicacion.Pendiente) ||
-      (value === 1 && item.status === EstadoAplicacion.EnCurso) ||
-      (value === 2 && item.status === EstadoAplicacion.Finalizada && item.type === "INSTANT")
-    )
+    .filter((item) => {
+      const matchesTab =
+        (value === 0 && item.status === EstadoAplicacion.Pendiente) ||
+        (value === 1 && item.status === EstadoAplicacion.EnCurso) ||
+        (value === 2 && item.status === EstadoAplicacion.Finalizada && item.type === "INSTANT");
+      if (!matchesTab) return false;
+
+      // Filtro adicional: si es aplicador y estamos en "Pendientes",
+      // mostrar solo las suyas o sin asignar.
+      if (!isLoading && isApplicatorUser && value === 0) {
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const currentUserId = (user as any)?.external_id || (user as any)?.id;
+        return item.applicator_id === currentUserId || !item.applicator_id;
+      }
+
+      return true;
+    })
     .map((item) => ({
       id: item.id.toString(),
       estado: item.status,
       cultivo: locaciones?.find((l) => l.id === item.location_id)?.name || 'Sin cultivo',
-      fecha: new Date(item.application_date).toLocaleDateString()
+      fecha: new Date(item.application_date).toLocaleDateString(),
     }));
 
   const items = transformToItems(parsedAplicaciones, "id", ["cultivo", "fecha"]).map((item) => {
@@ -183,22 +200,22 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
     };
   });
 
-const itemsEnCurso = useMemo(() =>
-  transformToItems(
-    parsedAplicaciones
-      .filter((item) => value === 1 && item.estado === EstadoAplicacion.EnCurso)
-      .map(item => ({
-        ...item,
-        pendienteSync: pendingFinishIds.includes(item.id) // SOLO los que matchean
-      })),
-    "id",
-    ["cultivo", "fecha", "pendienteSync"]
-  ), [parsedAplicaciones, pendingFinishIds, value]
-);
+  const itemsEnCurso = useMemo(() =>
+    transformToItems(
+      parsedAplicaciones
+        .filter((item) => value === 1 && item.estado === EstadoAplicacion.EnCurso)
+        .map(item => ({
+          ...item,
+          pendienteSync: pendingFinishIds.includes(item.id) // SOLO los que matchean
+        })),
+      "id",
+      ["cultivo", "fecha", "pendienteSync"]
+    ), [parsedAplicaciones, pendingFinishIds, value]
+  );
 
-if(value===1){
-  console.log("Items en curso:", itemsEnCurso);
-}
+  if (value === 1) {
+    console.log("Items en curso:", itemsEnCurso);
+  }
   const campos = ["cultivo", "fecha"];
 
   const startApplication = (id: string) => {
@@ -289,8 +306,8 @@ if(value===1){
                     handleOpenModal(item.id);
                   }}
                 />
-                {item.pendienteSync && item.pendienteSync !== "false"  && (
-                  
+                {item.pendienteSync && item.pendienteSync !== "false" && (
+
                   <span
                     style={{
                       marginTop: 0,
