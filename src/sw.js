@@ -2,6 +2,7 @@ import { defaultCache } from "@serwist/next/worker";
 import { Serwist } from "serwist";
 import { NetworkOnly, NetworkFirst } from "workbox-strategies";
 import { BackgroundSyncPlugin } from "workbox-background-sync";
+import { actualizaAplicaciones } from "./utilities/ActualizaAplicaciones";
 
 // Plugin para POST/PUT offline
 const bgSyncPlugin = new BackgroundSyncPlugin("offline-queue", {
@@ -46,6 +47,14 @@ const serwist = new Serwist({
   ],
 });
 
+class MiNetworkOnlyConActualizacionDB extends NetworkOnly {
+  async handle({ request, event }) {
+    await actualizaAplicaciones(request, event);
+    return super.handle({ request, event });
+  }
+}
+
+
 serwist.registerCapture(
   /.*/,
   new MiNetworkOnlyConActualizacionDB({
@@ -54,12 +63,7 @@ serwist.registerCapture(
   "POST"
 );
 
-class MiNetworkOnlyConActualizacionDB extends NetworkOnly {
-  async handle({ request, event }) {
-    await actualizaAplicaciones(request, event);
-    return super.handle({ request, event });
-  }
-}
+
 
 serwist.registerCapture(
   /.*/,
