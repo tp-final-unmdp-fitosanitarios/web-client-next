@@ -28,6 +28,7 @@ interface Movement {
     amount: number;
     unit: string;
     created_at: string;
+    reason: string;
 }
 
 const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los producos y depositos. Evaluar cuando hacer los fetch. Anular el y-scroll.
@@ -225,6 +226,7 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                 <div className={styles.movementList}>
                 {
                 movements.map((movement) => {
+                    const isForced = movement.reason.toLocaleLowerCase().includes('force');
                     if(latestDate == null || new Date(movement.created_at).toLocaleDateString() !== new Date(latestDate).toLocaleDateString()){
                         latestDate = new Date(movement.created_at)
                         return (
@@ -234,7 +236,7 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                                 </div>
                                 <div 
                                     key={movement.id} 
-                                    className={`${styles.item} ${selectedId === movement.id ? styles.selected : ''}`}
+                                    className={`${styles.item} ${selectedId === movement.id ? styles.selected : ''} ${isForced ? styles.forced : ''}`}
                                     onClick={() => handleClickMovement(movement)}
                                 >
                                     <p className={styles.movementInfo}>{`${movement.product.name} - ${movement.amount} ${movement.unit}`}</p>
@@ -247,7 +249,7 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                         return (
                             <div 
                                 key={movement.id} 
-                                className={`${styles.item} ${selectedId === movement.id ? styles.selected : ''}`}
+                                className={`${styles.item} ${selectedId === movement.id ? styles.selected : ''} ${isForced ? styles.forced : ''}`}
                                 onClick={() => handleClickMovement(movement)}
                             >
                                 <p className={styles.movementInfo}>{`${movement.product.name} - ${movement.amount} ${movement.unit}`}</p>

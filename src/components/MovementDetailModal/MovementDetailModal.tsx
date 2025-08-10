@@ -12,6 +12,8 @@ interface Props {
 }
 
 const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) => {
+    const isForced = movement?.reason?.toLocaleLowerCase().includes('force');
+    
     return (
         <Modal 
             open={open} 
@@ -34,6 +36,12 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
                 }}
             >
                 <h3 className={styles.title}>Resumen del Movimiento</h3>
+                
+                {isForced && (
+                    <div className={styles.forcedIndicator}>
+                        <span className={styles.forcedText}>⚠️ MOVIMIENTO FORZADO</span>
+                    </div>
+                )}
                 
                 <div className={styles.movementContainer}>
                     <div className={styles.outputContainer}>
