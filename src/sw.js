@@ -27,7 +27,8 @@ const serwist = new Serwist({
     "/maquinas",
     "/stock",
     "/stock/mover",
-    "/stock/retirar"
+    "/stock/retirar",
+    "/not-found"
   ],
   skipWaiting: true,
   clientsClaim: true,
@@ -47,15 +48,22 @@ const serwist = new Serwist({
 
 serwist.registerCapture(
   /.*/,
-  new NetworkOnly({
+  new MiNetworkOnlyConActualizacionDB({
     plugins: [bgSyncPlugin],
   }),
   "POST"
 );
 
+class MiNetworkOnlyConActualizacionDB extends NetworkOnly {
+  async handle({ request, event }) {
+    await actualizaAplicaciones(request, event);
+    return super.handle({ request, event });
+  }
+}
+
 serwist.registerCapture(
   /.*/,
-  new NetworkOnly({
+  new MiNetworkOnlyConActualizacionDB({
     plugins: [bgSyncPlugin],
   }),
   "PUT"
