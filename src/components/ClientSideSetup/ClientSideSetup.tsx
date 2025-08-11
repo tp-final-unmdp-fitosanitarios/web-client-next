@@ -26,10 +26,10 @@ export default function ClientSideSetup() {
         const params = new URLSearchParams();
         params.append("status", status); // "IN_PROGRESS" o "PENDING"
         params.append("page", "0");
-        params.append("size", "20");
+        params.append("size", "10");
 
         const resp = await apiService.get<ResponseItems<Aplicacion>>(
-          `applications?${params.toString()}`
+          `/applications?${params.toString()}`
         );
 
         if (resp.success && Array.isArray(resp.data?.content)) {
@@ -56,6 +56,6 @@ export default function ClientSideSetup() {
       })();
     }
   }, [user, token, getApiService, show, hide]);
-
+  
   return null;
 }

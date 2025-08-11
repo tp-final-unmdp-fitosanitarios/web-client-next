@@ -37,19 +37,22 @@ const serwist = new Serwist({
   runtimeCaching: [
     ...defaultCache,
 
-
+    // Navegación de la app (incluye rutas /aplicaciones/*) sigue con NetworkFirst,
+    // lo cual garantiza HTML offline precacheado y datos frescos cuando hay red
     {
       matcher({ request, url }) {
         return request.mode === "navigate" || url.searchParams.has("__flight__") || url.searchParams.has("_rsc");
       },
-      handler: new NetworkFirst(),}
-  
+      handler: new NetworkFirst(),
+    },
   ],
 });
 
 class MiNetworkOnlyConActualizacionDB extends NetworkOnly {
   async handle({ request, event }) {
-    await actualizaAplicaciones(request, event);
+    // Actualiza la IndexedDB con la request
+    await actualizaAplicaciones(request);
+    // Seguir con el comportamiento normal
     return super.handle({ request, event });
   }
 }

@@ -16,28 +16,40 @@ export const getDb = async () => {
 };
 
 export const setItem = async <T>(key: string, data: T): Promise<void> => {
-    const db = await getDb();
-    await db.put(STORE_NAME, data, key);
-  };
+  const db = await getDb();
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  await tx.store.put(data, key);
+  await tx.done; // Garantiza que la transacción se haya comprometido
+};
   
-  export const getItem = async <T>(key: string): Promise<T | undefined> => {
-    const db = await getDb();
-    return db.get(STORE_NAME, key);
-  };
+export const getItem = async <T>(key: string): Promise<T | undefined> => {
+  const db = await getDb();
+  const tx = db.transaction(STORE_NAME, 'readonly');
+  const value = await tx.store.get(key);
+  await tx.done;
+  return value as T | undefined;
+};
 // Borra una clave
 export const removeItem = async (key: string) => {
   const db = await getDb();
-  return db.delete(STORE_NAME, key);
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  await tx.store.delete(key);
+  await tx.done;
 };
 
 // Limpia todo
 export const clearAll = async () => {
   const db = await getDb();
-  return db.clear(STORE_NAME);
+  const tx = db.transaction(STORE_NAME, 'readwrite');
+  await tx.store.clear();
+  await tx.done;
 };
 
 // Lista todas las claves
 export const listKeys = async () => {
   const db = await getDb();
-  return db.getAllKeys(STORE_NAME);
+  const tx = db.transaction(STORE_NAME, 'readonly');
+  const keys = await tx.store.getAllKeys();
+  await tx.done;
+  return keys;
 };

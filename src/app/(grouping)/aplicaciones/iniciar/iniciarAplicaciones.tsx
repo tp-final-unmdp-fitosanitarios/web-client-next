@@ -87,9 +87,15 @@ export default function IniciarAplicacion() {
                 if (response.success) {
                     setConfirmationModalOpen(true);
                 } else {
-                    console.error("Error al crear la aplicacion:", response.error);
+                    if(response.error == "Network Error")
+                        setConfirmationModalOpen(true);
+                    else
+                        console.error("Error al crear la aplicacion:", response.error);
                 }
             } catch (error) {
+                if(error == "Network Error")
+                    setConfirmationModalOpen(true);
+                else
                 console.error("Error al crear la aplicacion:", error);
             }
     }

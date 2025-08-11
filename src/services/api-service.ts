@@ -23,6 +23,7 @@ class ApiService {
   private defaultBaseUrl: string = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/";
   private token: string | null = null;
   private logout: () => void;
+  private connection = navigator.onLine? true : false;
 
   constructor(token: string | null, logout: () => void) {
     this.logout = logout;
@@ -67,22 +68,56 @@ class ApiService {
   
     const config: AxiosRequestConfig = {
       method,
-      url: url.toString(), // Esto incluye query params si endpoint los tiene
+      url: url.toString(),
       data,
       headers: { ...this.axiosInstance.defaults.headers.common, ...headers },
-      baseURL: undefined, // Ya está incluido en el `url` completo
+      baseURL: undefined,
     };
   
+    // Solo GET tiene cache
+    const cacheKey = endpoint.startsWith("/") ? endpoint : `/${endpoint}`;
+  
     try {
-      const response = await this.axiosInstance(config);
-    
-      // Guardar en cache si es GET y exitoso
-      if (method === "GET" && response?.data) {
-        await setItem<T>(endpoint, response.data);
+      if (method !== "GET") {
+        // Para POST, PUT, PATCH, DELETE no cacheamos ni fallback
+        const response = await this.axiosInstance(config);
+        return { data: response.data, status: response.status, success: true };
       }
-    
+  
+      // Para GET intentamos primero la llamada a API
+      if (!this.connection) {
+        // Si no hay conexión, fallback inmediato a cache
+        console.log("buscando resp offline");
+        const cachedData = await getItem<T>(cacheKey);
+        if (cachedData) {
+          console.warn(`[CACHE] Respuesta offline desde cache para ${url.toString()}`);
+          return { data: cachedData, status: 200, success: true };
+        } else {
+          return { data: null as T, status: 503, success: false, error: "Connection error and no cache" };
+        }
+      }
+  
+      // Hay conexión, intentamos llamar a la API
+      const response = await this.axiosInstance(config);
+  
+      // Guardamos en cache la respuesta
+      if (response?.data) {
+        await setItem<T>(cacheKey, response.data);
+      }
+  
       return { data: response.data, status: response.status, success: true };
+  
     } catch (error: any) {
+      // Si hay error en la llamada a API (ej timeout, server down), fallback a cache si es GET
+      if (method === "GET") {
+        const cachedData = await getItem<T>(cacheKey);
+        if (cachedData) {
+          console.warn(`[CACHE] Fallback offline desde cache tras error para ${url.toString()}`);
+          return { data: cachedData, status: 200, success: true };
+        }
+      }
+  
+      // Manejo errores 401, 403, 500
       if (error.response?.status === 401) {
         console.log("Fallo de autorizacion");
         this.logout();
@@ -93,16 +128,7 @@ class ApiService {
       if (error.response?.status === 500) {
         console.error("API Error:", error.response || error);
       }
-    
-      // Fallback al cache si es GET
-      if (method === "GET") {
-        const cachedData = await getItem<T>(endpoint);
-        if (cachedData) {
-          console.warn(`[CACHE] Respuesta offline desde cache para ${url.toString()}`);
-          return { data: cachedData as T, status: 200, success: true };
-        }
-      }
-    
+  
       return {
         data: null as T,
         status: error.response?.status || 500,
@@ -111,7 +137,7 @@ class ApiService {
       };
     }
   }
-
+  
   async create<T>(endpoint: string, data: any, options: Partial<ApiOptions> = {}): Promise<ApiResponse<T>> {
     return this.request<T>({ endpoint, method: "POST", data, ...options });
   }
