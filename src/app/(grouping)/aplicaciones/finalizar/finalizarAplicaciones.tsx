@@ -208,10 +208,9 @@ export default function FinalizarAplicacion() {
                     );
                     setTimeout(() => {
                         useWarmupAlertStore.getState().hide();
-                    router.push("/aplicaciones");
-
+                        // ➜ Offline: volver a EN CURSO
+                        router.push("/aplicaciones?tab=encurso");
                     }, 4000);
-
                 }
                 console.error("Error al crear la aplicacion:", response.error);
             }
@@ -223,10 +222,9 @@ export default function FinalizarAplicacion() {
                 );
                 setTimeout(() => {
                     useWarmupAlertStore.getState().hide();
-                router.push("/aplicaciones");
-
+                    // ➜ Offline: volver a EN CURSO
+                    router.push("/aplicaciones?tab=encurso");
                 }, 4000);
-
             }
             console.error("Error al crear la aplicacion:", error);
         }
@@ -310,7 +308,9 @@ export default function FinalizarAplicacion() {
 
     function handleCloseConfirmationModal(): void {
         setConfirmationModalOpen(false);
-        router.push("/aplicaciones");
+        // ➜ Si está offline, volver a EN CURSO; si no, a la vista por defecto
+        const target = (!navigator.onLine) ? "/aplicaciones?tab=encurso" : "/aplicaciones";
+        router.push(target);
     }
 
     const customInputSx = {
@@ -343,9 +343,6 @@ export default function FinalizarAplicacion() {
         if (!amount) return;
         if (!producto) return;
         if (!dose_type) return;
-
-
-        // const formattedExpirationDate = new Date(expirationDate.$y, expirationDate.$M, expirationDate.$D).toISOString();
 
         const existingProductIndex = productosAAgregar.findIndex((p) => p.product_id === producto.id);
 
@@ -807,7 +804,6 @@ export default function FinalizarAplicacion() {
                             </Box>
                         </Paper>
                         <div className={`${styles.buttonContainer}`}>
-
 
                             <button
                                 className={`button button-outlined ${styles.button}`}

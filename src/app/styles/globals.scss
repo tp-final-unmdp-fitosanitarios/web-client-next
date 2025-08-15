@@ -95,3 +95,55 @@ body {
   }
   
 }
+
+/* ---------- Disabled Button (global) ---------- */
+:root {
+  --btn-disabled-opacity: .55;
+  --btn-disabled-filter: grayscale(30%);
+}
+
+/* Mixin reutilizable */
+@mixin disabled-visual {
+  opacity: var(--btn-disabled-opacity);
+  filter: var(--btn-disabled-filter);
+  cursor: not-allowed !important;
+}
+
+/* Deshabilita interacción + look */
+@mixin disabled-full {
+  @include disabled-visual;
+  pointer-events: none; /* bloquea clicks en elementos que no soportan :disabled */
+}
+
+/* Casos típicos */
+button:disabled,
+[aria-disabled="true"],
+.is-disabled {
+  @include disabled-full;
+}
+
+/* Sólo apariencia (no bloquea interacción) */
+.is-visually-disabled {
+  @include disabled-visual;
+}
+
+/* Mantener accesibilidad del foco si aplica */
+button:disabled:focus-visible,
+[aria-disabled="true"]:focus-visible,
+.is-disabled:focus-visible {
+  outline: 2px solid CanvasText;
+  outline-offset: 2px;
+}
+
+/* Alto contraste (Windows) */
+@media (forced-colors: active) {
+  button:disabled,
+  [aria-disabled="true"],
+  .is-disabled,
+  .is-visually-disabled {
+    opacity: 1; /* en HC, evitá bajar contraste */
+    filter: none;
+    border: 1px solid GrayText;
+    color: GrayText;
+  }
+}
