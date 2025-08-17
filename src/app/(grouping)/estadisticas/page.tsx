@@ -5,12 +5,13 @@ import Footer from "@/components/Footer/Footer";
 import styles from "./estadisticas-view.module.scss";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import { useUser } from "@/hooks/useUser";
-import { Box, Card, CardContent, Typography, Grid, Paper } from "@mui/material";
+import { Box, Card, CardContent, Typography, Grid, Paper, Button } from "@mui/material";
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import InventoryIcon from '@mui/icons-material/Inventory';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 import PeopleIcon from '@mui/icons-material/People';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import { useRouter } from 'next/navigation';
 
 // Types and Interfaces
 interface StatisticsData {
@@ -339,6 +340,7 @@ export default function EstadisticasView() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { getApiService, isReady } = useAuth();
     const { stats, loading, error, fetchStatistics } = useStatistics();
+    const router = useRouter();
 
     useEffect(() => {
         if (!isReady) return;
@@ -372,7 +374,23 @@ export default function EstadisticasView() {
         <div className="page-container">
             <div className="content-wrap">
                 <MenuBar showMenu={true} path="" />
-                <h1 className={styles.title}>Estadísticas del Sistema</h1>
+                <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                    <h1 className={styles.title}>Estadísticas del Sistema</h1>
+                    <Button
+                        variant="outlined"
+                        onClick={() => router.push('/estadisticas/v2')}
+                        sx={{ 
+                            color: '#aebc86', 
+                            borderColor: '#aebc86',
+                            '&:hover': {
+                                backgroundColor: '#aebc86',
+                                color: 'white'
+                            }
+                        }}
+                    >
+                        Ver Analytics V2
+                    </Button>
+                </Box>
 
                 <StatisticsGrid stats={stats} />
 

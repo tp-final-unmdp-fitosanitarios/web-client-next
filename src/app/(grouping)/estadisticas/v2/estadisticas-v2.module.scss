@@ -1,0 +1,532 @@
+.v2Container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #f5f7fa 0%, #c3cfe2 100%);
+}
+
+.v2Header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 24px;
+  padding: 16px 0;
+  border-bottom: 2px solid #aebc86;
+}
+
+.v2Title {
+  color: #404e5c;
+  font-size: 32px;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+}
+
+.v2Subtitle {
+  color: #666;
+  font-size: 16px;
+  font-weight: 400;
+  margin-top: 8px;
+}
+
+.v2ActionButtons {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+.v2RefreshButton, .v2ExportButton {
+  min-width: 120px;
+  font-size: 14px;
+  padding: 8px 16px;
+  border: 2px solid #aebc86;
+  border-radius: 8px;
+  font-weight: 600;
+  font-family: 'Roboto', sans-serif;
+  cursor: pointer;
+  color: #aebc86;
+  background-color: transparent;
+  text-align: center;
+  transition: all 0.2s ease-in-out;
+
+  &:hover {
+    background-color: #aebc86;
+    color: white;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 8px rgba(174, 188, 134, 0.2);
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.v2DateRangeControls {
+  background: #f8f9fa;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  border: 1px solid #e9ecef;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.v2DateRangeTitle {
+  color: #404e5c;
+  font-size: 18px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.v2LoadingContainer {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 200px;
+  margin: 24px 0;
+}
+
+.v2ErrorContainer {
+  margin: 24px 0;
+}
+
+.v2StatsGrid {
+  margin-bottom: 32px;
+}
+
+.v2MetricsGrid {
+  margin-bottom: 32px;
+}
+
+.v2AlertsGrid {
+  margin-bottom: 32px;
+}
+
+.v2Card {
+  background: #e6ebea;
+  border: 2px solid #aebc86;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  margin-bottom: 24px;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
+  }
+}
+
+.v2CardHeader {
+  padding: 20px 20px 0 20px;
+}
+
+.v2CardTitle {
+  color: #404e5c;
+  font-size: 20px;
+  font-weight: bold;
+  margin-bottom: 16px;
+  font-family: 'Roboto', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.v2CardContent {
+  padding: 0 20px 20px 20px;
+}
+
+.v2StatCard {
+  background: #e6ebea;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease-in-out;
+  overflow: hidden;
+  position: relative;
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: var(--card-color, #aebc86);
+  }
+}
+
+.v2StatCardContent {
+  padding: 20px;
+}
+
+.v2StatCardHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.v2StatCardTitle {
+  color: #404e5c;
+  font-size: 14px;
+  font-weight: 600;
+  font-family: 'Roboto', sans-serif;
+}
+
+.v2StatCardIcon {
+  font-size: 24px;
+  opacity: 0.8;
+}
+
+.v2StatCardValue {
+  color: #404e5c;
+  font-size: 28px;
+  font-weight: bold;
+  font-family: 'Roboto', sans-serif;
+  margin-bottom: 8px;
+}
+
+.v2StatCardTrend {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 8px;
+}
+
+.v2StatCardSubtitle {
+  color: #666;
+  font-size: 12px;
+  font-family: 'Roboto', sans-serif;
+}
+
+.v2AlertItem {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.5);
+  border-radius: 8px;
+  border-left: 4px solid transparent;
+
+  &.high {
+    border-left-color: #d32f2f;
+  }
+
+  &.medium {
+    border-left-color: #f57c00;
+  }
+
+  &.low {
+    border-left-color: #388e3c;
+  }
+}
+
+.v2AlertIcon {
+  margin-top: 2px;
+}
+
+.v2AlertContent {
+  flex: 1;
+}
+
+.v2AlertMessage {
+  color: #404e5c;
+  font-size: 14px;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.v2AlertSeverity {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  font-size: 10px;
+  font-weight: bold;
+  text-transform: uppercase;
+  color: white;
+
+  &.high {
+    background-color: #d32f2f;
+  }
+
+  &.medium {
+    background-color: #f57c00;
+  }
+
+  &.low {
+    background-color: #388e3c;
+  }
+}
+
+.v2LocationCard {
+  background: #f8f9fa;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+  margin-bottom: 12px;
+}
+
+.v2LocationHeader {
+  display: flex;
+  align-items: center;
+  margin-bottom: 12px;
+  gap: 8px;
+}
+
+.v2LocationName {
+  font-size: 16px;
+  font-weight: bold;
+  color: #404e5c;
+}
+
+.v2LocationMetrics {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.v2LocationMetric {
+  font-size: 12px;
+  color: #666;
+}
+
+.v2ProgressContainer {
+  margin-top: 12px;
+}
+
+.v2ProgressLabel {
+  font-size: 12px;
+  color: #666;
+  margin-bottom: 4px;
+}
+
+.v2ProductUsageItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  margin-bottom: 8px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.v2ProductRank {
+  background-color: #aebc86;
+  color: white;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  font-weight: bold;
+  margin-right: 12px;
+}
+
+.v2ProductInfo {
+  flex: 1;
+  font-size: 14px;
+  color: #404e5c;
+}
+
+.v2ProductUsage {
+  font-size: 14px;
+  font-weight: bold;
+  color: #404e5c;
+}
+
+.v2ChartPlaceholder {
+  height: 200px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border: 1px dashed #dee2e6;
+  gap: 8px;
+}
+
+.v2ChartIcon {
+  font-size: 48px;
+  color: #aebc86;
+}
+
+.v2ChartText {
+  color: #666;
+  text-align: center;
+  font-size: 14px;
+}
+
+.v2ChartSubtext {
+  color: #999;
+  text-align: center;
+  font-size: 12px;
+}
+
+.v2InventorySection {
+  margin-bottom: 24px;
+}
+
+.v2CategoryUsage {
+  margin-bottom: 16px;
+}
+
+.v2CategoryItem {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.v2CategoryName {
+  font-size: 14px;
+  color: #404e5c;
+}
+
+.v2CategoryAmount {
+  font-size: 14px;
+  font-weight: bold;
+  color: #404e5c;
+}
+
+.v2CategoryProgress {
+  height: 6px;
+  border-radius: 3px;
+  background-color: #e0e0e0;
+  margin-top: 4px;
+  overflow: hidden;
+}
+
+.v2CategoryProgressBar {
+  height: 100%;
+  background: linear-gradient(90deg, #aebc86, #6a7349);
+  transition: width 0.3s ease;
+}
+
+.v2InventoryValue {
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+  color: #aebc86;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .v2Header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: flex-start;
+  }
+
+  .v2Title {
+    font-size: 28px;
+  }
+
+  .v2ActionButtons {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .v2RefreshButton, .v2ExportButton {
+    width: 100%;
+  }
+}
+
+@media (max-width: 768px) {
+  .v2Title {
+    font-size: 24px;
+  }
+
+  .v2StatCardValue {
+    font-size: 24px;
+  }
+
+  .v2LocationMetrics {
+    grid-template-columns: 1fr;
+  }
+
+  .v2DateRangeControls {
+    padding: 16px;
+  }
+
+  .v2Card {
+    margin-bottom: 16px;
+  }
+
+  .v2CardTitle {
+    font-size: 18px;
+  }
+}
+
+@media (max-width: 480px) {
+  .v2Title {
+    font-size: 20px;
+  }
+
+  .v2StatCardValue {
+    font-size: 20px;
+  }
+
+  .v2StatCardTitle {
+    font-size: 12px;
+  }
+
+  .v2CardTitle {
+    font-size: 16px;
+  }
+
+  .v2DateRangeControls {
+    padding: 12px;
+  }
+}
+
+/* Animation for loading states */
+@keyframes pulse {
+  0% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+  100% {
+    opacity: 1;
+  }
+}
+
+.v2Loading {
+  animation: pulse 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar for better aesthetics */
+.v2Card::-webkit-scrollbar {
+  width: 6px;
+}
+
+.v2Card::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.v2Card::-webkit-scrollbar-thumb {
+  background: #aebc86;
+  border-radius: 3px;
+}
+
+.v2Card::-webkit-scrollbar-thumb:hover {
+  background: #6a7349;
+}
