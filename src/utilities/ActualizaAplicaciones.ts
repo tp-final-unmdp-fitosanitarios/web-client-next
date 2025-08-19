@@ -24,27 +24,14 @@ export const actualizaAplicaciones = async (req: Request) => {
         const pendingKey = "/applications?status=PENDING&page=0&size=10";
         const inProgressKey = "/applications?status=IN_PROGRESS&page=0&size=10";
 
-        const pendingRaw = await getItem<unknown>(pendingKey);
-        if (pendingRaw) {
+        const pending = await getItem<ResponseItems<Aplicacion> >(pendingKey);
+        if (pending) {
             const match = urlPath.match(/^\/?applications\/([^\/]+)\/status$/);
             if (match) {
                 const id = match[1]; //ID como string
-                console.log("hay match");
                 
-                // Normalizar PENDING a arreglo
-                const isResponseItemsAplicacion = (value: unknown): value is ResponseItems<Aplicacion> => {
-                    return (
-                        typeof value === "object" &&
-                        value !== null &&
-                        Array.isArray((value as { content?: unknown }).content)
-                    );
-                };
-                const pendingIsPage = isResponseItemsAplicacion(pendingRaw);
-                const pendingList: Aplicacion[] = pendingIsPage
-                    ? [...(pendingRaw as ResponseItems<Aplicacion>).content]
-                    : (Array.isArray(pendingRaw) ? [...(pendingRaw as Aplicacion[])] : []);
-
                 // Encontrar índice del elemento a remover de forma explícita y segura
+                const pendingList = pending.content;
                 const removeIndex = pendingList.findIndex((application) => application.id === id);
                 if (removeIndex !== -1) {
                     console.log("eliminando ap, índice:", removeIndex);
@@ -63,56 +50,47 @@ export const actualizaAplicaciones = async (req: Request) => {
 
                     // Guardar lista PENDING sin el elemento
                     await removeItem(pendingKey);
-                    if (pendingIsPage) {
-                        const page = pendingRaw as ResponseItems<Aplicacion>;
-                        const updatedPage: ResponseItems<Aplicacion> = {
-                            ...page,
-                            content: pendingList,
-                            number_of_elements: pendingList.length,
-                            total_elements: Math.max(0, (page.total_elements ?? pendingList.length) - 1),
-                            empty: pendingList.length === 0,
-                        };
-                        await setItem(pendingKey, updatedPage);
-                        console.log(updatedPage);
-                    } else {
-                        await setItem(pendingKey, pendingList);
-                        console.log(pendingList);
-                    }
+                    /*console.log(pendingIsPage);*/
+                   
+                    const updatedPage: ResponseItems<Aplicacion> = {
+                        ...pending,
+                        content: pendingList,
+                        number_of_elements: pendingList.length,
+                        total_elements: Math.max(0, (pending.total_elements ?? pendingList.length) - 1)
+                    };
+                    updatedPage.content = updatedPage.content.filter(app => app.id!=movedApp.id);
+                    await setItem(pendingKey, updatedPage);
+                    console.log(updatedPage);
+                    
                     console.log("pendinentes guardadas en: "+pendingKey);
 
 
                     // Cargar lista IN_PROGRESS
-                    const inProgressRaw = await getItem<unknown>(inProgressKey);
-                    const inProgressIsPage = isResponseItemsAplicacion(inProgressRaw);
-                    const inProgressApps: Aplicacion[] = inProgressIsPage
-                        ? [...(inProgressRaw as ResponseItems<Aplicacion>).content]
-                        : (Array.isArray(inProgressRaw) ? [...(inProgressRaw as Aplicacion[])] : []);
+                    const inProgress = await getItem<ResponseItems<Aplicacion>>(inProgressKey);
+                    if(inProgress){
+                    
+                    const inProgressApps = inProgress?.content;
                     console.log(inProgressApps);
+
                     // Asegurar unicidad por id y agregar el movido
-                    const alreadyExistedInProgress = inProgressApps.some((application) => application.id === movedApp.id);
-                    const updatedInProgressApps: Aplicacion[] = [
-                        ...inProgressApps.filter((application) => application.id !== movedApp.id),
-                        movedApp,
-                    ];
+                    const alreadyExistedInProgress = inProgressApps?.some((application) => application.id === movedApp.id);
+                    if(!alreadyExistedInProgress){
+                        inProgressApps?.push(movedApp);
+                    }
 
                     await removeItem(inProgressKey);
-                    if (inProgressIsPage) {
-                        const page = inProgressRaw as ResponseItems<Aplicacion>;
-                        const updatedPage: ResponseItems<Aplicacion> = {
-                            ...page,
-                            content: updatedInProgressApps,
-                            number_of_elements: updatedInProgressApps.length,
-                            total_elements:
-                                (typeof page.total_elements === "number" ? page.total_elements : inProgressApps.length) +
-                                (alreadyExistedInProgress ? 0 : 1),
-                            empty: updatedInProgressApps.length === 0,
-                        };
-                        await setItem(inProgressKey, updatedPage);
-                    } else {
-                        await setItem(inProgressKey, updatedInProgressApps);
-                    }
+
+                    const updatedPageInProgress: ResponseItems<Aplicacion> = {
+                        ...inProgress,
+                        content: inProgressApps? inProgressApps : [],
+                        number_of_elements: inProgressApps? inProgressApps.length : 0,
+                        total_elements: inProgressApps? inProgressApps.length : 0
+                    };
+                    await setItem(inProgressKey, updatedPageInProgress);
+                    
                     console.log("aps pendientes actualkizadas en: "+inProgressKey);
-                    console.log(updatedInProgressApps);
+                    console.log(inProgressApps);
+                }
                 }
             }
         }

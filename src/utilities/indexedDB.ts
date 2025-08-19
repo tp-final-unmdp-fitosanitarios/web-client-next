@@ -31,6 +31,7 @@ export const getItem = async <T>(key: string): Promise<T | undefined> => {
 };
 // Borra una clave
 export const removeItem = async (key: string) => {
+  console.log("removing: "+key);
   const db = await getDb();
   const tx = db.transaction(STORE_NAME, 'readwrite');
   await tx.store.delete(key);

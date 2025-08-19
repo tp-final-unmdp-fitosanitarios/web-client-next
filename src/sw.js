@@ -1,4 +1,4 @@
-import { defaultCache } from "@serwist/next/worker";
+//import { defaultCache } from "@serwist/next/worker";
 import { Serwist } from "serwist";
 import { NetworkOnly, NetworkFirst } from "workbox-strategies";
 import { BackgroundSyncPlugin } from "workbox-background-sync";
@@ -35,8 +35,6 @@ const serwist = new Serwist({
   clientsClaim: true,
   navigationPreload: true,
   runtimeCaching: [
-    ...defaultCache,
-
     // Navegación de la app (incluye rutas /aplicaciones/*) sigue con NetworkFirst,
     // lo cual garantiza HTML offline precacheado y datos frescos cuando hay red
     {
