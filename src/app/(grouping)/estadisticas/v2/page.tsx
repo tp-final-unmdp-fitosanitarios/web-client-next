@@ -45,7 +45,6 @@ import {
   SelectChangeEvent
 } from "@mui/material";
 import TrendingUpIcon from '@mui/icons-material/TrendingUp';
-import InventoryIcon from '@mui/icons-material/Inventory';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 
 import AssessmentIcon from '@mui/icons-material/Assessment';
@@ -718,8 +717,7 @@ export default function EstadisticasV2View() {
     quickStats, 
     loading, 
     error, 
-    dateRange, 
-    setDateRange,
+    dateRange,
     updateDateRange,
     setQuickDateRange,
     fetchDashboard, 

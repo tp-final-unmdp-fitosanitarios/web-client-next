@@ -504,7 +504,7 @@ export class AnalyticsService {
   /**
    * Helper method to safely get array length or return 0
    */
-  static safeArrayLength(array: any[] | null | undefined): number {
+  static safeArrayLength(array: unknown[] | null | undefined): number {
     return array?.length || 0;
   }
 
