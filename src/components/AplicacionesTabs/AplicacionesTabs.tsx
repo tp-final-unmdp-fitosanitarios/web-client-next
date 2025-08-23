@@ -21,6 +21,8 @@ import { useRouter } from 'next/navigation';
 import { useLoaderStore } from '@/contexts/loaderStore';
 import { Pagination, TextField, MenuItem, Box as MUIBox } from '@mui/material';
 import { getPendingFinishAppIds } from "@/utilities/offlineQueue";
+import { getItem } from "../../utilities/indexedDB";
+import GenericModal from '../modal/GenericModal';
 
 interface TabPanelProps {
   children?: React.ReactNode;
@@ -115,6 +117,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
   const { user, isLoading } = useUser();
   const { showLoader } = useLoaderStore();
   const [pendingFinishIds, setPendingFinishIds] = useState<string[]>([]);
+  const [notSyncroModalOpen, setNotSyncroModalOpen] = useState(false);
 
   // Estado para el modal de detalles
   const [modalOpen, setModalOpen] = React.useState(false);
@@ -129,6 +132,9 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
     setSelectedAppId(null);
   };
 
+  function handleCloseNotSyncroModalModal(): void {
+    setNotSyncroModalOpen(false);
+}
   const handleChange = (event: React.SyntheticEvent, newValue: number) => {
     setValue(newValue);
     // Cambiar el estado según el tab seleccionado
@@ -232,9 +238,15 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
       router.push(`aplicaciones/iniciar?id=${id}`);
   }
 
-  const finishApplication = (id: string) => {
-    showLoader('Cargando aplicación...');
-    router.push(`aplicaciones/finalizar?id=${id}`);
+  const finishApplication = async(id: string) => {
+    const appsSinSincronizar = await getItem<string[]>("appsSinSincronizar");
+    if(appsSinSincronizar && appsSinSincronizar.includes(id)){
+      setNotSyncroModalOpen(true);
+    }
+    else{
+      showLoader('Cargando aplicación...');
+      router.push(`aplicaciones/finalizar?id=${id}`);
+    }
   }
 
   const confirmApplication = (id: string) => {
@@ -244,6 +256,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
 
 
   return (
+    <>
     <Box className={styles.container}>
       <StyledAppBar position="static">
         <StyledTabs
@@ -390,5 +403,13 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
         </span>
       </MUIBox>
     </Box>
+    <GenericModal
+      isOpen={notSyncroModalOpen}
+      onClose={handleCloseNotSyncroModalModal}
+      title="Aplicación No Sincronizada"
+      modalText="Debe recuperar la conexion para finalizar la aplicación."
+      buttonTitle="Cerrar"
+      showSecondButton={false}
+  /></>
   );
 } 

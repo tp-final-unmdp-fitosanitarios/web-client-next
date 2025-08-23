@@ -23,7 +23,7 @@ export const actualizaAplicaciones = async (req: Request) => {
 
         const pendingKey = "/applications?status=PENDING&page=0&size=10";
         const inProgressKey = "/applications?status=IN_PROGRESS&page=0&size=10";
-
+        const idAppsActualizadasKey = "appsSinSincronizar"
         const pending = await getItem<ResponseItems<Aplicacion> >(pendingKey);
         if (pending) {
             const match = urlPath.match(/^\/?applications\/([^\/]+)\/status$/);
@@ -90,9 +90,23 @@ export const actualizaAplicaciones = async (req: Request) => {
                     
                     console.log("aps pendientes actualkizadas en: "+inProgressKey);
                     console.log(inProgressApps);
+
+
+                    // 🔹 Guardar ID de la app actualizada en "appsActualizadas"
+                    let appsActualizadas = await getItem<string[]>(idAppsActualizadasKey);
+                    if (!appsActualizadas) {
+                        appsActualizadas = [];
+                    }
+                    if (!appsActualizadas.includes(movedApp.id)) {
+                        appsActualizadas.push(movedApp.id);
+                    }
+                    await setItem(idAppsActualizadasKey, appsActualizadas);
+                    console.log("App actualizada registrada en: " + idAppsActualizadasKey, appsActualizadas);
+
                 }
                 }
             }
         }
     }
+    
 }

@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User } from "@/domain/models/User";
 import { preloadDataAfterLogin } from "../../utilities/cacheInitialData";
+import { clearAll } from "../../utilities/indexedDB";
 
 interface AuthContextType {
   isAuthenticated: boolean;
@@ -43,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     set_UserId(null);
     setIsLoadingUser(false);
+    clearAll();
     router.push("/login");
   };
 
