@@ -35,7 +35,7 @@ export default function StockView() {
     const [locations, setLocations] = useState<Locacion[]>([]);
     const [showMoverModal, setShowMoverModal] = useState(false);
     const [showRetirarModal, setShowRetirarModal] = useState(false);
-    const { getApiService, isReady, user } = useAuth();
+    const { getApiService, isReady, user, isOnline } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
     const [selectedStockItem, setSelectedStockItem] = useState<Stock | null>(null);
@@ -589,12 +589,15 @@ export default function StockView() {
                                     key={index}
                                     className={`button button-primary ${styles.buttonHome}`}
                                     onClick={button.action}
+                                    disabled={!isOnline}
                                 >
                                     {button.label}
                                 </button>
                             ) : (
                                 <NavigationLink key={index} href={button.path}>
-                                    <button className={`button button-primary ${styles.buttonHome}`}>
+                                    <button className={`button button-primary ${styles.buttonHome}`}
+                                        disabled={!isOnline}
+                                    >
                                         {button.label}
                                     </button>
                                 </NavigationLink>

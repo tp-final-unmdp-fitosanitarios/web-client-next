@@ -10,12 +10,12 @@ export default function HomeRedirect() {
 
   useEffect(() => {
     if (!isReady) return; // Espera que AuthProvider termine de inicializar
-
-    if (isAuthenticated) {
+    router.replace("/login");
+    /*if (isAuthenticated) {
       router.replace("/home");
     } else {
       router.replace("/login");
-    }
+    }*/
   }, [isAuthenticated, isReady]);
 
   return null; // no mostramos nada mientras redirige

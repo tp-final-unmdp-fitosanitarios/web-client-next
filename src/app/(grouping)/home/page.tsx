@@ -28,25 +28,25 @@ useEffect(() => {
   // Determinar botones según el rol del usuario
   if (user && Array.isArray(user.roles) && user.roles.length > 0 && user.roles[0] === Roles.Admin) {
     buttons.push(
-      { label: "Personal", path: "/personal" },
-      { label: "Maquinas", path: "/maquinas" },
-      { label: "Estadísticas", path: "/estadisticas" },
-      { label: "Productos", path: "/productos" }, 
-      { label: "Stock", path: "/stock" },
-      { label: "Ubicaciones", path: "/locaciones" },
-      { label: "Cultivos", path: "/cultivos" },
+      { label: "Personal", path: "/personal", disabled:false },
+      { label: "Maquinas", path: "/maquinas", disabled:false },
+      { label: "Estadísticas", path: "/estadisticas", disabled:false },
+      { label: "Productos", path: "/productos", disabled:false }, 
+      { label: "Stock", path: "/stock", disabled:false },
+      { label: "Ubicaciones", path: "/locaciones", disabled:false },
+      { label: "Cultivos", path: "/cultivos", disabled:false },
     );
   } else if (user && Array.isArray(user.roles) && user.roles.length > 0 && user.roles[0] === Roles.Aplicador) {
     buttons.push(
-      { label: "Aplicaciones", path: "/aplicaciones" },
-      { label: "Stock", path: "/stock" },
-      { label: "Cultivos", path: "/cultivos" },
+      { label: "Aplicaciones", path: "/aplicaciones", disabled:false },
+      { label: "Stock", path: "/stock", disabled:false },
+      { label: "Cultivos", path: "/cultivos", disabled:false },
     );
   } else {
     buttons.push(
-      { label: "Aplicaciones", path: "/aplicaciones" },
-      { label: "Stock", path: "/stock" },
-      { label: "Estadísticas", path: "/estadisticas" }
+      { label: "Aplicaciones", path: "/aplicaciones", disabled:false },
+      { label: "Stock", path: "/stock", disabled:false },
+      { label: "Estadísticas", path: "/estadisticas", disabled:false }
     );
   }
 

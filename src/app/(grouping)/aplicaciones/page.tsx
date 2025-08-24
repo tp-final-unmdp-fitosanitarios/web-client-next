@@ -18,7 +18,7 @@ import NavigationLink from '@/components/NavigationLink/NavigationLink';
 import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
 
 export default function AplicacionesPage() {
-    const { getApiService, isReady } = useAuth();
+    const { getApiService, isReady, isOnline } = useAuth();
     const apiService = getApiService();
     const { withLoading } = useLoading();
 
@@ -160,7 +160,7 @@ export default function AplicacionesPage() {
               <div className={styles.buttonContainer}>
                 {buttons.map((button, index) => (
                     <NavigationLink key={index} href={button.path}>
-                        <button className={`button button-primary ${styles.buttonHome}`}>
+                        <button className={`button button-primary ${styles.buttonHome}`} disabled={!isOnline}>
                             {button.label}
                         </button>
                     </NavigationLink>

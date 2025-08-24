@@ -9,7 +9,7 @@ import { IoArrowBack } from "react-icons/io5";
 import { useLoading } from "@/hooks/useLoading";
 import { format } from "date-fns";
 import { es } from "date-fns/locale";
-import { useEffect, useState } from "react";
+import {useAuth } from "../../components/Auth/AuthProvider";
 
 interface MenuBarProps {
   showMenu: boolean;
@@ -22,13 +22,18 @@ export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
   const { showLoader } = useLoading();
   const date: Date = new Date();
   const dateWithoutTime: string = format(date, "dd/MM/yyyy", { locale: es });
+  const {isOnline} = useAuth();
+  
+ /* const [isOnline, setIsOnline] = useState(true);
 
-  const [isOnline, setIsOnline] = useState(true);
+  const updateOnlineStatus = () => {
+    if (typeof navigator !== "undefined") {
+      setIsOnline(navigator.onLine);
+    }
+  };
 
   useEffect(() => {
-    const updateOnlineStatus = () => {
-      setIsOnline(navigator.onLine);
-    };
+    
     window.addEventListener("online", updateOnlineStatus);
     window.addEventListener("offline", updateOnlineStatus);
 
@@ -38,7 +43,7 @@ export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
       window.removeEventListener("online", updateOnlineStatus);
       window.removeEventListener("offline", updateOnlineStatus);
     };
-  }, []);
+  }, []);*/
 
   function handleBackClick() {
     if (!showMenu && path) {
@@ -46,6 +51,8 @@ export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
       router.push(path);
     }
   }
+
+  //updateOnlineStatus();
 
   return (
     <>
@@ -73,5 +80,5 @@ export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
       </div>
       <hr className={styles.homeDivision}></hr>
     </>
-  );
+  ); 
 }

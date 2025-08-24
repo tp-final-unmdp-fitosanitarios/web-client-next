@@ -1,4 +1,4 @@
-import { setItem } from "./indexedDB";
+import { setItem, clearAll } from "./indexedDB";
 import ApiService from "@/services/api-service";
 
 export const preloadDataAfterLogin = async (apiService: ApiService) => {
@@ -20,6 +20,8 @@ export const preloadDataAfterLogin = async (apiService: ApiService) => {
       "/products?page=0&size=10",
       "/agrochemicals?page=0&size=10"
     ];
+
+    await clearAll();
 
     await Promise.all(
       endpoints.map(async (endpoint) => {

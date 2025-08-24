@@ -17,6 +17,7 @@ interface AuthContextType {
   setUserId: (id: string) => void;
   user: User | null;
   isLoadingUser: boolean; // / Nuevo estado para indicar si se está cargando el usuario
+  isOnline: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -33,6 +34,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isLoadingUser, setIsLoadingUser] = useState(false);
   const router = useRouter();
   const [isReady, setIsReady] = useState(false);
+  const [isOnline, setIsOnline] = useState(true);
 
   const logout = () => {
     console.log("Eliminando el token: ", token);
@@ -47,6 +49,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     clearAll();
     router.push("/login");
   };
+
+  const checkInternetConnection = async () => {
+    try {
+      // Hacer un ping a tu backend o a un recurso muy liviano
+      const apiService = getApiService();
+      const response = await apiService.get("/health");
+      console.log(response);
+      if (response.data === "OK") {
+        return true;
+      }
+      return false;
+    } catch {
+      return false;
+    }
+  };
+
+  useEffect(() => {
+    const updateOnlineStatus = async () => {
+      const hasConnection = await checkInternetConnection();
+      setIsOnline(hasConnection);
+    };
+  
+    window.addEventListener("online", updateOnlineStatus);
+    window.addEventListener("offline", updateOnlineStatus);
+  
+    updateOnlineStatus(); // check inicial
+  
+    const interval = setInterval(updateOnlineStatus, 10000); // chequear cada 10s
+    return () => {
+      window.removeEventListener("online", updateOnlineStatus);
+      window.removeEventListener("offline", updateOnlineStatus);
+      clearInterval(interval);
+    };
+  }, []);
+  
 
   useEffect(() => {
     const storedToken = localStorage.getItem("token");
@@ -148,7 +185,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       getUserId, 
       setUserId, 
       user,
-      isLoadingUser
+      isLoadingUser,
+      isOnline
     }}>
       {children}
     </AuthContext.Provider>

@@ -41,9 +41,13 @@ const icons = [
   <BarChartIcon />,
 ];
 
+const paths = ['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadisticas'];
+const offlinePaths = ['Home', 'Aplicaciones'];
+const offlineIcons = [<HomeIcon />,<LocalOfferIcon />];
+
 export default function SideBar() {
   const [open, setOpen] = React.useState(false);
-  const { logout } = useAuth();
+  const { logout,isOnline } = useAuth();
   const { user } = useUser();
   
   const toggleDrawer = (newOpen: boolean) => () => {
@@ -86,12 +90,12 @@ export default function SideBar() {
       <Divider />
       <p className={styles.userData}>Navegacion </p>
       <List>
-        {['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadisticas'].map((text, index) => (
+        {(isOnline ? paths : offlinePaths).map((text, index) => (
           <ListItem key={text} disablePadding>
             <NavigationLink href={`/${text.toLowerCase()}`} className={styles.link}>
               <ListItemButton className={styles.listItemButton}>
                 <ListItemIcon className={styles.icon}>
-                  {icons[index]}
+                  {isOnline ? icons[index] : offlineIcons[index] }
                 </ListItemIcon>
                 <ListItemText primary={text} />
               </ListItemButton>

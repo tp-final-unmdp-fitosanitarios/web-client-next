@@ -101,7 +101,7 @@ class ApiService {
       const response = await this.axiosInstance(config);
   
       // Guardamos en cache la respuesta
-      if (response?.data) {
+      if (response?.data && endpoint!=="/health") {
         await setItem<T>(cacheKey, response.data);
       }
   
