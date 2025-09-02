@@ -58,7 +58,7 @@ export default function AgregarMaquinas() {
       const response = await apiService.create<Maquina>("/machines", payload); // Asegúrate de usar el endpoint correcto
 
       if (response.success) {
-        console.log("Máquina creada:", response.data);
+        //console.log("Máquina creada:", response.data);
         setNewMaquina(response.data);
         handleOpenModal();
       } else {

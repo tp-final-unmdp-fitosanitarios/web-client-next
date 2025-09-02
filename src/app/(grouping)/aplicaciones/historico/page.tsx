@@ -180,7 +180,7 @@ export default function HistoricoAplicacionesPage() {
     const fetchAplicaciones = async () => {
         try {
             const queryParams = construirQueryParams();
-            console.log(queryParams);
+            //console.log(queryParams);
             const response = await withLoading(
                 apiService.get<ResponseItems<Aplicacion>>(`applications?${queryParams}`),
                 "Cargando aplicaciones..."

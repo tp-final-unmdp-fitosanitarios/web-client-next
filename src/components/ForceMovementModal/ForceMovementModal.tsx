@@ -20,13 +20,13 @@ const ForceMovementModal: React.FC<Props> = ({open, setModalClose, stockToMove, 
     const stockNegativo = stockToMove.map((item) => {
         const stockARestar = actualStock.find((stock) => stock.product.id === item.product.id);
         if(stockARestar){
-            console.log("stockARestar", stockARestar.amount);
-            console.log("item", item.cantidad);
+            //console.log("stockARestar", stockARestar.amount);
+            //console.log("item", item.cantidad);
             let diferencia = 0;
             if(item.flag === "unitAmount"){
                 diferencia = stockARestar.amount - (item.cantidad * item.product.amount);
                 if(diferencia < 0){
-                    console.log("diferencia", diferencia);
+                    //console.log("diferencia", diferencia);
                     return {
                         id: item.id,
                         producto: item.product.name,
@@ -38,7 +38,7 @@ const ForceMovementModal: React.FC<Props> = ({open, setModalClose, stockToMove, 
             }else{
                 diferencia = stockARestar.amount - item.cantidad;
                 if(diferencia < 0){
-                    console.log("diferencia", diferencia);
+                    //console.log("diferencia", diferencia);
                     return {
                         id: item.id,
                         producto: item.product.name,
@@ -50,7 +50,7 @@ const ForceMovementModal: React.FC<Props> = ({open, setModalClose, stockToMove, 
             }
         }
     });
-    console.log("stockNegativo", stockNegativo);
+    //console.log("stockNegativo", stockNegativo);
 
     const items = stockNegativo.filter(item => item !== undefined).map((item) => {
         const exceso = Number(item.cantidad) - Number(item.stockActual);

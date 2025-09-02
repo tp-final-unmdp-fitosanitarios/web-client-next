@@ -44,7 +44,7 @@ const MoverStock = () => {
         `stock?location=${actualLocation}`
       );
       if (response.success) {
-        console.log(response.data.content);
+        //console.log(response.data.content);
         setStockFromServer(response.data.content);
       } else {
         setError(response.error || "Error al obtener el stock");
@@ -159,7 +159,7 @@ const campos = ["display"];
 
   async function handleFinish(): Promise<void> {
     const stockToMove = productsToMove.map((item) => {
-      console.log(item);
+      //console.log(item);
 
       if (item.flag === "unitAmount") {
         return {
@@ -196,7 +196,7 @@ const campos = ["display"];
       stock_to_move: stockToMove
     }
 
-    console.log(moveStockRequest);
+    //console.log(moveStockRequest);
 
     const response = await apiService.create<ResponseItems<Stock>>("stock/movement", moveStockRequest);
 
@@ -205,8 +205,8 @@ const campos = ["display"];
       setProductsToMove([]);
       setConfirmationModalOpen(true);
     } else{
-      console.log("Error al mover stock");
-      console.log(response);
+      //console.log("Error al mover stock");
+      //console.log(response);
       
       if (response.status === 400) {
         setShowResultModal(false);
@@ -218,9 +218,9 @@ const campos = ["display"];
   }
 
   async function handleForceFinish(): Promise<void> {
-    console.log("Force finish");
+    //console.log("Force finish");
     const stockToMove = productsToMove.map((item) => {
-      console.log(item);
+      //console.log(item);
       if(item.flag === "unitAmount")
         return{
         product_id: item.product.id,

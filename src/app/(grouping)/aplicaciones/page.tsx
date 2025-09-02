@@ -43,18 +43,18 @@ export default function AplicacionesPage() {
     }
     
     const fetchAplicaciones = async () => {
-      console.log('[UI] fetchAplicaciones start', { status, page, pageSize });
+      //console.log('[UI] fetchAplicaciones start', { status, page, pageSize });
       try {
           const queryParams = new URLSearchParams();
           queryParams.append('status', status);
           queryParams.append('page', page.toString());
           queryParams.append('size', pageSize.toString());
-          console.log('[UI] Building request for applications?', queryParams.toString());
+          //console.log('[UI] Building request for applications?', queryParams.toString());
           const response = await withLoading(
             apiService.get<ResponseItems<Aplicacion>>(`/applications?${queryParams.toString()}`),
             "Cargando aplicaciones..."
           );
-          console.log('[UI] fetchAplicaciones response', response);
+          //console.log('[UI] fetchAplicaciones response', response);
           if (response.success) {
               setAplicaciones(response.data.content);
               setTotalPages(response.data.total_pages || 0);
@@ -68,12 +68,12 @@ export default function AplicacionesPage() {
           setError("Error al conectar con el servidor" + err);
         } finally {
           setLoading(false);
-          console.log('[UI] fetchAplicaciones end');
+          //console.log('[UI] fetchAplicaciones end');
         }
   };
 
   const fetchLocaciones = async () => {
-    console.log('[UI] Starting fetchLocaciones');
+    //console.log('[UI] Starting fetchLocaciones');
     try {
         const response = await withLoading(
         apiService.get<Locacion[]>('locations?type=CROP'),

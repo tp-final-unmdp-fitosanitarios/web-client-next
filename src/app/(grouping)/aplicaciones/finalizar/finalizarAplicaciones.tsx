@@ -87,7 +87,7 @@ export default function FinalizarAplicacion() {
             setProductosExistentes(prods);
         }
         catch (e: any) {
-            console.log(e.message);
+            //console.log(e.message);
             return [];
         }
     }
@@ -95,7 +95,7 @@ export default function FinalizarAplicacion() {
     const fetchApplication = async () => {
         try {
             const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
-            console.log(response);
+            //console.log(response);
             const app = response.data
             const loc = app.stock_location_id;
             fetchProductos(loc);
@@ -136,7 +136,7 @@ export default function FinalizarAplicacion() {
     };
 
     const handleFinalizarAplicacion = async () => {
-        console.log("Finishing application");
+        //console.log("Finishing application");
         const recipeItems: RecipeItem[] = [];
 
         // Add modified recipe items
@@ -190,7 +190,7 @@ export default function FinalizarAplicacion() {
             actual_surface: Number(cantidadHectareas)
         }
 
-        console.log(finishAplicationReq);
+        //console.log(finishAplicationReq);
         try {
             const response = await withLoading(
                 apiService.create(`applications/${aplicacion?.id}/finish`, finishAplicationReq),

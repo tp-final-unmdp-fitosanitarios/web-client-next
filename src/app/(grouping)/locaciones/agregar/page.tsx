@@ -127,7 +127,7 @@ export default function AgregarLocacion() {
                 setError(response.error || "Error al crear la locación");
             }
         } catch (error) {
-            console.log("Error", error)
+            //console.log("Error", error)
             setError("Error al conectar con el servidor");
         }
     };

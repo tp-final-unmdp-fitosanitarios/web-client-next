@@ -171,7 +171,7 @@ const AgregarStockPage: React.FC = () => {
             return productos;
         }
         catch (e: any) {
-            console.log(e.message);
+            //console.log(e.message);
             return [];
         }
 
@@ -181,12 +181,12 @@ const AgregarStockPage: React.FC = () => {
         try {
             const response = await apiService.get<Locacion[]>("/locations?type=WAREHOUSE,FIELD");
             const locaciones = response.data;
-            console.log("locaciones", locaciones);
+            //console.log("locaciones", locaciones);
 
             return locaciones;
         }
         catch (e: any) {
-            console.log(e.message);
+            //console.log(e.message);
             return []; //Aca puede caer por falta de conexion o forbbiden. Chequear como lo manejamos
         }
     }
@@ -195,12 +195,12 @@ const AgregarStockPage: React.FC = () => {
       try {
           const response = await apiService.get<ResponseItems<Proveedor>>("/providers");
           const providers = response.data.content;
-          console.log("providers", providers);
+          //console.log("providers", providers);
 
           return providers;
       }
       catch (e: any) {
-          console.log(e.message);
+          //console.log(e.message);
           return []; //Aca puede caer por falta de conexion o forbbiden. Chequear como lo manejamos
       }
   }
@@ -274,8 +274,8 @@ const AgregarStockPage: React.FC = () => {
             },
             location_id: loc
         }
-        console.log(loc);
-        console.log(addStockRequest);
+        //console.log(loc);
+        //console.log(addStockRequest);
         apiService.create("/delivery", addStockRequest).then((response: any) => {
             if (response.success) {
                 setConfirmationModalOpen(true);

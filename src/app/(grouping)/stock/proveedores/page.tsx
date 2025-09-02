@@ -52,7 +52,7 @@ const ProvidersPage = () => {
                     "Cargando proveedores..."
                 );
                 if (response.success && isMounted) {
-                    console.log(response.data.content);
+                    //console.log(response.data.content);
                     setProviders(response.data.content);
                     setTotalPages(response.data.total_pages || 0);
                     setTotalElements(response.data.total_elements || 0);

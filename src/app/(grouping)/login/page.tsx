@@ -59,11 +59,11 @@ export default function Login() {
         try {
           const userResponse = await api.get<User>(`/users/${user_id}`);
           if (userResponse.success) {
-            console.log("Login successful with user data:", userResponse.data);
+            //console.log("Login successful with user data:", userResponse.data);
             login(token, user_id, userResponse.data);
           } else {
             // Si no se puede obtener el usuario, hacer login solo con token y userId
-            console.log("Login successful without user data");
+            //console.log("Login successful without user data");
             login(token, user_id);
           }
         } catch (userError) {

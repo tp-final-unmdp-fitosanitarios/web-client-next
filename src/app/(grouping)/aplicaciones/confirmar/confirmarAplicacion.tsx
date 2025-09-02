@@ -135,7 +135,7 @@ export default function ConfirmarAplicacion() {
         description: p.description
     })) || [];
 
-    console.log("items:",items);
+    //console.log("items:",items);
 
     return (
         <div className="page-container">

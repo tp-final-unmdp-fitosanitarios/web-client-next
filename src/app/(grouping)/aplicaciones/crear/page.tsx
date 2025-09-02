@@ -64,7 +64,7 @@ const CrearAplicacionPage: React.FC = () => {
             return response.data;
         }
         catch (e: unknown) {
-            if (e instanceof Error) console.log(e.message);
+            if (e instanceof Error) //console.log(e.message);
             return [];
         }
     }
@@ -77,7 +77,7 @@ const CrearAplicacionPage: React.FC = () => {
             return aplicadores;
         }
         catch (e: unknown) {
-            if (e instanceof Error) console.log(e.message);
+            if (e instanceof Error) //console.log(e.message);
             setApplicators([]);
             return [];
         }
@@ -95,7 +95,7 @@ const CrearAplicacionPage: React.FC = () => {
             setProductosExistentes(prods);
         }
         catch (e: unknown) {
-            if (e instanceof Error) console.log(e.message);
+            if (e instanceof Error) //console.log(e.message);
             return [];
         }
     }
@@ -240,7 +240,7 @@ const CrearAplicacionPage: React.FC = () => {
     const onSelectCampo = async (e: any) => { 
         setCampo(e.target.value);
        const res =  await apiService.get<Locacion[]>("locations/crops/"+e.target.value);
-       console.log(res.data[0]);
+       //console.log(res.data[0]);
        setCultivos(res.data);
       
      }

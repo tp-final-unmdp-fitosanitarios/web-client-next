@@ -79,7 +79,7 @@ const ModificarAplicacionPage: React.FC = () => {
         try {
             const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
             const app = response.data;
-            console.log(app);
+            //console.log(app);
             setAplicacion(app);
             
             // Cargar datos de la aplicación existente
@@ -127,7 +127,7 @@ const ModificarAplicacionPage: React.FC = () => {
             return locaciones;
         }
         catch (e: any) {
-            console.log(e.message);
+            //console.log(e.message);
             return [];
         }
     }
@@ -140,7 +140,7 @@ const ModificarAplicacionPage: React.FC = () => {
             return aplicadores;
         }
         catch (e: any) {
-            console.log(e.message);
+            //console.log(e.message);
             setApplicators([]);
             return [];
         }
@@ -158,7 +158,7 @@ const ModificarAplicacionPage: React.FC = () => {
             setProductosExistentes(prods);
         }
         catch (e: any) {
-            console.log(e.message);
+            //console.log(e.message);
             return [];
         }
     }
@@ -253,7 +253,7 @@ const ModificarAplicacionPage: React.FC = () => {
     };
 
     const handleFinish = async () => {
-        console.log("Finishing application modification");
+        //console.log("Finishing application modification");
         const recipeItems = productosAAgregar.map((p) => ({
             product_id: p.product_id,
             amount: p.amount,
@@ -278,7 +278,7 @@ const ModificarAplicacionPage: React.FC = () => {
             application_date: expirationDate?.toISOString()
         }
 
-        console.log(updateAplicationReq);
+        //console.log(updateAplicationReq);
         try {
             const response = await withLoading(
                 apiService.update(`applications`,applicationId? applicationId : "", updateAplicationReq),
