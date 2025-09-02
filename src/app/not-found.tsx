@@ -6,7 +6,7 @@ const NotFound = () => {
     return (
       <div className="page-container">
         <div className="content-wrap">
-          <MenuBar showMenu={false} showArrow={true}/>
+          <MenuBar showMenu={false} showArrow={true} path="home"/>
           <h1 style={{textAlign: "center"}}>Página no encontrada :(</h1>
         </div>
         <Footer />

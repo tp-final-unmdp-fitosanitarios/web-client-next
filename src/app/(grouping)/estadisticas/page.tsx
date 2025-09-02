@@ -11,6 +11,10 @@ import InventoryIcon from '@mui/icons-material/Inventory';
 import AgricultureIcon from '@mui/icons-material/Agriculture';
 import PeopleIcon from '@mui/icons-material/People';
 import AssessmentIcon from '@mui/icons-material/Assessment';
+import { Roles } from "@/domain/enum/Roles";
+import { useRouter } from "next/navigation";
+
+
 
 // Types and Interfaces
 interface StatisticsData {
@@ -335,10 +339,16 @@ const ChartPlaceholder: React.FC = () => (
 
 // Main Component
 export default function EstadisticasView() {
-    const { user, isLoading } = useUser();
+    const {  isLoading } = useUser();
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { getApiService, isReady } = useAuth();
+    const { getApiService, isReady, user } = useAuth();
     const { stats, loading, error, fetchStatistics } = useStatistics();
+    const router = useRouter();
+
+    if(!user || !user.roles.includes(Roles.Admin) || !user.roles.includes(Roles.Encargado)){
+        router.replace("/not-found");
+        return null; 
+    }
 
     useEffect(() => {
         if (!isReady) return;

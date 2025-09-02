@@ -19,6 +19,7 @@ import { useRouter } from "next/navigation";
 import LocationDetailsModal from "@/components/LocationDetailsModal/LocationDetailsModal";
 import { IconButton } from "@mui/material";
 import VisibilityIcon from "@mui/icons-material/Visibility";
+import { Roles } from "@/domain/enum/Roles";
 
 const buttons = [{ label: "Agregar", path: "/locaciones/agregar" }];
 
@@ -38,10 +39,15 @@ export default function LocacionesView() {
     const [shouldFetch, setShouldFetch] = useState<boolean>(true);
     const [selectedLocation, setSelectedLocation] = useState<Locacion | null>(null);
     const [showDetailsModal, setShowDetailsModal] = useState<boolean>(false);
-    const { getApiService } = useAuth();
+    const { getApiService, user } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
     const router = useRouter();
+
+    if(!user || !user.roles.includes(Roles.Admin)){
+        router.replace("/not-found");
+        return null; 
+    }
 
     useEffect(() => {
         let isMounted = true;

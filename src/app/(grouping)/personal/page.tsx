@@ -15,7 +15,8 @@ import { transformToItems } from '@/utilities/transform';
 import Link from 'next/link';
 import { useItemsManager } from '@/hooks/useItemsManager';
 import GenericModal from '@/components/modal/GenericModal';
-
+import { useRouter } from "next/navigation";
+import { Roles } from '@/domain/enum/Roles';
 interface UsersResponse {
     users: User[];
 }
@@ -32,9 +33,16 @@ export default function PersonalPage() {
     const [selectedRole, setSelectedRole] = useState<string>('');
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>('');
-    const { getApiService } = useAuth();
+    const { getApiService, user } = useAuth();
     const { withLoading } = useLoading();
     const apiService = getApiService();
+
+    const router = useRouter();
+
+    if(!user || !user.roles.includes(Roles.Admin)){
+      router.replace("/not-found");
+      return null; 
+    }
 
     const {
         items: usuarios,

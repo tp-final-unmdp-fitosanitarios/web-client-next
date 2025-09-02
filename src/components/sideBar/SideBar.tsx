@@ -26,28 +26,21 @@ import PersonIcon from '@mui/icons-material/Person';
 import WorkIcon from '@mui/icons-material/Work';
 import EmailIcon from '@mui/icons-material/Email';
 import SettingsIcon from '@mui/icons-material/Settings';
+import PeopleIcon from '@mui/icons-material/People';
+import BuildIcon from '@mui/icons-material/Build';
+import LocationOnIcon from '@mui/icons-material/LocationOn';
+import AgricultureIcon from '@mui/icons-material/Agriculture';
+import { Roles } from '@/domain/enum/Roles';
 
 const userDataIcons = [
   <PersonIcon />,
   <WorkIcon />,
   <EmailIcon />
-]
-
-const icons = [
-  <HomeIcon />,
-  <ShoppingCartIcon />,
-  <LocalOfferIcon />,
-  <InventoryIcon />,
-  <BarChartIcon />,
 ];
-
-const paths = ['Home', 'Productos', 'Aplicaciones', 'Stock', 'Estadisticas'];
-const offlinePaths = ['Home', 'Aplicaciones'];
-const offlineIcons = [<HomeIcon />,<LocalOfferIcon />];
 
 export default function SideBar() {
   const [open, setOpen] = React.useState(false);
-  const { logout,isOnline } = useAuth();
+  const { logout, isOnline } = useAuth();
   const { user } = useUser();
   
   const toggleDrawer = (newOpen: boolean) => () => {
@@ -59,7 +52,62 @@ export default function SideBar() {
     name: user ? `${user.first_name} ${user.last_name}` : 'Cargando...',
     role: user?.roles?.[0] || 'Sin rol asignado',
     email: user?.email || 'Sin email'
-  }
+  };
+
+  // Determinar navegación según el rol del usuario (siguiendo la lógica de home/page.tsx)
+  const getNavigationItems = () => {
+    if (!user || !Array.isArray(user.roles) || user.roles.length === 0) {
+      return { paths: [], icons: [], offlinePaths: [], offlineIcons: [] };
+    }
+
+    const role = user.roles[0];
+
+    if (role === Roles.Admin) {
+      return {
+        paths: ['Home', 'Personal', 'Maquinas', 'Estadisticas', 'Productos', 'Stock', 'Locaciones', 'Cultivos'],
+        icons: [
+          <HomeIcon />,
+          <PeopleIcon />,
+          <BuildIcon />,
+          <BarChartIcon />,
+          <ShoppingCartIcon />,
+          <InventoryIcon />,
+          <LocationOnIcon />,
+          <AgricultureIcon />
+        ],
+        offlinePaths: ['Home'],
+        offlineIcons: [<HomeIcon />]
+      };
+    } else if (role === Roles.Aplicador) {
+      return {
+        paths: ['Home', 'Aplicaciones', 'Stock', 'Cultivos'],
+        icons: [
+          <HomeIcon />,
+          <LocalOfferIcon />,
+          <InventoryIcon />,
+          <AgricultureIcon />
+        ],
+        offlinePaths: ['Home', 'Aplicaciones'],
+        offlineIcons: [<HomeIcon />,<LocalOfferIcon />]
+      };
+    } else {
+      // Roles.Encargado o cualquier otro rol
+      return {
+        paths: ['Home', 'Aplicaciones', 'Stock', 'Estadisticas', 'Cultivos'],
+        icons: [
+          <HomeIcon />,
+          <LocalOfferIcon />,
+          <InventoryIcon />,
+          <BarChartIcon />,
+          <AgricultureIcon />
+        ],
+        offlinePaths: ['Home', 'Aplicaciones'],
+        offlineIcons: [<HomeIcon />,<LocalOfferIcon />]
+      };
+    }
+  };
+
+  const { paths, icons, offlinePaths, offlineIcons } = getNavigationItems();
 
   const DrawerList = (
     <Box className={styles.drawerContainer} role="presentation" onClick={toggleDrawer(false)}>

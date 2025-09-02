@@ -46,7 +46,8 @@ useEffect(() => {
     buttons.push(
       { label: "Aplicaciones", path: "/aplicaciones", disabled:false },
       { label: "Stock", path: "/stock", disabled:false },
-      { label: "Estadísticas", path: "/estadisticas", disabled:false }
+      { label: "Estadísticas", path: "/estadisticas", disabled:false },
+      { label: "Cultivos", path: "/cultivos", disabled:false }
     );
   }
 

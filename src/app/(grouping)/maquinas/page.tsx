@@ -13,13 +13,15 @@ import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
+import { Roles } from "@/domain/enum/Roles";
+import { useRouter } from "next/navigation";
+
 const buttons = [{ label: "Agregar", path: "/maquinas/agregar" }];
 
 export default function MaquinasView() {
-  const { getApiService } = useAuth();
+  const { getApiService, user } = useAuth();
   const { withLoading } = useLoading();
   const apiService = getApiService();
-
   const [maquinasFromServer, setMaquinasFromServer] = useState<Maquina[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
   const [error, setError] = useState<string>("");
@@ -28,6 +30,12 @@ export default function MaquinasView() {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [pageElements, setPageElements] = useState(0);
+  const router = useRouter();
+
+  if(!user || !user.roles.includes(Roles.Admin)){
+    router.replace("/not-found");
+    return null; 
+  }
 
   useEffect(() => {
     const fetchMaquinas = async () => {

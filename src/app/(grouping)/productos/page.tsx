@@ -17,6 +17,8 @@ import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { useRouter } from "next/navigation";
 import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
+import { Roles } from "@/domain/enum/Roles";
+
 const buttons = [
     { label: "Agregar", path: "/productos/agregar" },
     { label: "Agroquímicos", path: "/productos/agroquimicos" },
@@ -33,10 +35,15 @@ export default function ProductosView() {
      const [totalPages, setTotalPages] = useState(0);
      const [totalElements, setTotalElements] = useState(0);
      const [pageElements, setPageElements] = useState(0);
-     const { getApiService } = useAuth();
+     const { getApiService, user } = useAuth();
      const { withLoading } = useLoading();
      const apiService = getApiService();
      const router = useRouter();
+
+    if(!user || !user.roles.includes(Roles.Admin)){
+        router.replace("/not-found");
+        return null; 
+    }
 
     // Debounce search input
     useEffect(() => {

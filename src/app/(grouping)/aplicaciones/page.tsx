@@ -16,9 +16,11 @@ import { Locacion } from '@/domain/models/Locacion';
 import { Producto } from '@/domain/models/Producto';
 import NavigationLink from '@/components/NavigationLink/NavigationLink';
 import { EstadoAplicacion } from '@/domain/enum/EstadoAplicacion';
+import { Roles } from '@/domain/enum/Roles';
+import { useRouter } from 'next/navigation';
 
 export default function AplicacionesPage() {
-    const { getApiService, isReady, isOnline } = useAuth();
+    const { getApiService, isReady, isOnline, user } = useAuth();
     const apiService = getApiService();
     const { withLoading } = useLoading();
 
@@ -33,6 +35,13 @@ export default function AplicacionesPage() {
     const [totalPages, setTotalPages] = useState(0);
     const [totalElements, setTotalElements] = useState(0);
     const [pageElements, setPageElements] = useState(0);
+
+    const router = useRouter();
+
+    if(!user || user.roles.includes(Roles.Admin)){
+        router.replace("/not-found");
+        return null; 
+    }
     
     const fetchAplicaciones = async () => {
       console.log('[UI] fetchAplicaciones start', { status, page, pageSize });
