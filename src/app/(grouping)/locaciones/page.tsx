@@ -46,7 +46,6 @@ export default function LocacionesView() {
 
     if(!user || !user.roles.includes(Roles.Admin)){
         router.replace("/not-found");
-        return null; 
     }
 
     useEffect(() => {

@@ -12,10 +12,10 @@ import { Maquina } from "@/domain/models/Maquina";
 import { useAuth } from "@/components/Auth/AuthProvider";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
-import { Pagination, TextField, MenuItem, Box, Typography } from "@mui/material";
 import { Roles } from "@/domain/enum/Roles";
 import { useRouter } from "next/navigation";
 
+import PaginationControls from "@/components/PaginationControls/paginationControls";
 const buttons = [{ label: "Agregar", path: "/maquinas/agregar" }];
 
 export default function MaquinasView() {
@@ -34,7 +34,6 @@ export default function MaquinasView() {
 
   if(!user || !user.roles.includes(Roles.Admin)){
     router.replace("/not-found");
-    return null; 
   }
 
   useEffect(() => {
@@ -92,7 +91,7 @@ export default function MaquinasView() {
     try {
       const deleteResults = await Promise.all(
         selectedIds.map(async (id) => {
-          const response = await apiService.delete('machines',id); // Asegúrate de usar el endpoint correcto para eliminar por ID
+          const response = await apiService.delete('machines', id); // Asegúrate de usar el endpoint correcto para eliminar por ID
           return response.success;
         })
       );
@@ -105,7 +104,7 @@ export default function MaquinasView() {
         alert("Algunas máquinas no pudieron ser eliminadas.");
       }
     } catch (err) {
-     console.warn("Error al conectar con el servidor",err);
+      console.warn("Error al conectar con el servidor", err);
     }
   };
 
@@ -135,69 +134,53 @@ export default function MaquinasView() {
   return (
     <div className="page-container">
       <div className="content-wrap">
-      <MenuBar showMenu={false} showArrow={true} path="home"/>
-      <h1 className={styles.title}>Máquinas</h1>
+        <MenuBar showMenu={false} showArrow={true} path="home" />
+        <h1 className={styles.title}>Máquinas</h1>
 
-      {items.length > 0 ? (
-        <>
-          <ItemList
-            items={items}
-            displayKeys={campos}
-            onSelect={toggleSelectItem}
-            selectedIds={selectedIds}
-            selectItems={true}
-            deleteItems={false}
-            selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
-          />
-          {/* Paginación */}
-          <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', mb: 2, marginTop: 2 }}>
-            <Pagination
-              count={totalPages}
-              page={page + 1}
-              onChange={handlePageChange}
-              color="primary"
-              size="large"
+        {items.length > 0 ? (
+          <>
+            <ItemList
+              items={items}
+              displayKeys={campos}
+              onSelect={toggleSelectItem}
+              selectedIds={selectedIds}
+              selectItems={true}
+              deleteItems={false}
+              selectSingleItem={false} // Puedes cambiarlo a true si solo quieres permitir seleccionar una máquina a la vez para eliminar
             />
-            <Box sx={{ mt: 1 }}>
-              <TextField
-                select
-                label="Elementos por página"
-                value={pageSize}
-                onChange={handlePageSizeChange}
-                sx={{ width: 180 }}
-                size="small"
-              >
-                {[5, 10, 20, 50].map((size) => (
-                  <MenuItem key={size} value={size}>{size}</MenuItem>
-                ))}
-              </TextField>
-            </Box>
-            <Typography variant="body2" color="text.secondary" sx={{ mt: 1 }}>
-              Mostrando {pageElements} de {totalElements} elementos
-            </Typography>
-          </Box>
-        </>
-      ) : (
-        <p style={{textAlign: "center"}}>No hay máquinas disponibles</p>
-      )}
+            {/* Paginación */}
+            <PaginationControls
+              page={page}
+              pageSize={pageSize}
+              totalPages={totalPages}
+              totalElements={totalElements}
+              pageElements={pageElements}
+              onPageChange={handlePageChange}
+              onPageSizeChange={handlePageSizeChange}
+            />
 
-      <div className={styles.buttonContainer}>
-        {selectedIds.length > 0 && (
-          <button
-            className={`button button-secondary ${styles.buttonHome}`}
-            onClick={handleQuitarItems}
-          >
-            Quitar
-          </button>
+          </>
+        ) : (
+          <p style={{ textAlign: "center" }}>No hay máquinas disponibles</p>
         )}
-        {buttons.map((button, index) => (
-          <Link key={index} href={button.path}>
-            <button className={`button button-primary ${styles.buttonHome}`}>
-              {button.label}
+
+        <div className={styles.buttonContainer}>
+          {selectedIds.length > 0 && (
+            <button
+              className={`button button-secondary ${styles.buttonHome}`}
+              onClick={handleQuitarItems}
+            >
+              Quitar
             </button>
-          </Link>
-        ))}
-      </div>
+          )}
+          {buttons.map((button, index) => (
+            <Link key={index} href={button.path}>
+              <button className={`button button-primary ${styles.buttonHome}`}>
+                {button.label}
+              </button>
+            </Link>
+          ))}
+        </div>
       </div>
       <Footer />
       <GenericModal

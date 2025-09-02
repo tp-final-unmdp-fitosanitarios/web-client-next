@@ -47,6 +47,7 @@ export default function AgregarUsuarioPage() { // to do parece que estoy mandand
         last_name: String(inputData.last_name),
         email: String(inputData.email),
         roles: Array.isArray(inputData.roles) ? inputData.roles : [String(inputData.roles)],
+        phone_number: String(inputData.phone_number),
         company_id: ''
       },
       password: String(inputData.password),
@@ -54,7 +55,7 @@ export default function AgregarUsuarioPage() { // to do parece que estoy mandand
 
     try {
       const response = await apiService.create<CreateUserResponse>('/users', payload);
-      
+
       if (response.success && response.status === 200) {
         setNewUser({
           id: '',
@@ -83,11 +84,11 @@ export default function AgregarUsuarioPage() { // to do parece que estoy mandand
   };
 
   const isFormValid = (formData: Record<string, string | string[]>) => {
-    return formData.first_name && 
-           formData.last_name && 
-           formData.email && 
-           formData.password && 
-           formData.roles;
+    return formData.first_name &&
+      formData.last_name &&
+      formData.email &&
+      formData.password &&
+      formData.roles;
   };
 
   const fields: Field[] = [
@@ -117,6 +118,11 @@ export default function AgregarUsuarioPage() { // to do parece que estoy mandand
       type: 'select',
       options: roles.map(role => role.value),
     },
+    {
+      name: 'phone_number',
+      label: 'Numero de telefono',
+      type: 'text',
+    }
   ];
 
   return (
@@ -133,6 +139,7 @@ export default function AgregarUsuarioPage() { // to do parece que estoy mandand
           equalButtonWidth={true}
           isSubmitDisabled={(formData) => !isFormValid(formData)}
         />
+
       </div>
       <Footer />
       <GenericModal

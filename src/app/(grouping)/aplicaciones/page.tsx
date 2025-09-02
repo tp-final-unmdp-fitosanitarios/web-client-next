@@ -40,7 +40,6 @@ export default function AplicacionesPage() {
 
     if(!user || user.roles.includes(Roles.Admin)){
         router.replace("/not-found");
-        return null; 
     }
     
     const fetchAplicaciones = async () => {

@@ -118,13 +118,21 @@
   }
 
   .buttonContainer {
-    margin-top: 0px;
+    
+    margin-top: 10px;
+    gap:10px;
     flex-direction: column;
     align-items: center;
     padding: 0;
     width: 90%;
   }
 
+  .disabledButton {
+    opacity: 0.5;
+    pointer-events: none;
+    cursor: not-allowed;
+  }
+  
   .buttonHome {
     margin: 15px auto;
     width: 100%;

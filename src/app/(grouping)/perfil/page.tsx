@@ -101,24 +101,24 @@ export default function PerfilPage() {
       defaultValue: currentUser?.email || '',
       required: true
     },
-    /*{
+    {
       name: 'phone_number',
       label: 'Número de teléfono',
       type: 'text',
       defaultValue: currentUser?.phone_number || ''
     },
-    {
-      name: 'chat_id',
-      label: 'ID de Chat',
-      type: 'text',
-      defaultValue: currentUser?.chat_id || ''
-    },
-    {
-      name: 'telegram_id',
-      label: 'ID de Telegram',
-      type: 'text',
-      defaultValue: currentUser?.telegram_id || ''
-    }*/
+    // {
+    //   name: 'chat_id',
+    //   label: 'ID de Chat',
+    //   type: 'text',
+    //   defaultValue: currentUser?.chat_id || ''
+    // },
+    // {
+    //   name: 'telegram_id',
+    //   label: 'ID de Telegram',
+    //   type: 'text',
+    //   defaultValue: currentUser?.telegram_id || ''
+    // }
   ];
 
   if (isLoading) {
