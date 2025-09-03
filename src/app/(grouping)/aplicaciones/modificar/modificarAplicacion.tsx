@@ -127,7 +127,7 @@ const ModificarAplicacionPage: React.FC = () => {
             return locaciones;
         }
         catch (e: any) {
-            //console.log(e.message);
+            console.error(e.message);
             return [];
         }
     }
@@ -140,7 +140,7 @@ const ModificarAplicacionPage: React.FC = () => {
             return aplicadores;
         }
         catch (e: any) {
-            //console.log(e.message);
+            console.error(e.message);
             setApplicators([]);
             return [];
         }
@@ -158,7 +158,7 @@ const ModificarAplicacionPage: React.FC = () => {
             setProductosExistentes(prods);
         }
         catch (e: any) {
-            //console.log(e.message);
+            console.error(e.message);
             return [];
         }
     }

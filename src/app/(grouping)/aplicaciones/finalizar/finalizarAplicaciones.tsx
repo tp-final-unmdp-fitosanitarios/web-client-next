@@ -87,7 +87,7 @@ export default function FinalizarAplicacion() {
             setProductosExistentes(prods);
         }
         catch (e: any) {
-            //console.log(e.message);
+            console.error(e.message);
             return [];
         }
     }

@@ -64,7 +64,7 @@ const CrearAplicacionPage: React.FC = () => {
             return response.data;
         }
         catch (e: unknown) {
-            if (e instanceof Error) //console.log(e.message);
+            if (e instanceof Error) console.error(e.message);
             return [];
         }
     }
@@ -77,7 +77,7 @@ const CrearAplicacionPage: React.FC = () => {
             return aplicadores;
         }
         catch (e: unknown) {
-            if (e instanceof Error) //console.log(e.message);
+            if (e instanceof Error) console.error(e.message);
             setApplicators([]);
             return [];
         }
@@ -95,7 +95,7 @@ const CrearAplicacionPage: React.FC = () => {
             setProductosExistentes(prods);
         }
         catch (e: unknown) {
-            if (e instanceof Error) //console.log(e.message);
+            if (e instanceof Error) console.error(e.message);
             return [];
         }
     }
