@@ -8,7 +8,7 @@ import { useUser } from "@/hooks/useUser";
 import Footer from "@/components/Footer/Footer";
 import { useLoading } from "@/hooks/useLoading";
 import { useEffect } from "react";
-
+import ClientSideSetup from "@/components/ClientSideSetup/ClientSideSetup";
 export default function Home() {
   const { user, isLoading} = useUser();
   const { hideLoader } = useLoading();
@@ -54,6 +54,7 @@ useEffect(() => {
   return (
     <div className="page-container">
       <div className="content-wrap">
+        <ClientSideSetup />
         {user.roles[0] === Roles.Admin || user.roles[0] === Roles.Encargado ? 
           <HomepageJerarquico user={user} buttons={buttons} /> : 
           <HomepageAplicador user={user} buttons={buttons} />
