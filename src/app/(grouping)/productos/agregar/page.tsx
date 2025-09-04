@@ -69,7 +69,7 @@ export default function AgregarProductos() {
         const agroResponse = await apiService.get<ResponseItems<Agroquimico>>("/agrochemicals");
      
         if (agroResponse.success) {
-          console.log("Agroquímico recibido ", agroResponse.data.content);
+          //console.log("Agroquímico recibido ", agroResponse.data.content);
           setAgroquimicos(agroResponse.data.content);
          
         } else {
@@ -126,9 +126,9 @@ export default function AgregarProductos() {
       const response = await apiService.create<Producto>("/products", payload);
 
       if (response.success) {
-        console.log("Producto creado:", response.data);
+        //console.log("Producto creado:", response.data);
         setnewProducto(response.data);
-        console.log("new producto",newProducto);
+        //console.log("new producto",newProducto);
         handleOpenModal();
       } else {
         console.error("Error al crear el producto:", response.error);

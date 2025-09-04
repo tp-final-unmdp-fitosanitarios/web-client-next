@@ -146,7 +146,7 @@ const EditarProducto = () => {
       const response = await apiService.update<Producto>("/products", product?.id || "", payload);
 
       if (response.success) {
-        console.log("Producto actualizado:", response.data);
+        //console.log("Producto actualizado:", response.data);
         setProduct(response.data);
         handleOpenModal();
       

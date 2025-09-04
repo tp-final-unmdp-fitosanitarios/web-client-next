@@ -31,7 +31,7 @@ const ApplicationDetailModal: React.FC<ApplicationDetailModalProps> = ({
     };
 
     const getProductName = (productId: string) => {
-        console.log("aplicacion:: ",aplicacion);
+        //console.log("aplicacion:: ",aplicacion);
         const prod = productos.find(p => p.id === productId);
         return prod ? prod.name : productId;
     };

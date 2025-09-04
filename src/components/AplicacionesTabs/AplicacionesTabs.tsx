@@ -158,7 +158,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
       (async () => {
         const ids = await getPendingFinishAppIds();
         setPendingFinishIds(Array.isArray(ids) ? ids : []);
-        console.log("IDS pendientes de sync:", ids);
+        //console.log("IDS pendientes de sync:", ids);
       })();
     }
   }, [value]);
@@ -220,7 +220,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
   );
 
   if (value === 1) {
-    console.log("Items en curso:", itemsEnCurso);
+    //console.log("Items en curso:", itemsEnCurso);
   }
   const campos = ["cultivo", "fecha"];
 
@@ -231,7 +231,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
     }
 
     const roles = user.roles;
-    console.log(user);
+    //console.log(user);
     if (roles?.includes(Roles.Encargado))
       router.push(`aplicaciones/modificar?id=${id}`);
     else

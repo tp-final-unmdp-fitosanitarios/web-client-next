@@ -37,7 +37,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isOnline, setIsOnline] = useState(true);
 
   const logout = () => {
-    console.log("Eliminando el token: ", token);
+    //console.log("Eliminando el token: ", token);
     localStorage.removeItem("token");
     localStorage.removeItem("userId");
     localStorage.removeItem("userData");
@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       // Hacer un ping a tu backend o a un recurso muy liviano
       const apiService = getApiService();
       const response = await apiService.get("/health");
-      console.log(response);
+      //console.log(response);
       if (response.data === "OK") {
         return true;
       }
@@ -140,7 +140,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   }, [isReady, userId]); // Removí 'user' de las dependencias para evitar loops
 
   const login = async (updatedToken: string, userId: string, userData?: User) => {
-    console.log("Login called with:", { updatedToken, userId, userData });
+    //console.log("Login called with:", { updatedToken, userId, userData });
     
     localStorage.setItem("token", updatedToken);
     localStorage.setItem("userId", userId);
@@ -150,7 +150,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setIsAuthenticated(true);
     
     if (userData) {
-      console.log("Setting user data:", userData);
+      //console.log("Setting user data:", userData);
       setUser(userData);
       localStorage.setItem("userData", JSON.stringify(userData));
       

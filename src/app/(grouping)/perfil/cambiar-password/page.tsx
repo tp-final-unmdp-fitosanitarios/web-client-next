@@ -33,7 +33,7 @@ export default function CambiarPasswordPage() {
 
     try {
       const response = await apiService.updateDirect('/users/change-password', payload);
-      console.log('Response:', response);
+      //console.log('Response:', response);
       if (response.success && response.status === 200) {
         handleOpenModal(false);
         setTimeout(() => {

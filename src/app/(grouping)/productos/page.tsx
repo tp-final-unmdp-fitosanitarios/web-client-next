@@ -118,7 +118,7 @@ export default function ProductosView() {
         closeModal,
     } = useItemsManager<Producto>(productosFromServer);
 
-    console.log("productos", productos);
+    //console.log("productos", productos);
 
     const items = transformToItems(productos, "id", ["name"]);
     const campos = ["name"];
@@ -145,7 +145,7 @@ export default function ProductosView() {
     };
 
     const handleModificarItems = async () => {
-        console.log("Se modificara el item: " + selectedIds[0]);
+        //console.log("Se modificara el item: " + selectedIds[0]);
         //const prodToModify = apiService.get("products",selectedIds[0]);
         //Aca deberia tirar alert si selectedIds.length > 1
         router.push(`productos/edit?Id=${selectedIds[0]}`);

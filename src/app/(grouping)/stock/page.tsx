@@ -129,8 +129,8 @@ export default function StockView() {
                 );
                 
                 if (summaryResponse.success) {
-                    console.log("summaryResponse");
-                    console.log(summaryResponse);
+                    //console.log("summaryResponse");
+                    //console.log(summaryResponse);
                     setStockSummary(summaryResponse.data.content);
                     setTotalElements(summaryResponse.data.total_elements);
                     setPageElements(summaryResponse.data.number_of_elements);
@@ -222,8 +222,8 @@ export default function StockView() {
             );
             fetchProducts();
             if (response.success && isMounted.current) {
-                console.log("stock response");
-                console.log(response);
+                //console.log("stock response");
+                //console.log(response);
                 const stock = response.data.content;
                 setStockFromServer(stock);
                 setTotalPages(response.data.total_pages || 0);

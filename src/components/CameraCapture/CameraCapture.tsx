@@ -47,8 +47,8 @@ const CameraCapture: React.FC<CameraCaptureProps> = ({ isOpen, onClose, onCaptur
                         height: { ideal: 720 }
                     } 
                 });
-            } catch (rearCameraError) {
-                console.log('Rear camera failed, trying front camera:', rearCameraError);
+            } catch (error) {
+                console.log('Rear camera failed, trying front camera:', error);
                 // Fallback to front camera
                 mediaStream = await navigator.mediaDevices.getUserMedia({ 
                     video: { 
