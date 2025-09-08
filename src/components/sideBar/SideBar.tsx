@@ -42,7 +42,7 @@ export default function SideBar() {
   const [open, setOpen] = React.useState(false);
   const { logout, isOnline } = useAuth();
   const { user } = useUser();
-  
+
   const toggleDrawer = (newOpen: boolean) => () => {
     setOpen(newOpen);
   };
@@ -88,7 +88,7 @@ export default function SideBar() {
           <AgricultureIcon />
         ],
         offlinePaths: ['Home', 'Aplicaciones'],
-        offlineIcons: [<HomeIcon />,<LocalOfferIcon />]
+        offlineIcons: [<HomeIcon />, <LocalOfferIcon />]
       };
     } else {
       // Roles.Encargado o cualquier otro rol
@@ -102,7 +102,7 @@ export default function SideBar() {
           <AgricultureIcon />
         ],
         offlinePaths: ['Home', 'Aplicaciones'],
-        offlineIcons: [<HomeIcon />,<LocalOfferIcon />]
+        offlineIcons: [<HomeIcon />, <LocalOfferIcon />]
       };
     }
   };
@@ -111,7 +111,7 @@ export default function SideBar() {
 
   const DrawerList = (
     <Box className={styles.drawerContainer} role="presentation" onClick={toggleDrawer(false)}>
-    <p className={styles.userData}>Datos de usuario</p>
+      <p className={styles.userData}>Datos de usuario</p>
       <List>
         {[userData.name, userData.role, userData.email].map((text, index) => (
           <ListItem key={text} disablePadding>
@@ -119,7 +119,14 @@ export default function SideBar() {
               <ListItemIcon className={styles.icon}>
                 {userDataIcons[index]}
               </ListItemIcon>
-              <ListItemText className={styles.userName} primary={text} />
+              <ListItemText
+                className={styles.userName}
+                primary={text}
+                primaryTypographyProps={{
+                  noWrap: true,
+                  title: text
+                }}
+              />
             </ListItemButton>
           </ListItem>
         ))}
@@ -138,18 +145,24 @@ export default function SideBar() {
       <Divider />
       <p className={styles.userData}>Navegacion </p>
       <List>
-        {(isOnline ? paths : offlinePaths).map((text, index) => (
-          <ListItem key={text} disablePadding>
-            <NavigationLink href={`/${text.toLowerCase()}`} className={styles.link}>
-              <ListItemButton className={styles.listItemButton}>
-                <ListItemIcon className={styles.icon}>
-                  {isOnline ? icons[index] : offlineIcons[index] }
-                </ListItemIcon>
-                <ListItemText primary={text} />
-              </ListItemButton>
-            </NavigationLink>
-          </ListItem>
-        ))}
+        {(isOnline ? paths : offlinePaths).map((text, index) => {
+          const href = text === "Estadisticas"
+            ? "/estadisticas/v2"
+            : `/${text.toLowerCase()}`;
+
+          return (
+            <ListItem key={text} disablePadding>
+              <NavigationLink href={href} className={styles.link}>
+                <ListItemButton className={styles.listItemButton}>
+                  <ListItemIcon className={styles.icon}>
+                    {isOnline ? icons[index] : offlineIcons[index]}
+                  </ListItemIcon>
+                  <ListItemText primary={text} />
+                </ListItemButton>
+              </NavigationLink>
+            </ListItem>
+          );
+        })}
       </List>
       <Divider />
       <div className={styles.logoutSection}>

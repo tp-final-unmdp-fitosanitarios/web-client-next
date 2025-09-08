@@ -38,13 +38,17 @@ export default function IniciarAplicacion() {
         }
     }
 
-   useEffect(() => {
-        if(!isReady) return;
+ useEffect(() => {
+    if (!isReady) return; 
 
-        fetchApplication();
-        
-    }, [applicationId,isReady]);
+    if (!user || !user.roles.includes(Roles.Aplicador)) {
+        router.push("/home");
+        return;
+    }
 
+    // Si el usuario es aplicador, carga la aplicación
+    fetchApplication();
+}, [applicationId, isReady, user]);
 
     if (loading) 
         // return <LoaderGlobal />; // Descomenta esta línea para usar el loader global

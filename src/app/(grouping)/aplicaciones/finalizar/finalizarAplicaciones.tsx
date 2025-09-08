@@ -28,6 +28,7 @@ import CameraAltIcon from '@mui/icons-material/CameraAlt';
 import CameraCapture from '@/components/CameraCapture/CameraCapture';
 import { useLoaderStore } from '@/contexts/loaderStore';
 import { useWarmupAlertStore } from "@/contexts/warmupAlertStore";
+import { Roles } from "@/domain/enum/Roles";
 
 type RecipeItemAAgregar = RecipeItem & {
     id: string;
@@ -42,7 +43,7 @@ type ProductoExistente = Producto & {
 export default function FinalizarAplicacion() {
     const searchParams = useSearchParams();
     const applicationId = searchParams.get("id");
-    const { getApiService } = useAuth();
+    const { getApiService, isReady, user } = useAuth();
     const apiService = getApiService();
     const router = useRouter();
     const { withLoading } = useLoading();
@@ -244,9 +245,19 @@ export default function FinalizarAplicacion() {
         setLoading(false);
     }
 
-    useEffect(() => {
+    
+     useEffect(() => {
+        if (!isReady) return; 
+    
+        if (!user || !user.roles.includes(Roles.Aplicador)) {
+            router.push("/home");
+            return;
+        }
+    
         fetchData();
-    }, [applicationId]);
+    }, [isReady, user]);
+
+
 
     useEffect(() => {
         if (aplicacion) {

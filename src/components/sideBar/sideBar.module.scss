@@ -115,3 +115,15 @@
     background-color: #dee2e6;
   }
 }
+
+.userDataItem {
+  display: flex;
+  align-items: center;
+  width: 100%; // asegurar que no crezca más que el contenedor
+}
+
+.userName {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}

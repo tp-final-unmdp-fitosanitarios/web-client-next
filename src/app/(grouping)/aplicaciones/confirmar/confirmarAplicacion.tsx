@@ -24,21 +24,43 @@ export default function ConfirmarAplicacion() {
     const router = useRouter();
     const { withLoading } = useLoading();
     const { hideLoader } = useLoaderStore();
+    const [productosDetalles, setProductosDetalles] = useState<{ [key: string]: string }>({});
+
+    const fetchProductosDetalles = async (aplicacion: Aplicacion) => {
+        try {
+            const productosIds = aplicacion?.recipe?.recipe_items?.map(item => item.product_id) || [];
+            const detalles = await Promise.all(
+                productosIds.map(async (id) => {
+                    const response = await apiService.get<{ id: number; name: string }>(`products/${id}`);
+                    return { id, name: response.data.name };
+                })
+            );
+            const detallesMap = detalles.reduce((acc, curr) => {
+                acc[curr.id] = curr.name;
+                return acc;
+            }, {} as { [key: string]: string });
+            setProductosDetalles(detallesMap);
+        } catch (error) {
+            console.error("Error al obtener detalles de productos:", error);
+        }
+    };
 
     const fetchApplication = async () => {
         try {
             const response = await apiService.get<Aplicacion>(`applications/${applicationId}`);
             setAplicacion(response.data);
+            await fetchProductosDetalles(response.data); // ⬅️ traer nombres después de cargar la aplicación
             setLoading(false);
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+            // eslint-disable-next-line @typescript-eslint/no-explicit-any
         } catch (e: any) {
             console.error("Error en la solicitud:", e.message);
             return null;
         }
-    }
+    };
+
 
     useEffect(() => {
-        if(!isReady) return;
+        if (!isReady) return;
         fetchApplication();
     }, [applicationId, isReady]);
 
@@ -47,12 +69,14 @@ export default function ConfirmarAplicacion() {
             hideLoader();
         }
     }, [loading]);
-
     const handleRechazar = async () => {
-     
+        const req = {
+            status: "REJECTED"    // 👈 este valor lo espera tu backend
+        };
+
         try {
             const response = await withLoading(
-                apiService.create(`applications/${aplicacion?.id}/reject`, {}),
+                apiService.create(`applications/${aplicacion?.id}/status`, req),
                 "Rechazando aplicación..."
             );
             if (response.success) {
@@ -66,14 +90,13 @@ export default function ConfirmarAplicacion() {
             console.error("Error al rechazar la aplicación:", error);
         }
     };
-
     const handleAceptar = async () => {
         const req = {
-            "status":"APPROVED"
+            "status": "APPROVED"
         }
         try {
             const response = await withLoading(
-                apiService.create(`applications/${aplicacion?.id}/status`,req),
+                apiService.create(`applications/${aplicacion?.id}/status`, req),
                 "Aprobando aplicación..."
             );
             if (response.success) {
@@ -90,11 +113,11 @@ export default function ConfirmarAplicacion() {
 
     const handleModificar = async () => {
         const req = {
-            "status":"NEEDS_REUPLOAD"
+            "status": "NEEDS_REUPLOAD"
         }
         try {
             const response = await withLoading(
-                apiService.create(`applications/${aplicacion?.id}/status`,req),
+                apiService.create(`applications/${aplicacion?.id}/status`, req),
                 "Modificando aplicación..."
             );
             if (response.success) {
@@ -114,7 +137,7 @@ export default function ConfirmarAplicacion() {
         router.push("/aplicaciones");
     }
 
-    if (loading) 
+    if (loading)
         return <div>Cargando...</div>;
     if (!aplicacion) return <div>No se encontró la aplicación.</div>;
 
@@ -123,24 +146,23 @@ export default function ConfirmarAplicacion() {
 
     const productos = aplicacion.recipe?.recipe_items?.map((item) => ({
         id: item.product_id,
-        title: `${item.product_id}`,
-        description: item.dose_type === "SURFACE" ? item.amount+item.unit+"/Ha" : item.amount+item.unit
-    }));
+        title: productosDetalles[item.product_id] || item.product_id,
+        description: item.dose_type === "SURFACE"
+            ? item.amount + item.unit + "/Ha"
+            : item.amount + item.unit + " en total"
+    })) || [];
 
-    const items = productos?.map(p => ({
-       
-
+    const items = productos.map(p => ({
         id: p.id.toString(),
         title: p.title,
         description: p.description
-    })) || [];
-
+    }));
     //console.log("items:",items);
 
     return (
         <div className="page-container">
             <div className="content-wrap">
-                <MenuBar showMenu={false} showArrow={true} path="/aplicaciones"/>
+                <MenuBar showMenu={false} showArrow={true} path="/aplicaciones" />
                 <div className={styles.confirmarHeader}>Confirmar Aplicación</div>
                 <div className={styles.container}>
                     <div className={styles.confirmarInfo}>
@@ -156,27 +178,27 @@ export default function ConfirmarAplicacion() {
                         selectSingleItem={false}
                     />
                     <div className={`${styles.buttonContainer}`}>
-                        <button 
-                            className={`button button-danger ${styles.button}`} 
+                        <button
+                            className={`button ${styles.button} ${styles.rechazarButton}`}
                             onClick={handleRechazar}
                         >
                             Rechazar
                         </button>
-                        <button 
-                            className={`button button-secondary ${styles.button}`} 
+                        <button
+                            className={`button button-secondary ${styles.button}`}
                             onClick={handleModificar}
                         >
                             Solicitar edición
                         </button>
-                        <button 
-                            className={`button button-primary ${styles.button}`} 
+                        <button
+                            className={`button button-primary ${styles.button}`}
                             onClick={handleAceptar}
                         >
                             Aceptar
                         </button>
                     </div>
                 </div>
-                
+
                 <GenericModal
                     isOpen={confirmationModalOpen}
                     onClose={handleCloseConfirmationModal}

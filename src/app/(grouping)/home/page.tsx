@@ -30,7 +30,7 @@ useEffect(() => {
     buttons.push(
       { label: "Personal", path: "/personal", disabled:false },
       { label: "Maquinas", path: "/maquinas", disabled:false },
-      { label: "Estadísticas", path: "/estadisticas", disabled:false },
+      { label: "Estadísticas", path: "/estadisticas/v2", disabled:false },
       { label: "Productos", path: "/productos", disabled:false }, 
       { label: "Stock", path: "/stock", disabled:false },
       { label: "Ubicaciones", path: "/locaciones", disabled:false },
@@ -46,7 +46,7 @@ useEffect(() => {
     buttons.push(
       { label: "Aplicaciones", path: "/aplicaciones", disabled:false },
       { label: "Stock", path: "/stock", disabled:false },
-      { label: "Estadísticas", path: "/estadisticas", disabled:false },
+      { label: "Estadísticas", path: "/estadisticas/v2", disabled:false },
       { label: "Cultivos", path: "/cultivos", disabled:false }
     );
   }
