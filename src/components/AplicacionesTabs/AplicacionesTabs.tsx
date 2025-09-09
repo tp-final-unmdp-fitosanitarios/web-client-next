@@ -209,7 +209,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
   const itemsEnCurso = useMemo(() =>
     transformToItems(
       parsedAplicaciones
-        .filter((item) => value === 1 && item.estado === EstadoAplicacion.EnCurso)
+        .filter((item) => value === 1 && (item.estado === EstadoAplicacion.EnCurso || item.estado === EstadoAplicacion.NecesitaRevision) )
         .map(item => ({
           ...item,
           pendienteSync: pendingFinishIds.includes(item.id) // SOLO los que matchean

@@ -25,7 +25,7 @@ export default function Login() {
   const { getApiService, login } = useAuth();
   const { withLoading, showLoader } = useLoading();
   const fields: Field[] = [
-    { name: "email", label: "Nombre", type: "text" },
+    { name: "email", label: "Email", type: "text" },
     { name: "password", label: "Contraseña", type: "password" }, 
   ];
   const router = useRouter();
