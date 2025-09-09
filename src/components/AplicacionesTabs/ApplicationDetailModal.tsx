@@ -14,6 +14,7 @@ interface ApplicationDetailModalProps {
 const estadoToLabel: Record<string, string> = {
     PENDING: "Pendiente",
     IN_PROGRESS: "En curso",
+    NEEDS_REUPLOAD: "Necesita atencion",
     FINISHED: "Finalizada"
 };
 
