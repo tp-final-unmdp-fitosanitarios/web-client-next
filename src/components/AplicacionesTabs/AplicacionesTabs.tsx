@@ -177,7 +177,7 @@ export default function AplicacionesTabs({ aplicaciones, productos, locaciones, 
     .filter((item) => {
       const matchesTab =
         (value === 0 && item.status === EstadoAplicacion.Pendiente) ||
-        (value === 1 && item.status === EstadoAplicacion.EnCurso) ||
+        (value === 1 &&( item.status === EstadoAplicacion.EnCurso || item.status === EstadoAplicacion.NecesitaRevision)) ||
         (value === 2 && item.status === EstadoAplicacion.Finalizada && item.type === "INSTANT");
       if (!matchesTab) return false;
 
