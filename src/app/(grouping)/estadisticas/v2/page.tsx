@@ -496,7 +496,7 @@ const LocationPerformanceCard: React.FC<{ locationPerformance: LocationPerforman
                 </Grid>
                 <Grid item xs={6}>
                   <Typography variant="body2" color="textSecondary">
-                    Tasa de éxito: {AnalyticsService.formatPercentage(location.success_rate)}
+                   Tasa de éxito: {AnalyticsService.formatPercentage(location.average_application_success_rate)}
                   </Typography>
                 </Grid>
                 <Grid item xs={6}>
@@ -511,14 +511,14 @@ const LocationPerformanceCard: React.FC<{ locationPerformance: LocationPerforman
                 </Typography>
                 <LinearProgress 
                   variant="determinate" 
-                  value={location.success_rate || 0} 
+                  value={location.average_application_success_rate || 0} 
                   sx={{ 
                     height: 8, 
                     borderRadius: 4,
                     backgroundColor: '#e0e0e0',
                     '& .MuiLinearProgress-bar': {
-                      backgroundColor: (location.success_rate || 0) >= 90 ? '#4caf50' : 
-                                     (location.success_rate || 0) >= 80 ? '#ff9800' : '#f44336'
+                      backgroundColor: (location.average_application_success_rate || 0) >= 90 ? '#4caf50' : 
+                                     (location.average_application_success_rate || 0) >= 80 ? '#ff9800' : '#f44336'
                     }
                   }}
                 />
@@ -914,7 +914,7 @@ export default function EstadisticasV2View() {
             <Grid item xs={12} sm={6} md={4}>
               <StatCardV2
                 title="Superficie Tratada"
-                value={`${quickStats.total_surface_treated.toFixed(1)} ha`}
+                value={quickStats.total_surface_treated ? `${quickStats.total_surface_treated.toFixed(1)} ha` : "N/A"}
                 icon={<AgricultureIcon />}
                 color="#cbcabd"
                 subtitle="Hectáreas totales"
@@ -938,7 +938,7 @@ export default function EstadisticasV2View() {
             <Grid item xs={12} sm={6} md={4}>
               <StatCardV2
                 title="Tiempo Promedio"
-                value={`${(dashboardData?.operational_metrics?.average_lead_time_hours || 0).toFixed(1)} hrs`}
+                value={`${(dashboardData?.operational_metrics?.average_application_lead_time || 0).toFixed(1)} hrs`}
                 icon={<AssessmentIcon />}
                 color="#ff9800"
                 subtitle="Lead time de aplicaciones"
@@ -1054,7 +1054,7 @@ export default function EstadisticasV2View() {
                       <Typography variant="body2">{product.product_name}</Typography>
                     </Box>
                     <Typography variant="body2" sx={{ fontWeight: 'bold' }}>
-                      {AnalyticsService.formatInteger(product.total_usage)} {product.unit || ""}
+                      {AnalyticsService.formatInteger(product.total_amount_used)} {product.unit || ""}
                     </Typography>
                   </Box>
                 )) : (
@@ -1099,7 +1099,7 @@ export default function EstadisticasV2View() {
                 Gráfico de series temporales
               </Typography>
               <Typography variant="caption" sx={{ color: '#999', textAlign: 'center' }}>
-                {AnalyticsService.safeArrayLength(dashboardData?.time_series_analytics?.application_volume)} puntos de datos disponibles
+                {AnalyticsService.safeArrayLength(dashboardData?.time_series_analytics?.application_count)} puntos de datos disponibles
               </Typography>
             </Box>
           </Paper>

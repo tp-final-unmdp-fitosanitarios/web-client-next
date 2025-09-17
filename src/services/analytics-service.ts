@@ -57,7 +57,7 @@ export interface OperationalMetrics {
   application_success_rate: number;
   total_surface_treated: number;
   average_fuel_efficiency: number;
-  average_lead_time_hours: number;
+  average_application_lead_time: number;
   stock_out_events: number;
   period_start: string;
   period_end: string;
@@ -100,7 +100,7 @@ export interface ProductUsageAnalytics {
 export interface TopProduct {
   product_id: string;
   product_name: string;
-  total_usage: number;
+  total_amount_used: number;
   unit: ProductUnit;
 }
 
@@ -113,14 +113,14 @@ export interface LocationMetric {
   location_name: string;
   total_applications: number;
   successful_applications: number;
-  success_rate: number;
+  average_application_success_rate: number;
   total_surface_treated: number;
   average_fuel_efficiency: number;
 }
 
 export interface TimeSeriesAnalytics {
   stock_movements: TimeSeriesPoint[];
-  application_volume: TimeSeriesPoint[];
+  application_count: TimeSeriesPoint[];
   granularity: string;
 }
 
