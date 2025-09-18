@@ -240,7 +240,12 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
                                     onClick={() => handleClickMovement(movement)}
                                 >
                                     <p className={styles.movementInfo}>{`${movement.product.name} - ${movement.amount} ${movement.unit}`}</p>
-                                    <p className={styles.movementInfo}>{`Origen: ${movement.origin.name} - Destino: ${movement.destination.name}`}</p>
+                                    <p className={styles.movementInfo}>
+                                     {movement.origin && movement.destination
+                                     ? `Origen: ${movement.origin.name} - Destino: ${movement.destination.name}` : movement.origin  ? `Origen: ${movement.origin.name}` : movement.destination
+                                     ? `Destino: ${movement.destination.name}`
+                                     : 'Sin origen ni destino'}
+                                    </p>
                                 </div>
                             </div>
                         )
