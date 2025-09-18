@@ -47,11 +47,11 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
                     <div className={styles.outputContainer}>
                         <div className={styles.dataPresentation}>
                             <h4>Origen:</h4>
-                            <h4>{movement.origin.name}</h4>
+                            <h4>{movement.origin ? movement.origin.name : 'N/a'}</h4>
                         </div>
                         <div className={styles.dataPresentation}>
                             <h4>Destino:</h4>
-                            <h4>{movement.destination.name}</h4>
+                            <h4>{movement.destination ? movement.destination.name : 'Desconocido'}</h4>
                         </div>
                            <div className={styles.dataPresentation}>
                             <h4>Fecha:</h4>
