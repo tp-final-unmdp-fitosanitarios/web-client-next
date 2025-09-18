@@ -224,7 +224,7 @@ const StockMovements = () => {  //TODO: Cambiar los ids por los nombres de los p
             {/* Fin Filtros */}
             <div className={styles.container}>
                 <div className={styles.movementList}>
-                {
+                {/** deploy* */
                 movements.map((movement) => {
                     const isForced = movement.reason.toLocaleLowerCase().includes('force');
                     if(latestDate == null || new Date(movement.created_at).toLocaleDateString() !== new Date(latestDate).toLocaleDateString()){
