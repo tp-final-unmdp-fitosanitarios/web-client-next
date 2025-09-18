@@ -1,6 +1,6 @@
 @use '../../app/styles/variables' as *;
 
-.title {
+.title , .subtitle {
     color: $dark-color;
     display: flex;
     justify-content: center;

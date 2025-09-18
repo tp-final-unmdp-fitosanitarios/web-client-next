@@ -13,6 +13,14 @@ interface Props {
 
 const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) => {
     const isForced = movement?.reason?.toLocaleLowerCase().includes('force');
+
+     const getMovementType = () => {
+        if (movement?.origin && movement?.destination) return 'Movimiento';
+        if (movement?.destination && !movement?.origin) return 'Ingreso de stock';
+        if (movement?.origin && !movement?.destination) return 'Retiro de stock';
+        return 'Sin clasificar';
+    };
+
     
     return (
         <Modal 
@@ -36,6 +44,7 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
                 }}
             >
                 <h3 className={styles.title}>Resumen del Movimiento</h3>
+                 <h4 className={styles.subtitle}>{getMovementType()}</h4>
                 
                 {isForced && (
                     <div className={styles.forcedIndicator}>
