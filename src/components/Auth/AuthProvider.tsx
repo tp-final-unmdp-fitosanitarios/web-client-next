@@ -36,6 +36,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [isReady, setIsReady] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
 
+  const WARMUP_DONE_KEY = "warmup_aplicaciones_done_v2";
+
   const logout = () => {
     //console.log("Eliminando el token: ", token);
     localStorage.removeItem("token");
@@ -46,6 +48,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
     set_UserId(null);
     setIsLoadingUser(false);
+    sessionStorage.removeItem(WARMUP_DONE_KEY);
     clearAll();
     router.push("/login");
   };
@@ -144,6 +147,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     
     localStorage.setItem("token", updatedToken);
     localStorage.setItem("userId", userId);
+    sessionStorage.removeItem(WARMUP_DONE_KEY);
     
     setToken(updatedToken);
     setUserId(userId);

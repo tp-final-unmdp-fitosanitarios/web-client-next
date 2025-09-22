@@ -69,7 +69,7 @@ export default function MenuBar({ showMenu, showArrow, path }: MenuBarProps) {
             )
           )}
         </div>
-        <Link href="/home" passHref>
+        <Link className={styles.logoLink}href="/home" passHref>
           <Image className={styles.homeLogo} src={eppMarca} alt="Home Logo" />
         </Link>
 

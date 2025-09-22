@@ -72,6 +72,11 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2);
 }
 
+.logoLink{
+  display: flex;
+  justify-content: center;
+}
+
 @media (max-width: 500px) {
   .homeDate {
     font-size: 14px;

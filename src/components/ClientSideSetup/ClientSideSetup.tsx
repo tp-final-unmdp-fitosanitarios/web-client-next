@@ -9,17 +9,18 @@ import { useWarmupAlertStore } from "@/contexts/warmupAlertStore";
 const WARMUP_DONE_KEY = "warmup_aplicaciones_done_v2"; // nuevo key, cubre finalizar+iniciar
 
 export default function ClientSideSetup() {
-  const { user, token, getApiService } = useAuth();
+  const { user, getApiService } = useAuth();
   const { show, hide } = useWarmupAlertStore();
 
   useEffect(() => {
     if (
       user?.roles.includes("APPLICATOR") &&
-      token &&
+      localStorage.getItem("token")  &&
       typeof window !== "undefined" &&
       !sessionStorage.getItem(WARMUP_DONE_KEY)
     ) {
       show("Cargando datos para modo offline...");
+      const token = localStorage.getItem("token");
       const apiService = getApiService ? getApiService() : new ApiService(token, () => {});
 
       const warmupFor = async (status: string, routeBase: string) => {
@@ -55,7 +56,7 @@ export default function ClientSideSetup() {
         }
       })();
     }
-  }, [user, token, getApiService, show, hide]);
+  }, [user, getApiService, show, hide]);
   
   return null;
 }
