@@ -274,6 +274,7 @@ const campos = ["display"];
       <div className={styles.mainContainer}>
         <div className={styles.column}>
           <h2 className={styles.subtitle}>Stock disponible en {originName}</h2>
+          { itemsCurrentStock.length > 0 ? (
           <ItemList
             items={itemsCurrentStock}
             displayKeys={campos}
@@ -283,6 +284,10 @@ const campos = ["display"];
             onSelectSingleItem={handleSelectSingleItem}
             selectedIds={selectedId ? [selectedId] : []}
           />
+        ):(
+            <p>No hay stock en la locacion seleccionada</p>
+          )
+        }
         </div>
         <div className={styles.column}>
           <h2 className={styles.subtitle}>Productos a mover hacia {destinationName}</h2>

@@ -15,10 +15,17 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
     const isForced = movement?.reason?.toLocaleLowerCase().includes('force');
 
      const getMovementType = () => {
-        if (movement?.origin && movement?.destination) return 'Movimiento';
-        if (movement?.destination && !movement?.origin) return 'Ingreso de stock';
+        if (movement?.origin && movement?.destination) return 'Traslado';
+        if (movement?.destination && !movement?.origin && !movement.reason.includes("application")) return 'Ingreso de stock';
         if (movement?.origin && !movement?.destination) return 'Retiro de stock';
-        return 'Sin clasificar';
+        return 'Aplicacion';
+    };
+
+    const getAction = () => {
+        if (movement?.origin && movement?.destination) return 'trasladó';
+        if (movement?.destination && !movement?.origin && !movement.reason.includes("application")) return 'ingresó';
+        if (movement?.origin && !movement?.destination) return 'retiró';
+        return 'aplicó';
     };
 
     
@@ -69,7 +76,7 @@ const MovementDetailModal: React.FC<Props> = ({open, setModalClose, movement}) =
                     </div>
 
                     <div className={styles.productContainer}>
-                        <h4 className={styles.message}>Se trasladó el siguiente producto</h4>
+                        <h4 className={styles.message}>Se {getAction()} el siguiente producto:</h4>
                         <h4 className={styles.message}>{movement.product.name}</h4>
                         <h4 className={styles.message}>Cantidad: {movement.amount} {movement.product.unit}</h4>
                     </div>
